@@ -4,6 +4,7 @@ import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
 
+
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -37,24 +38,24 @@ const checkStatus = response => {
   throw error;
 };
 
-const cachedSave = (response, hashcode) => {
-  /**
-   * Clone a response data and store it in sessionStorage
-   * Does not support data other than json, Cache only json
-   */
-  const contentType = response.headers.get('Content-Type');
-  if (contentType && contentType.match(/application\/json/i)) {
-    // All data is saved as text
-    response
-      .clone()
-      .text()
-      .then(content => {
-        sessionStorage.setItem(hashcode, content);
-        sessionStorage.setItem(`${hashcode}:timestamp`, Date.now());
-      });
-  }
-  return response;
-};
+// const cachedSave = (response, hashcode) => {
+//   /**
+//    * Clone a response data and store it in sessionStorage
+//    * Does not support data other than json, Cache only json
+//    */
+//   const contentType = response.headers.get('Content-Type');
+//   if (contentType && contentType.match(/application\/json/i)) {
+//     // All data is saved as text
+//     response
+//       .clone()
+//       .text()
+//       .then(content => {
+//         sessionStorage.setItem(hashcode, content);
+//         sessionStorage.setItem(`${hashcode}:timestamp`, Date.now());
+//       });
+//   }
+//   return response;
+// };
 
 /**
  * Requests a URL, returning a promise.
@@ -80,8 +81,18 @@ export default function request(url, option) {
 
   const defaultOptions = {
     credentials: 'include',
+   
   };
+
+  
+  const defaultData = {
+      time: `${Date.parse(new Date()) / 1000}`,
+      token: JSON.parse(localStorage.getItem('token')),
+    } 
+  
+  
   const newOptions = { ...defaultOptions, ...options };
+    
   if (
     newOptions.method === 'POST' ||
     newOptions.method === 'PUT' ||
@@ -93,7 +104,7 @@ export default function request(url, option) {
         'Content-Type': 'application/json; charset=utf-8',
         ...newOptions.headers,
       };
-      newOptions.body = JSON.stringify(newOptions.body);
+  
     } else {
       // newOptions.body is FormData
       newOptions.headers = {
@@ -101,6 +112,8 @@ export default function request(url, option) {
         ...newOptions.headers,
       };
     }
+
+    newOptions.body = JSON.stringify(Object.assign({}, defaultData, newOptions.body))
   }
 
   const expirys = options.expirys && 60;
@@ -118,9 +131,12 @@ export default function request(url, option) {
       sessionStorage.removeItem(`${hashcode}:timestamp`);
     }
   }
-  return fetch(url, newOptions)
+  // const baseUrl = 'http://192.168.1.38'
+  // const baseUrl = 'https://maochenhui.top'
+  const newUrl = url
+  return fetch(newUrl, newOptions)
     .then(checkStatus)
-    .then(response => cachedSave(response, hashcode))
+    // .then(response => cachedSave(response, hashcode))
     .then(response => {
       // DELETE and 204 do not return data by default
       // using .json will report an error.

@@ -24,17 +24,17 @@ class StandardTable extends PureComponent {
     };
   }
 
-  static getDerivedStateFromProps(nextProps) {
-    // clean state
-    if (nextProps.selectedRows.length === 0) {
-      const needTotalList = initTotalList(nextProps.columns);
-      return {
-        selectedRowKeys: [],
-        needTotalList,
-      };
-    }
-    return null;
-  }
+  // static getDerivedStateFromProps(nextProps) {
+  //   // clean state
+  //   if (nextProps.selectedRows.length === 0) {
+  //     const needTotalList = initTotalList(nextProps.columns);
+  //     return {
+  //       selectedRowKeys: [],
+  //       needTotalList,
+  //     };
+  //   }
+  //   return null;
+  // }
 
   handleRowSelectChange = (selectedRowKeys, selectedRows) => {
     let { needTotalList } = this.state;
@@ -65,20 +65,20 @@ class StandardTable extends PureComponent {
     const { selectedRowKeys, needTotalList } = this.state;
     const { data = {}, rowKey, ...rest } = this.props;
     const { list = [], pagination } = data;
-
+    
     const paginationProps = {
       showSizeChanger: true,
       showQuickJumper: true,
       ...pagination,
     };
 
-    const rowSelection = {
-      selectedRowKeys,
-      onChange: this.handleRowSelectChange,
-      getCheckboxProps: record => ({
-        disabled: record.disabled,
-      }),
-    };
+    // const rowSelection = {
+    //   selectedRowKeys,
+    //   onChange: this.handleRowSelectChange,
+    //   getCheckboxProps: record => ({
+    //     disabled: record.disabled,
+    //   }),
+    // };
 
     return (
       <div className={styles.standardTable}>
@@ -106,8 +106,7 @@ class StandardTable extends PureComponent {
           />
         </div>
         <Table
-          rowKey={rowKey || 'key'}
-          rowSelection={rowSelection}
+          rowKey={rowKey || 'id'}
           dataSource={list}
           pagination={paginationProps}
           onChange={this.handleTableChange}

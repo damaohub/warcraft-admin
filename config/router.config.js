@@ -1,4 +1,13 @@
 export default [
+  //login
+  {
+    path: '/login',
+    component: '../layouts/UserLayout',
+    routes: [
+      { path: './', component: '/Login' },
+      
+    ]
+  },
   // user
   {
     path: '/user',
@@ -18,7 +27,7 @@ export default [
     authority: ['admin', 'user'],
     routes: [
       // dashboard
-      { path: '/', redirect: '/dashboard/analysis' },
+      { path: '/', redirect: '/races' },
       {
         path: '/dashboard',
         name: 'dashboard',
@@ -40,6 +49,24 @@ export default [
             component: './Dashboard/Workplace',
           },
         ],
+      },
+      //gameRole
+      {
+        path: '/gamerole',
+        icon: 'table',
+        name: 'gameRole',
+        routes: [
+          {
+            path: '/gamerole/races',
+            name: 'races',
+            component: './GameRole/Races',
+          },
+          {
+            path: '/gamerole/profession',
+            name: 'profession',
+            component: './GameRole/Profession',
+          }
+        ]
       },
       // forms
       {
