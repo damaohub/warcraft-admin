@@ -1,4 +1,9 @@
-import { queryProfession, removeProfession, addProfession, updateProfession } from '@/services/game';
+import {
+  queryProfession,
+  removeProfession,
+  addProfession,
+  updateProfession,
+} from '@/services/game';
 
 export default {
   namespace: 'profession',
@@ -23,7 +28,7 @@ export default {
         type: 'save',
         payload: response,
       });
-      if (callback)  yield callback();
+      if (callback) yield callback();
     },
     *remove({ payload, callback }, { call, put }) {
       const response = yield call(removeProfession, payload);

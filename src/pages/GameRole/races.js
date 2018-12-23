@@ -1,6 +1,6 @@
 import React, { Component, Fragment, PureComponent } from 'react';
 import { connect } from 'dva';
-import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm } from 'antd'
+import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -38,7 +38,6 @@ const CreateForm = Form.create()(props => {
   );
 });
 
-
 @Form.create()
 class UpdateForm extends PureComponent {
   static defaultProps = {
@@ -53,9 +52,8 @@ class UpdateForm extends PureComponent {
     this.state = {
       formVals: {
         name: props.values.name,
-        id: props.values.id
+        id: props.values.id,
       },
-      
     };
 
     this.formLayout = {
@@ -64,7 +62,7 @@ class UpdateForm extends PureComponent {
     };
   }
 
-  renderContent = (formVals) => {
+  renderContent = formVals => {
     const { form } = this.props;
     return [
       <FormItem key="race_name" {...this.formLayout} label="种族名称">
@@ -80,7 +78,7 @@ class UpdateForm extends PureComponent {
       //   })(<TextArea rows={4} placeholder="请输入至少五个字符" />)}
       // </FormItem>,
     ];
-  }
+  };
 
   renderFooter = () => {
     const { handleUpdateModalVisible, values } = this.props;
@@ -91,11 +89,11 @@ class UpdateForm extends PureComponent {
       <Button key="submit" type="primary" onClick={() => this.handleNext(values)}>
         完成
       </Button>,
-    ]
-  }
+    ];
+  };
 
   handleNext = () => {
-    const { form, handleUpdate, values} = this.props;
+    const { form, handleUpdate, values } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       const formVals = { ...values, ...fieldsValue };
@@ -104,12 +102,11 @@ class UpdateForm extends PureComponent {
           formVals,
         },
         () => {
-          handleUpdate(formVals); 
+          handleUpdate(formVals);
         }
       );
     });
   };
-
 
   render() {
     const { updateModalVisible, handleUpdateModalVisible, values } = this.props;
@@ -133,56 +130,55 @@ class UpdateForm extends PureComponent {
 }
 
 /* eslint react/no-multi-comp:0 */
-@connect(({races, loading}) => ({
+@connect(({ races, loading }) => ({
   races,
-  loading: loading.models.races
+  loading: loading.models.races,
 }))
 class RacesPage extends Component {
   state = {
     modalVisible: false,
     updateModalVisible: false,
-    formValues: {}
+    formValues: {},
   };
- 
+
   columns = [
     {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '名称',
       dataIndex: 'race_name',
       key: 'race_name',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '操作',
-      render: (text,record) => (
+      render: (text, record) => (
         <Fragment>
           <a onClick={() => this.handleUpdateModalVisible(true, record)}>更新</a>
           <Divider type="vertical" />
           <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
             <a>删除</a>
           </Popconfirm>
-         
         </Fragment>
       ),
-      align: 'center'
-    }
-  ]
+      align: 'center',
+    },
+  ];
 
   componentDidMount() {
     const { dispatch } = this.props;
-    this.handleFetch(dispatch)
+    this.handleFetch(dispatch);
   }
 
-  handleFetch = (dispatch) => {
+  handleFetch = dispatch => {
     dispatch({
-      type: 'races/fetch'
-    })
-  }
+      type: 'races/fetch',
+    });
+  };
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
@@ -216,13 +212,11 @@ class RacesPage extends Component {
     });
   };
 
-  handleUpdateModalVisible = (flag, record ) => {
-   
+  handleUpdateModalVisible = (flag, record) => {
     this.setState({
       updateModalVisible: !!flag,
-      formValues: record || {}
+      formValues: record || {},
     });
-    
   };
 
   handleAdd = fields => {
@@ -233,11 +227,11 @@ class RacesPage extends Component {
         race_name: fields.race_name,
       },
       callback: () => {
-        console.log('拉取更新后的数据')
-        this.handleFetch(dispatch)
+        console.log('拉取更新后的数据');
+        this.handleFetch(dispatch);
         message.success('添加成功');
         this.handleModalVisible();
-      }
+      },
     });
   };
 
@@ -247,32 +241,31 @@ class RacesPage extends Component {
       type: 'races/update',
       payload: fields,
       callback: () => {
-        this.handleFetch(dispatch)
+        this.handleFetch(dispatch);
         message.success('更新成功');
         this.handleUpdateModalVisible();
-      }
-    }); 
+      },
+    });
   };
 
   handleDelete = record => {
     const { dispatch } = this.props;
     dispatch({
       type: 'races/remove',
-      payload: {id: record.id},
+      payload: { id: record.id },
       callback: () => {
-        this.handleFetch(dispatch)
+        this.handleFetch(dispatch);
         message.success('已经删除');
-      }
-    })
-    
-  }
+      },
+    });
+  };
 
-  render () {
+  render() {
     const {
-      races:  { data },
-      loading
+      races: { data },
+      loading,
     } = this.props;
-    const { modalVisible, updateModalVisible, formValues} = this.state;
+    const { modalVisible, updateModalVisible, formValues } = this.state;
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
@@ -285,15 +278,12 @@ class RacesPage extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className={styles.tableList}>
-            
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
               </Button>
-              
             </div>
             <StandardTable
-              
               loading={loading}
               data={data}
               columns={this.columns}
@@ -309,7 +299,7 @@ class RacesPage extends Component {
           updateModalVisible={updateModalVisible}
         />
       </PageHeaderWrapper>
-    ) 
+    );
   }
 }
 

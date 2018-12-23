@@ -1,6 +1,6 @@
 import React, { Component, Fragment, PureComponent } from 'react';
 import { connect } from 'dva';
-import { Card, Button, Modal, Form, Input, message, Divider } from 'antd'
+import { Card, Button, Modal, Form, Input, message, Divider } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -38,7 +38,6 @@ const CreateForm = Form.create()(props => {
   );
 });
 
-
 @Form.create()
 class UpdateForm extends PureComponent {
   static defaultProps = {
@@ -54,7 +53,6 @@ class UpdateForm extends PureComponent {
       formVals: {
         name: props.values.name,
       },
-      
     };
 
     this.formLayout = {
@@ -63,7 +61,7 @@ class UpdateForm extends PureComponent {
     };
   }
 
-  renderContent = (formVals) => {
+  renderContent = formVals => {
     const { form } = this.props;
     return [
       <FormItem key="name" {...this.formLayout} label="职业名称">
@@ -79,7 +77,7 @@ class UpdateForm extends PureComponent {
       //   })(<TextArea rows={4} placeholder="请输入至少五个字符" />)}
       // </FormItem>,
     ];
-  }
+  };
 
   renderFooter = () => {
     const { handleUpdateModalVisible, values } = this.props;
@@ -90,11 +88,8 @@ class UpdateForm extends PureComponent {
       <Button key="submit" type="primary" onClick={() => this.handleNext()}>
         完成
       </Button>,
-    ]
-  }
-
-
-
+    ];
+  };
 
   render() {
     const { updateModalVisible, handleUpdateModalVisible, values } = this.props;
@@ -118,29 +113,29 @@ class UpdateForm extends PureComponent {
 }
 
 /* eslint react/no-multi-comp:0 */
-@connect(({profession, loading}) => ({
+@connect(({ profession, loading }) => ({
   profession,
-  loading: loading.models.profession
+  loading: loading.models.profession,
 }))
 class ProfessionPage extends Component {
   state = {
     modalVisible: false,
     updateModalVisible: false,
-    formValues: {}
+    formValues: {},
   };
- 
+
   columns = [
     {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '名称',
       dataIndex: 'profession_name',
       key: 'profession_name',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '操作',
@@ -151,20 +146,20 @@ class ProfessionPage extends Component {
           <a href="">删除</a>
         </Fragment>
       ),
-      align: 'center'
-    }
-  ]
+      align: 'center',
+    },
+  ];
 
   componentDidMount() {
     const { dispatch } = this.props;
-    this.handleFetch(dispatch)
+    this.handleFetch(dispatch);
   }
 
-  handleFetch = (dispatch) => {
+  handleFetch = dispatch => {
     dispatch({
-      type: 'profession/fetch'
-    })
-  }
+      type: 'profession/fetch',
+    });
+  };
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
@@ -198,9 +193,9 @@ class ProfessionPage extends Component {
     });
   };
 
-  handleUpdateModalVisible = (flag, ) => {
+  handleUpdateModalVisible = flag => {
     this.setState({
-      updateModalVisible: !!flag
+      updateModalVisible: !!flag,
     });
   };
 
@@ -212,7 +207,7 @@ class ProfessionPage extends Component {
         profession_name: fields.profession_name,
       },
     });
-    this.handleFetch(dispatch)
+    this.handleFetch(dispatch);
     message.success('添加成功');
     this.handleModalVisible();
   };
@@ -222,18 +217,18 @@ class ProfessionPage extends Component {
     dispatch({
       type: 'profession/update',
       payload: {
-        profession_name: fields.name
-      }
+        profession_name: fields.name,
+      },
     });
 
     message.success('更新成功');
     this.handleUpdateModalVisible();
   };
 
-  render () {
+  render() {
     const {
-      profession:  { data },
-      loading
+      profession: { data },
+      loading,
     } = this.props;
     const { modalVisible, updateModalVisible } = this.state;
     const parentMethods = {
@@ -248,15 +243,12 @@ class ProfessionPage extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className={styles.tableList}>
-            
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
               </Button>
-              
             </div>
             <StandardTable
-              
               loading={loading}
               data={data}
               columns={this.columns}
@@ -266,12 +258,9 @@ class ProfessionPage extends Component {
           </div>
         </Card>
         <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        <UpdateForm
-          {...updateMethods}
-          updateModalVisible={updateModalVisible}
-        />
+        <UpdateForm {...updateMethods} updateModalVisible={updateModalVisible} />
       </PageHeaderWrapper>
-    ) 
+    );
   }
 }
 

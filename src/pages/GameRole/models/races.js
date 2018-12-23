@@ -46,12 +46,11 @@ export default {
 
   reducers: {
     save(state, action) {
-      console.log('更新数据')
+      console.log('更新数据');
       return {
         ...state,
         data: action.payload,
       };
     },
-
   },
 };

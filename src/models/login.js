@@ -68,12 +68,12 @@ export default {
   reducers: {
     changeLoginStatus(state, { payload }) {
       localStorage.setItem('token', JSON.stringify(payload.data.token));
-      const currentAuthority = payload.data.role_info.id === "1" ? 'admin' : 'user'
+      const currentAuthority = payload.data.role_info.id === '1' ? 'admin' : 'user';
       setAuthority(currentAuthority);
       return {
         ...state,
         token: payload.data.token,
-        userInfo: payload.data.role_info
+        userInfo: payload.data.role_info,
       };
     },
   },

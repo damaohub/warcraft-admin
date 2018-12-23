@@ -9,9 +9,6 @@ export async function queryActivities() {
   return request('/api/activities');
 }
 
-
-
-
 export async function fakeSubmitForm(params) {
   return request('/api/forms', {
     method: 'POST',
@@ -73,7 +70,7 @@ export async function updateFakeList(params) {
 }
 
 export async function accountLogin(params) {
-  console.log(params)
+  console.log(params);
   return request('/api/login/login', {
     method: 'POST',
     body: params,
