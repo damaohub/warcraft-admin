@@ -1,7 +1,7 @@
-import { queryRaces, removeRace, addRace, updateRace } from '@/services/game';
+import { queryTalent, removeTalent, addTalent, updateTalent } from '@/services/game';
 
 export default {
-  namespace: 'races',
+  namespace: 'talent',
 
   state: {
     data: {
@@ -13,14 +13,14 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryRaces, payload);
+      const response = yield call(queryTalent, payload);
       yield put({
         type: 'save',
         payload: response.data,
       });
     },
     *add({ payload, callback }, { call, put }) {
-      const response = yield call(addRace, payload);
+      const response = yield call(addTalent, payload);
       yield put({
         type: 'item',
         payload: response,
@@ -28,7 +28,7 @@ export default {
       if (callback) callback();
     },
     *remove({ payload, callback }, { call, put }) {
-      const response = yield call(removeRace, payload);
+      const response = yield call(removeTalent, payload);
       yield put({
         type: 'item',
         payload: response,
@@ -36,7 +36,7 @@ export default {
       if (callback) callback();
     },
     *update({ payload, callback }, { call, put }) {
-      const response = yield call(updateRace, payload);
+      const response = yield call(updateTalent, payload);
       yield put({
         type: 'item',
         payload: response,

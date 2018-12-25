@@ -1,6 +1,7 @@
 import React, { Component, Fragment, PureComponent } from 'react';
 import { connect } from 'dva';
-import { Card, Button, Modal, Form, Input, message, Divider } from 'antd';
+import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm } from 'antd';
+
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -51,7 +52,7 @@ class UpdateForm extends PureComponent {
 
     this.state = {
       formVals: {
-        name: props.values.name,
+        profession_name: props.values.name,
       },
     };
 
@@ -64,8 +65,8 @@ class UpdateForm extends PureComponent {
   renderContent = formVals => {
     const { form } = this.props;
     return [
-      <FormItem key="name" {...this.formLayout} label="职业名称">
-        {form.getFieldDecorator('name', {
+      <FormItem key="profession_name" {...this.formLayout} label="职业名称">
+        {form.getFieldDecorator('profession_name', {
           rules: [{ required: true, message: '请输入职业名称！' }],
           initialValue: formVals.name,
         })(<Input placeholder="请输入" />)}
@@ -89,6 +90,22 @@ class UpdateForm extends PureComponent {
         完成
       </Button>,
     ];
+  };
+
+  handleNext = () => {
+    const { form, handleUpdate, values } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      const formVals = { ...values, ...fieldsValue };
+      this.setState(
+        {
+          formVals,
+        },
+        () => {
+          handleUpdate(formVals);
+        }
+      );
+    });
   };
 
   render() {
@@ -139,11 +156,13 @@ class ProfessionPage extends Component {
     },
     {
       title: '操作',
-      render: () => (
+      render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true)}>更新</a>
+          <a onClick={() => this.handleUpdateModalVisible(true, record)}>更新</a>
           <Divider type="vertical" />
-          <a href="">删除</a>
+          <Popconfirm title="是否要删除此行？" okText="确定" cancelText="取消" onConfirm={() => this.handleDelete(record)}>
+            <a>删除</a>
+          </Popconfirm>
         </Fragment>
       ),
       align: 'center',
@@ -160,6 +179,19 @@ class ProfessionPage extends Component {
       type: 'profession/fetch',
     });
   };
+
+  handleCall = (okText, failText) => {
+    const {dispatch, profession: {res} } = this.props;
+    if(res && res.ret === 0) {
+      message.success(okText || res.msg);
+    } else {
+      message.error(failText || res.msg);
+    }
+    dispatch({
+      type: 'profession/fetch',
+    });
+  }
+
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
@@ -193,9 +225,10 @@ class ProfessionPage extends Component {
     });
   };
 
-  handleUpdateModalVisible = flag => {
+  handleUpdateModalVisible = (flag, record) => {
     this.setState({
       updateModalVisible: !!flag,
+      formValues: record || {},
     });
   };
 
@@ -206,31 +239,48 @@ class ProfessionPage extends Component {
       payload: {
         profession_name: fields.profession_name,
       },
-    });
-    this.handleFetch(dispatch);
-    message.success('添加成功');
-    this.handleModalVisible();
+    }).then(
+      () => {
+        this.handleModalVisible()
+        this.handleCall('添加成功')
+      }  
+    )
+    
   };
 
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
       type: 'profession/update',
-      payload: {
-        profession_name: fields.name,
-      },
-    });
-
-    message.success('更新成功');
-    this.handleUpdateModalVisible();
+      payload: fields,
+    }).then(
+      () => {
+        this.handleUpdateModalVisible()
+        this.handleCall('更新成功')
+      }  
+    )
   };
+
+  handleDelete = record => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'profession/remove',
+      payload: { cid: record.id }
+    }).then(
+      () => {
+        this.handleUpdateModalVisible()
+        this.handleCall('删除成功')
+      }  
+    )
+  };
+
 
   render() {
     const {
       profession: { data },
       loading,
     } = this.props;
-    const { modalVisible, updateModalVisible } = this.state;
+    const { modalVisible, updateModalVisible, formValues } = this.state;
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
@@ -240,6 +290,7 @@ class ProfessionPage extends Component {
       handleUpdate: this.handleUpdate,
     };
     return (
+      
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className={styles.tableList}>
@@ -258,8 +309,9 @@ class ProfessionPage extends Component {
           </div>
         </Card>
         <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        <UpdateForm {...updateMethods} updateModalVisible={updateModalVisible} />
+        <UpdateForm {...updateMethods} updateModalVisible={updateModalVisible} values={formValues} />
       </PageHeaderWrapper>
+  
     );
   }
 }

@@ -1,6 +1,6 @@
 import React, { Component, Fragment, PureComponent } from 'react';
 import { connect } from 'dva';
-import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm } from 'antd';
+import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm, Select } from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -8,6 +8,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './game.less';
 
 const FormItem = Form.Item;
+const { Option } = Select;
 const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
@@ -31,7 +32,7 @@ const CreateForm = Form.create()(props => {
       onCancel={() => handleModalVisible()}
     >
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="种族名称">
-        {form.getFieldDecorator('race_name', {
+        {form.getFieldDecorator('talent_name', {
           rules: [{ required: true, message: '请输入种族名称！' }],
         })(<Input placeholder="请输入" />)}
       </FormItem>
@@ -54,6 +55,7 @@ class UpdateForm extends PureComponent {
       formVals: {
         name: props.values.name,
         id: props.values.id,
+        profession_name: props.values.profession_name
       },
     };
 
@@ -66,18 +68,23 @@ class UpdateForm extends PureComponent {
   renderContent = formVals => {
     const { form } = this.props;
     return [
-      <FormItem key="race_name" {...this.formLayout} label="种族名称">
-        {form.getFieldDecorator('race_name', {
-          rules: [{ required: true, message: '请输入种族名称！' }],
+      <FormItem key="talent_name" {...this.formLayout} label="天赋名称">
+        {form.getFieldDecorator('talent_name', {
+          rules: [{ required: true, message: '请输入天赋名称！' }],
           initialValue: formVals.name,
         })(<Input placeholder="请输入" />)}
       </FormItem>,
-      // <FormItem key="desc" {...this.formLayout} label="规则描述">
-      //   {form.getFieldDecorator('desc', {
-      //     rules: [{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }],
-      //     initialValue: formVals.desc,
-      //   })(<TextArea rows={4} placeholder="请输入至少五个字符" />)}
-      // </FormItem>,
+      <FormItem key="profession_name" {...this.formLayout} label="所属职业">
+        {form.getFieldDecorator('profession_name', {
+          rules: [{ required: true, message: '请选择职业！'}],
+          initialValue: formVals.profession_name,
+        })(
+          <Select placeholder="请选择" style={{ width: '100%' }}>
+            <Option value="0">关闭</Option>
+            <Option value="1">运行中</Option>
+          </Select>
+        )}
+      </FormItem>,
     ];
   };
 
@@ -131,11 +138,11 @@ class UpdateForm extends PureComponent {
 }
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ races, loading }) => ({
-  races,
-  loading: loading.models.races,
+@connect(({ talent, loading }) => ({
+  talent,
+  loading: loading.models.talent,
 }))
-class RacesPage extends Component {
+class TalentPage extends Component {
   state = {
     modalVisible: false,
     updateModalVisible: false,
@@ -151,8 +158,14 @@ class RacesPage extends Component {
     },
     {
       title: '名称',
-      dataIndex: 'race_name',
-      key: 'race_name',
+      dataIndex: 'talent_name',
+      key: 'talent_name',
+      align: 'center',
+    },
+    {
+      title: '职业',
+      dataIndex: 'profession_name',
+      key: 'profession_name',
       align: 'center',
     },
     {
@@ -178,19 +191,19 @@ class RacesPage extends Component {
 
   handleFetch = dispatch => {
     dispatch({
-      type: 'races/fetch',
+      type: 'talent/fetch',
     });
   };
 
   handleCall = (okText, failText) => {
-    const {dispatch, races: {res} } = this.props;
+    const {dispatch, talent: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
     } else {
       message.error(failText || res.msg);
     }
     dispatch({
-      type: 'races/fetch',
+      type: 'talent/fetch',
     });
   }
 
@@ -215,7 +228,7 @@ class RacesPage extends Component {
     }
 
     dispatch({
-      type: 'races/fetch',
+      type: 'talent/fetch',
       payload: params,
     });
   };
@@ -236,9 +249,9 @@ class RacesPage extends Component {
   handleAdd = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'races/add',
+      type: 'talent/add',
       payload: {
-        race_name: fields.race_name,
+        talent_name: fields.talent_name,
       }
     }).then(
       () => {
@@ -251,7 +264,7 @@ class RacesPage extends Component {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'races/update',
+      type: 'talent/update',
       payload: fields
     }).then(
       () => {
@@ -265,7 +278,7 @@ class RacesPage extends Component {
   handleDelete = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'races/remove',
+      type: 'talent/remove',
       payload: { id: record.id },
     }).then(
       () => {
@@ -276,7 +289,7 @@ class RacesPage extends Component {
 
   render() {
     const {
-      races: { data },
+      talent: { data },
       loading,
     } = this.props;
     const { modalVisible, updateModalVisible, formValues } = this.state;
@@ -319,4 +332,4 @@ class RacesPage extends Component {
   }
 }
 
-export default RacesPage;
+export default TalentPage;

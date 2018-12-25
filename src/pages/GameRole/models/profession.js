@@ -25,7 +25,7 @@ export default {
     *add({ payload, callback }, { call, put }) {
       const response = yield call(addProfession, payload);
       yield put({
-        type: 'save',
+        type: 'item',
         payload: response,
       });
       if (callback) yield callback();
@@ -33,7 +33,7 @@ export default {
     *remove({ payload, callback }, { call, put }) {
       const response = yield call(removeProfession, payload);
       yield put({
-        type: 'save',
+        type: 'item',
         payload: response,
       });
       if (callback) callback();
@@ -41,7 +41,7 @@ export default {
     *update({ payload, callback }, { call, put }) {
       const response = yield call(updateProfession, payload);
       yield put({
-        type: 'save',
+        type: 'item',
         payload: response,
       });
       if (callback) callback();
@@ -55,5 +55,11 @@ export default {
         data: action.payload,
       };
     },
+    item(state, action) {
+      return {
+        ...state,
+        res: action.payload
+      }
+    }
   },
 };

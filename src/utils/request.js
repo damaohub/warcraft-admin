@@ -1,6 +1,6 @@
 import fetch from 'dva/fetch';
 import { notification } from 'antd';
-import router from 'umi/router';
+// import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
 
@@ -82,11 +82,12 @@ export default function request(url, option) {
     credentials: 'include',
   };
 
+  const TOKEN = localStorage.getItem('token')
   const defaultData = {
     time: `${Date.parse(new Date()) / 1000}`,
-    token: JSON.parse(localStorage.getItem('token')),
+    token: TOKEN? JSON.parse(TOKEN) : null,
   };
-
+ 
   const newOptions = { ...defaultOptions, ...options };
 
   if (
@@ -134,12 +135,13 @@ export default function request(url, option) {
       .then(checkStatus)
       // .then(response => cachedSave(response, hashcode))
       .then(response => {
+        
         // DELETE and 204 do not return data by default
         // using .json will report an error.
         if (newOptions.method === 'DELETE' || response.status === 204) {
           return response.text();
         }
-        return response.json();
+        return response.json()
       })
       .catch(e => {
         const status = e.name;
@@ -153,15 +155,17 @@ export default function request(url, option) {
         }
         // environment should not be used
         if (status === 403) {
-          router.push('/exception/403');
+          // router.push('/exception/403');
           return;
         }
         if (status <= 504 && status >= 500) {
-          router.push('/exception/500');
+          // router.push('/exception/500');
           return;
         }
         if (status >= 404 && status < 422) {
-          router.push('/exception/404');
+          // router.push('/exception/404');
+          /* eslint-disable-next-line */
+          return;
         }
       })
   );

@@ -65,6 +65,11 @@ export default [
             path: '/gamerole/profession',
             name: 'profession',
             component: './GameRole/Profession',
+          },
+          {
+            path: '/gamerole/talent',
+            name: 'talent',
+            component: './GameRole/Talent',
           }
         ]
       },

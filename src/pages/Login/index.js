@@ -14,7 +14,7 @@ const { UserName, Password, Submit } = Login;
   submitting: loading.effects['login/login'],
 }))
 class LoginPage extends Component {
-  handleSubmit = err => {
+  handleSubmit = (err) => {
     if (!err) {
       const { dispatch } = this.props;
       dispatch({
@@ -43,7 +43,7 @@ class LoginPage extends Component {
         >
           {/* {this.renderMessage(formatMessage({ id: 'app.login.message-invalid-credentials' }))} */}
           <UserName
-            name="userName"
+            name="username"
             placeholder={`${formatMessage({ id: 'app.login.userName' })}`}
             rules={[
               {

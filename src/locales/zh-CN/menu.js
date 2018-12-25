@@ -7,6 +7,7 @@ export default {
   'menu.gameRole': '游戏角色',
   'menu.gameRole.races': '种族管理',
   'menu.gameRole.profession': '职业管理',
+  'menu.gameRole.talent': '天赋管理',
   'menu.form': '表单页',
   'menu.form.basicform': '基础表单',
   'menu.form.stepform': '分步表单',
