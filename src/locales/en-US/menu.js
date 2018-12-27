@@ -8,6 +8,7 @@ export default {
   'menu.gameRole.races': 'Races',
   'menu.gameRole.profession': 'Profession',
   'menu.gameRole.talent': 'Talent',
+  'menu.monster': 'Monster',
   'menu.form': 'Form',
   'menu.form.basicform': 'Basic Form',
   'menu.form.stepform': 'Step Form',

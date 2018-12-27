@@ -8,6 +8,7 @@ export default {
   'menu.gameRole.races': '种族管理',
   'menu.gameRole.profession': '职业管理',
   'menu.gameRole.talent': '天赋管理',
+  'menu.monster': '怪物管理',
   'menu.form': '表单页',
   'menu.form.basicform': '基础表单',
   'menu.form.stepform': '分步表单',

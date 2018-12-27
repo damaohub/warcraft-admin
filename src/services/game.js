@@ -10,10 +10,7 @@ export async function queryRaces(params) {
 export async function removeRace(params) {
   return request('/api/gamerole/racedel', {
     method: 'POST',
-    body: {
-      ...params,
-      method: 'delete',
-    },
+    body: params
   });
 }
 
@@ -21,8 +18,7 @@ export async function addRace(params) {
   return request('/api/gamerole/raceadd', {
     method: 'POST',
     body: {
-      ...params,
-      method: 'post',
+      ...params
     },
   });
 }
@@ -32,7 +28,6 @@ export async function updateRace(params) {
     method: 'POST',
     body: {
       ...params,
-      method: 'update',
     },
   });
 }
@@ -49,7 +44,6 @@ export async function removeProfession(params) {
     method: 'POST',
     body: {
       ...params,
-      method: 'delete',
     },
   });
 }
@@ -59,7 +53,6 @@ export async function addProfession(params) {
     method: 'POST',
     body: {
       ...params,
-      method: 'post',
     },
   });
 }
@@ -68,8 +61,7 @@ export async function updateProfession(params) {
   return request('/api/gamerole/professionedit', {
     method: 'POST',
     body: {
-      ...params,
-      method: 'update',
+      ...params
     },
   });
 }
@@ -86,7 +78,6 @@ export async function removeTalent(params) {
     method: 'POST',
     body: {
       ...params,
-      method: 'delete',
     },
   });
 }
@@ -95,8 +86,7 @@ export async function addTalent(params) {
   return request('/api/gamerole/talentadd', {
     method: 'POST',
     body: {
-      ...params,
-      method: 'post',
+      ...params
     },
   });
 }
@@ -104,9 +94,6 @@ export async function addTalent(params) {
 export async function updateTalent(params) {
   return request('/api/gamerole/talentedit', {
     method: 'POST',
-    body: {
-      ...params,
-      method: 'update',
-    },
+    body: params
   });
 }

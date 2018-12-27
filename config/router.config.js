@@ -73,6 +73,14 @@ export default [
           }
         ]
       },
+      //monster
+      {
+        path: '/monster',
+        icon: 'table',
+        name: 'monster',
+        component: './Monster'
+       
+      },
       // forms
       {
         path: '/form',

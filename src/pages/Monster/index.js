@@ -5,7 +5,7 @@ import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm, Select 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
-import styles from './game.less';
+import styles from '../GameRole/game.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -15,38 +15,49 @@ const getValue = obj =>
     .join(',');
 
 const CreateForm = Form.create()(props => {
-  const { modalVisible, form, handleAdd, handleModalVisible, professionList } = props;
+  const { modalVisible, form, handleAdd, handleModalVisible, instanceList, IM } = props;
+  const title = IM === 0 ? "新建副本" : "添加怪兽"
+  const msg = IM === 0 ? "请输入副本" : "请输入怪兽"
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
-      handleAdd(fieldsValue);
+      handleAdd({instance_or_monster: IM, ...fieldsValue});
     });
   };
+
   return (
     <Modal
       destroyOnClose
-      title="新建天赋"
+      title={title} 
       visible={modalVisible}
       onOk={okHandle}
       onCancel={() => handleModalVisible()}
     >
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="种族名称">
-        {form.getFieldDecorator('talent_name', {
-          rules: [{ required: true, message: '请输入种族名称！' }],
+   
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label={msg}>
+        {form.getFieldDecorator('name', {
+          rules: [{ required: true, message: {msg} }],
         })(<Input placeholder="请输入" />)}
       </FormItem>
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属职业">
-        {form.getFieldDecorator('profession_id', {
-          rules: [{ required: true, message: '请选择职业！'}],
-        })(
-          <Select placeholder="请选择职业" style={{ width: '100%' }}>
-            {professionList.map( (item) => 
-              (<Option key={item.id}>{item.profession_name}</Option>)
-            )}
-          </Select>
-        )}
-      </FormItem>,
+
+      {IM === 1 && 
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属副本">
+          {form.getFieldDecorator('instance_id', {
+            rules: [{ required: true, message: '请选择副本！'}],
+          })(
+            <Select placeholder="请选择副本" style={{ width: '100%' }}>
+              {instanceList.map( (item) => 
+                (<Option key={item.id}>{item.name}</Option>)
+              )}
+            </Select>
+          )}
+        </FormItem>
+      }
+      
+     
+      
+      
     </Modal>
   );
 });
@@ -64,9 +75,9 @@ class UpdateForm extends PureComponent {
 
     this.state = {
       formVals: {
-        name: props.values.talent_name,
+        name: props.values.name,
         id: props.values.id,
-        profession_name: props.values.profession_name
+        instance_name: props.values.instance_name
       },
     };
 
@@ -78,22 +89,22 @@ class UpdateForm extends PureComponent {
 
 
   renderContent = formVals => {
-    const { form, professionList} = this.props;
+    const { form, instanceList} = this.props;
     return [
-      <FormItem key="talent_name" {...this.formLayout} label="天赋名称">
-        {form.getFieldDecorator('talent_name', {
+      <FormItem key="name" {...this.formLayout} label="怪物名称">
+        {form.getFieldDecorator('name', {
           rules: [{ required: true, message: '请输入天赋名称！' }],
-          initialValue: formVals.talent_name,
+          initialValue: formVals.name,
         })(<Input placeholder="请输入" />)}
       </FormItem>,
-      <FormItem key="profession_name" {...this.formLayout} label="所属职业">
-        {form.getFieldDecorator('profession_id', {
+      <FormItem key="instance_id" {...this.formLayout} label="所属副本">
+        {form.getFieldDecorator('instance_id', {
           rules: [{ required: true, message: '请选择职业！'}],
-          initialValue: formVals.profession_name,
+          initialValue: formVals.instance_name,
         })(
-          <Select placeholder="请选择职业" style={{ width: '100%' }}>
-            {professionList.map( (item) => 
-              (<Option key={item.id}>{item.profession_name}</Option>)
+          <Select placeholder="请选择副本" style={{ width: '100%' }}>
+            {instanceList.map( (item) => 
+              (<Option key={item.id}>{item.name}</Option>)
             )}
           </Select>
         )}
@@ -152,16 +163,16 @@ class UpdateForm extends PureComponent {
 }
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ talent, profession, loading }) => ({
-  profession,
-  talent,
-  loading: loading.models.talent,
+@connect(({ monster, loading }) => ({
+  monster,
+  loading: loading.models.monster,
 }))
-class TalentPage extends Component {
+class MonsterPage extends Component {
   state = {
     modalVisible: false,
     updateModalVisible: false,
     formValues: {},
+    isIM: 0
   };
 
   columns = [
@@ -173,14 +184,14 @@ class TalentPage extends Component {
     },
     {
       title: '名称',
-      dataIndex: 'talent_name',
-      key: 'talent_name',
+      dataIndex: 'name',
+      key: 'name',
       align: 'center',
     },
     {
-      title: '职业',
-      dataIndex: 'profession_name',
-      key: 'profession_name',
+      title: '副本名称',
+      dataIndex: 'instance_name',
+      key: 'instance_name',
       align: 'center',
     },
     {
@@ -202,26 +213,24 @@ class TalentPage extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     this.handleFetch(dispatch);
-    dispatch({
-      type: 'profession/fetch'
-    })
+   
   }
 
   handleFetch = dispatch => {
     dispatch({
-      type: 'talent/fetch',
+      type: 'monster/fetch',
     });
   };
 
   handleCall = (okText, failText) => {
-    const {dispatch, talent: {res} } = this.props;
+    const {dispatch, monster: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
     } else {
       message.error(failText || res.msg);
     }
     dispatch({
-      type: 'talent/fetch',
+      type: 'monster/fetch',
     });
   }
 
@@ -246,28 +255,44 @@ class TalentPage extends Component {
     }
 
     dispatch({
-      type: 'talent/fetch',
+      type: 'monster/fetch',
       payload: params,
     });
   };
 
-  handleModalVisible = flag => {
+  handleModalVisible = (flag, is) => {
+    if(flag) {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'monster/inList'
+      })
+     }
     this.setState({
       modalVisible: !!flag,
+      isIM: is
     });
+
   };
 
   handleUpdateModalVisible = (flag, record) => {
+   if(flag) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'monster/inList'
+    })
+   }
+    
     this.setState({
       updateModalVisible: !!flag,
       formValues: record || {},
     });
+   
   };
 
   handleAdd = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'talent/add',
+      type: 'monster/add',
       payload: fields
     }).then(
       () => {
@@ -280,7 +305,7 @@ class TalentPage extends Component {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'talent/update',
+      type: 'monster/update',
       payload: fields
     }).then(
       () => {
@@ -294,7 +319,7 @@ class TalentPage extends Component {
   handleDelete = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'talent/remove',
+      type: 'monster/remove',
       payload: { id: record.id },
     }).then(
       () => {
@@ -305,11 +330,11 @@ class TalentPage extends Component {
 
   render() {
     const {
-      talent: { data },
-      profession: {data: {list}},
+      monster: { data },
+      monster: {instanceList},
       loading,
     } = this.props;
-    const { modalVisible, updateModalVisible, formValues } = this.state;
+    const { modalVisible, updateModalVisible, formValues, isIM } = this.state;
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
@@ -324,8 +349,11 @@ class TalentPage extends Component {
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                新建
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true, 1)}>
+                添加怪兽
+              </Button>
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true, 0)}>
+                新建副本
               </Button>
             </div>
             <StandardTable
@@ -337,11 +365,11 @@ class TalentPage extends Component {
             />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} professionList={list} />
+        <CreateForm {...parentMethods} modalVisible={modalVisible} instanceList={instanceList} IM={isIM} />
         <UpdateForm
           {...updateMethods}
           values={formValues}
-          professionList={list}
+          instanceList={instanceList}
           updateModalVisible={updateModalVisible}
         />
       </PageHeaderWrapper>
@@ -350,4 +378,4 @@ class TalentPage extends Component {
   }
 }
 
-export default TalentPage;
+export default MonsterPage;
