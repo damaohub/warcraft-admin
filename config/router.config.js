@@ -81,6 +81,14 @@ export default [
         component: './Monster'
        
       },
+      //equip
+      {
+        path: '/equip',
+        icon: 'table',
+        name: 'equip',
+        component: './Equip'
+       
+      },
       // forms
       {
         path: '/form',

@@ -9,6 +9,7 @@ export default {
   'menu.gameRole.profession': 'Profession',
   'menu.gameRole.talent': 'Talent',
   'menu.monster': 'Monster',
+  'menu.equip': 'Equip',
   'menu.form': 'Form',
   'menu.form.basicform': 'Basic Form',
   'menu.form.stepform': 'Step Form',
