@@ -36,6 +36,25 @@
   }
 }
 
+
+.arrayRow{
+  span{
+      position: relative;
+       margin-right: 9px;
+      &::after{
+          content: '|';
+          position: absolute;
+          width: 1px;
+          height: 0.9em;
+          right: -4px;
+          // background: #e8e8e8;
+          // margin: 0 8px;
+          vertical-align: middle;
+
+      }
+  }
+}
+
 @media screen and (max-width: @screen-lg) {
   .tableListForm :global(.ant-form-item) {
     margin-right: 24px;

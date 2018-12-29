@@ -27,3 +27,10 @@ export async function updateEquip(params) {
     body: params
   });
 }
+
+export async function queryList1(params) {
+  return request('/api/equip/locationtypelist', {
+    method: 'POST',
+    body: params
+  });
+}

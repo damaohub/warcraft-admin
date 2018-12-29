@@ -21,35 +21,36 @@ export default class RemoteSelect extends React.Component {
   }
 
  
-  fetcher = (value) => {
-    console.log('fetching...', value);
+  fetcher = (searchVal) => {
+    console.log('fetching...', searchVal);
     this.lastFetchId += 1;
     const fetchId = this.lastFetchId;
     this.setState({ data: [], fetching: true });
     request('/api/monster/searchlist', {
       method: 'POST',
-      body: {...value}
+      body: {searchValue: searchVal}
     })
-      .then(response => response.json())
+      
       .then((json) => {
+        console.log(json)
         if (fetchId !== this.lastFetchId) { // for fetch callback order
           return;
         }
-        console.log(json)
-        const data = json.data.map(user => ({
-          text: `${user.name.first} ${user.name.last}`,
-          value: user.login.username,
+        
+        const data = json.data.list.map(user => ({
+          text: `${user.name}`,
+          value: user.id,
         }));
         this.setState({ data, fetching: false });
       });
   }
 
 
-  handleChange = () => {
-    const {value} = this.props
+  handleChange = (value) => {
+    console.log(value)
     this.setState({
       value,
-      data: [],
+      
       fetching: false,
     });
   }
@@ -59,7 +60,6 @@ export default class RemoteSelect extends React.Component {
     return (
       <Select
         showSearch
-        labelInValue
         value={value}
         placeholder="请输入查找"
         notFoundContent={fetching ? <Spin size="small" /> : null}

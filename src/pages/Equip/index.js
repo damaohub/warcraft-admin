@@ -1,6 +1,6 @@
 import React, { Component, Fragment, PureComponent } from 'react';
 import { connect } from 'dva';
-import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm, Select, Tag } from 'antd';
+import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm, Select } from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -16,7 +16,7 @@ const getValue = obj =>
     .join(',');
 
 const CreateForm = Form.create()(props => {
-  const { modalVisible, form, handleAdd, handleModalVisible, monsterList } = props;
+  const { modalVisible, form, handleAdd, handleModalVisible } = props;
 
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
@@ -43,22 +43,24 @@ const CreateForm = Form.create()(props => {
 
     
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="装备部位">
-        {form.getFieldDecorator('monster_id', {
+        {form.getFieldDecorator('equip_location', {
           rules: [{ required: true, message: '请选择装备部位！'}],
         })(
           <Select placeholder="请选择装备部位" style={{ width: '100%' }}>
-            {monsterList.map( (item) => 
-              (<Option key={item.id}>{item.name}</Option>)
-            )}
+            {
+              Object.keys(equipLocation).map( item => {
+                console.log(item)
+              })
+            }
           </Select>
         )}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="装备类型">
-        {form.getFieldDecorator('monster_id', {
+        {form.getFieldDecorator('equip_type', {
           rules: [{ required: true, message: '请选择装备类型！'}],
         })(
           <Select placeholder="请选择装备类型" style={{ width: '100%' }}>
-            {monsterList.map( (item) => 
+            {equipLocationList.map( (item) => 
               (<Option key={item.id}>{item.name}</Option>)
             )}
           </Select>
@@ -69,7 +71,7 @@ const CreateForm = Form.create()(props => {
           rules: [{ required: true, message: '请选择适用天赋！'}],
         })(
           <Select placeholder="请选择适用天赋" style={{ width: '100%' }}>
-            {monsterList.map( (item) => 
+            {equipLocationList.map( (item) => 
               (<Option key={item.id}>{item.name}</Option>)
             )}
           </Select>
@@ -79,12 +81,12 @@ const CreateForm = Form.create()(props => {
         {form.getFieldDecorator('monster_id', {
           rules: [{ required: true, message: '请选择所属怪物！'}],
         })(
-          <Select placeholder="请选择所属怪物" style={{ width: '100%' }}>
-            {monsterList.map( (item) => 
-              (<Option key={item.id}>{item.name}</Option>)
-            )}
-          </Select>
-          
+          // <Select placeholder="请选择所属怪物" style={{ width: '100%' }}>
+          //   {monsterList.map( (item) => 
+          //     (<Option key={item.id}>{item.name}</Option>)
+          //   )}
+          // </Select>
+          <RemoteSelect value="sw" />
         )}
       </FormItem>
       
@@ -289,7 +291,11 @@ class EquipPage extends Component {
       align: 'center',
       render: talents => (
         <span>
-          {talents.map(talent => <Tag color="blue" key={talent}>{talent}</Tag>)}
+          {talents.map((talent,ids) => 
+            <Fragment>
+              <span color="blue" key={talent}>{talent}</span> { ids !== talents.length-1 && <Divider type="vertical" style={{margin: '0 2px'}} />}
+            </Fragment>)
+          }
         </span>
       ),
     },
@@ -366,6 +372,11 @@ class EquipPage extends Component {
       dispatch({
         type: 'monster/fetch'
       })
+
+      dispatch({
+        type: 'equip/fetchList1'
+      })
+
      }
     this.setState({
       modalVisible: !!flag,
@@ -378,6 +389,9 @@ class EquipPage extends Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'monster/fetch'
+    })
+    dispatch({
+      type: 'equip/fetchList1'
     })
    }
     
@@ -430,12 +444,21 @@ class EquipPage extends Component {
   render() {
     const {
       equip: { data },
-      monster: {data: {list}},
+      equip: {list1},
       loading,
     } = this.props;
-    const monsterList = list
-    console.log(monsterList)
+    console.log(list1)
+    if(list1.equipLocation) {
+      const { equipLocation, equipType, needType} = list1
+      equipLocationList = Object.getOwnPropertyNames(equipLocation)
+      console.log(equipLocationList)
+    }
     const { modalVisible, updateModalVisible, formValues } = this.state;
+    const parentData = {
+      equipLocation: {},
+      equipType: {},
+      needType: {}
+    } 
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
@@ -447,7 +470,6 @@ class EquipPage extends Component {
     return (
       
       <PageHeaderWrapper>
-        <RemoteSelect value="sw" />
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
@@ -465,11 +487,11 @@ class EquipPage extends Component {
             />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} monsterList={monsterList} />
+        <CreateForm {...parentMethods} modalVisible={modalVisible} list1={list1} />
         <UpdateForm
           {...updateMethods}
           values={formValues}
-          monsterList={monsterList}
+          monsterList={[]}
           updateModalVisible={updateModalVisible}
         />
 
