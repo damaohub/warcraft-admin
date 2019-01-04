@@ -16,8 +16,7 @@ const getValue = obj =>
     .join(',');
 
 const CreateForm = Form.create()(props => {
-  const { modalVisible, form, handleAdd, handleModalVisible } = props;
-
+  const { modalVisible, form, handleAdd, handleModalVisible, parentData } = props;
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -25,6 +24,13 @@ const CreateForm = Form.create()(props => {
       handleAdd(fieldsValue);
     });
   };
+
+  const isShowType = key => {
+    if(key in parentData.needTypeList) {
+      return true
+    } 
+    return false
+  } 
 
   return (
     <Modal
@@ -46,33 +52,34 @@ const CreateForm = Form.create()(props => {
         {form.getFieldDecorator('equip_location', {
           rules: [{ required: true, message: '请选择装备部位！'}],
         })(
-          <Select placeholder="请选择装备部位" style={{ width: '100%' }}>
-            {
-              Object.keys(equipLocation).map( item => {
-                console.log(item)
-              })
-            }
-          </Select>
-        )}
-      </FormItem>
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="装备类型">
-        {form.getFieldDecorator('equip_type', {
-          rules: [{ required: true, message: '请选择装备类型！'}],
-        })(
-          <Select placeholder="请选择装备类型" style={{ width: '100%' }}>
-            {equipLocationList.map( (item) => 
+          <Select placeholder="请选择装备部位" style={{ width: '100%' }} onSelect={(key) => {isShowType(key)}}>
+            {parentData.equipLocationList.map( (item) => 
               (<Option key={item.id}>{item.name}</Option>)
             )}
           </Select>
         )}
       </FormItem>
+      {isShowType && 
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="装备类型">
+        {form.getFieldDecorator('equip_type', {
+          rules: [{ required: true, message: '请选择装备类型！'}],
+        })(
+          <Select placeholder="请选择装备类型" style={{ width: '100%' }}>
+            {parentData.equipTypeList.map( (item) => 
+              (<Option key={item.id}>{item.name}</Option>)
+            )}
+          </Select>
+        )}
+      </FormItem> 
+      }
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="适用天赋">
         {form.getFieldDecorator('monster_id', {
           rules: [{ required: true, message: '请选择适用天赋！'}],
+          
         })(
           <Select placeholder="请选择适用天赋" style={{ width: '100%' }}>
-            {equipLocationList.map( (item) => 
-              (<Option key={item.id}>{item.name}</Option>)
+            {parentData.talentList.map( (item) => 
+              (<Option key={item.id}>{item.talent_name}</Option>)
             )}
           </Select>
         )}
@@ -86,7 +93,7 @@ const CreateForm = Form.create()(props => {
           //     (<Option key={item.id}>{item.name}</Option>)
           //   )}
           // </Select>
-          <RemoteSelect value="sw" />
+          <RemoteSelect value="" />
         )}
       </FormItem>
       
@@ -124,7 +131,7 @@ class UpdateForm extends PureComponent {
 
 
   renderContent = formVals => {
-    const { form, monsterList} = this.props;
+    const { form, parentData} = this.props;
     return [
       <FormItem key="name" {...this.formLayout} label="天赋名称">
         {form.getFieldDecorator('name', {
@@ -138,7 +145,7 @@ class UpdateForm extends PureComponent {
           initialValue: formVals.Monster_name,
         })(
           <Select placeholder="请选择装备部位" style={{ width: '100%' }}>
-            {monsterList.map( (item) => 
+            {parentData.equipLocationList.map( (item) => 
               (<Option key={item.id}>{item.name}</Option>)
             )}
           </Select>
@@ -150,7 +157,7 @@ class UpdateForm extends PureComponent {
           initialValue: formVals.Monster_name,
         })(
           <Select placeholder="请选择装备类型" style={{ width: '100%' }}>
-            {monsterList.map( (item) => 
+            {parentData.equipTypeList.map( (item) => 
               (<Option key={item.id}>{item.name}</Option>)
             )}
           </Select>
@@ -162,8 +169,8 @@ class UpdateForm extends PureComponent {
           initialValue: formVals.Monster_name,
         })(
           <Select placeholder="请选择适用天赋" style={{ width: '100%' }}>
-            {monsterList.map( (item) => 
-              (<Option key={item.id}>{item.name}</Option>)
+            {parentData.talentList.map( (item) => 
+              (<Option key={item.id}>{item.talent_name}</Option>)
             )}
           </Select>
         )}
@@ -174,7 +181,7 @@ class UpdateForm extends PureComponent {
           initialValue: formVals.Monster_name,
         })(
           <Select placeholder="请选择所属怪物" style={{ width: '100%' }}>
-            {monsterList.map( (item) => 
+            {parentData.monsterList.map( (item) => 
               (<Option key={item.id}>{item.name}</Option>)
             )}
           </Select>
@@ -372,9 +379,11 @@ class EquipPage extends Component {
       dispatch({
         type: 'monster/fetch'
       })
-
       dispatch({
-        type: 'equip/fetchList1'
+        type: 'talent/fetchAll'
+      })
+      dispatch({
+        type: 'equip/fetchData1'
       })
 
      }
@@ -391,7 +400,10 @@ class EquipPage extends Component {
       type: 'monster/fetch'
     })
     dispatch({
-      type: 'equip/fetchList1'
+      type: 'talent/fetchAll'
+    })
+    dispatch({
+      type: 'equip/fetchData1'
     })
    }
     
@@ -444,20 +456,23 @@ class EquipPage extends Component {
   render() {
     const {
       equip: { data },
-      equip: {list1},
+      equip: { data1 },
+      talent: { all },
       loading,
     } = this.props;
-    console.log(list1)
-    if(list1.equipLocation) {
-      const { equipLocation, equipType, needType} = list1
-      equipLocationList = Object.getOwnPropertyNames(equipLocation)
-      console.log(equipLocationList)
-    }
+    console.log()
+    // if(list1.equipLocation) {
+    //   const { equipLocation} = list1
+    //   equipLocationList = Object.getOwnPropertyNames(equipLocation)
+    //   console.log(equipLocationList)
+    // }
     const { modalVisible, updateModalVisible, formValues } = this.state;
     const parentData = {
-      equipLocation: {},
-      equipType: {},
-      needType: {}
+      equipLocationList: data1.equipLocation || [],
+      equipTypeList: data1.equipType || [],
+      needTypeList: data1.needType || [],
+      talentList: all || [],
+      monsterList: []
     } 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -487,11 +502,11 @@ class EquipPage extends Component {
             />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} list1={list1} />
+        <CreateForm {...parentMethods} modalVisible={modalVisible} parentData={parentData} />
         <UpdateForm
           {...updateMethods}
           values={formValues}
-          monsterList={[]}
+          parentData={parentData}
           updateModalVisible={updateModalVisible}
         />
 

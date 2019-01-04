@@ -22,7 +22,7 @@ export default class RemoteSelect extends React.Component {
 
  
   fetcher = (searchVal) => {
-    console.log('fetching...', searchVal);
+    if( searchVal ==='' ) return
     this.lastFetchId += 1;
     const fetchId = this.lastFetchId;
     this.setState({ data: [], fetching: true });
@@ -32,7 +32,6 @@ export default class RemoteSelect extends React.Component {
     })
       
       .then((json) => {
-        console.log(json)
         if (fetchId !== this.lastFetchId) { // for fetch callback order
           return;
         }
@@ -47,7 +46,7 @@ export default class RemoteSelect extends React.Component {
 
 
   handleChange = (value) => {
-    console.log(value)
+    
     this.setState({
       value,
       

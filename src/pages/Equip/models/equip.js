@@ -1,4 +1,4 @@
-import { queryEquip, removeEquip, addEquip, updateEquip, queryList1 } from '@/services/equip';
+import { queryEquip, removeEquip, addEquip, updateEquip, queryData1 } from '@/services/equip';
 
 export default {
   namespace: 'equip',
@@ -9,7 +9,7 @@ export default {
       pagination: {},
     },
     res: {},
-    list1: {}
+    data1: {}
   },
 
   effects: {
@@ -44,10 +44,10 @@ export default {
       });
       if (callback) callback();
     },
-    *fetchList1({ payload }, { call, put }) {
-      const response = yield call(queryList1, payload);
+    *fetchData1({ payload }, { call, put }) {
+      const response = yield call(queryData1, payload);
       yield put({
-        type: 'saveList1',
+        type: 'saveData1',
         payload: response,
       });
     }
@@ -68,10 +68,10 @@ export default {
         res: action.payload
       }
     },
-    saveList1(state, action) {
+    saveData1(state, action) {
       return {
         ...state,
-        list1: action.payload.data.list
+        data1: action.payload.data
       }
     }
   },

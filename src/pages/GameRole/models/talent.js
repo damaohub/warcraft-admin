@@ -8,7 +8,8 @@ export default {
       list: [],
       pagination: {},
     },
-    res: {}
+    res: {},
+    all: []
   },
 
   effects: {
@@ -43,6 +44,14 @@ export default {
       });
       if (callback) callback();
     },
+    *fetchAll({ payload }, { call, put }) {
+      const newPayload = Object.assign({}, payload, {pageSize: 1000})
+      const response = yield call(queryTalent, newPayload);
+      yield put({
+        type: 'saveAll',
+        payload: response.data,
+      });
+    },
   },
 
   reducers: {
@@ -56,6 +65,12 @@ export default {
       return {
         ...state,
         res: action.payload
+      }
+    },
+    saveAll(state, action) {
+      return {
+        ...state,
+        all: action.payload.list
       }
     }
   },

@@ -28,7 +28,7 @@ export async function updateEquip(params) {
   });
 }
 
-export async function queryList1(params) {
+export async function queryData1(params) {
   return request('/api/equip/locationtypelist', {
     method: 'POST',
     body: params
