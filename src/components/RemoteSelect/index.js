@@ -11,22 +11,23 @@ export default class RemoteSelect extends React.Component {
     super(props);
     this.fetcher = debounce(this.fetcher, 800);
     this.lastFetchId = 0
-  
+    this.state = {
+      data: [],
+      value: props.initialValue,
+      fetching: false,
+    }
   }
 
-  state = {
-    data: [],
-    value: undefined,
-    fetching: false,
-  }
+  
 
  
   fetcher = (searchVal) => {
+    const {url} = this.props
     if( searchVal ==='' ) return
     this.lastFetchId += 1;
     const fetchId = this.lastFetchId;
     this.setState({ data: [], fetching: true });
-    request('/api/monster/searchlist', {
+    request(url, {
       method: 'POST',
       body: {searchValue: searchVal}
     })
@@ -46,12 +47,13 @@ export default class RemoteSelect extends React.Component {
 
 
   handleChange = (value) => {
-    
+    const { onSelectHandel } = this.props
     this.setState({
       value,
       
       fetching: false,
     });
+    onSelectHandel(value)
   }
 
   render() {

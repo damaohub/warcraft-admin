@@ -1,48 +1,53 @@
-import { queryRule, removeRule, addRule, updateRule } from '@/services/api';
+import { queryRole, addRole, updateRole, editRl } from '@/services/role';
+
 
 export default {
-  namespace: 'rule',
+  namespace: 'role',
 
   state: {
     data: {
       list: [],
       pagination: {},
     },
+    res: {},
   },
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryRule, payload);
+      const response = yield call(queryRole, payload);
       yield put({
         type: 'save',
-        payload: response,
+        payload: response.data,
       });
     },
     *add({ payload, callback }, { call, put }) {
-      const response = yield call(addRule, payload);
+      const response = yield call(addRole, payload);
       yield put({
-        type: 'save',
+        type: 'item',
         payload: response,
       });
       if (callback) callback();
     },
-    *remove({ payload, callback }, { call, put }) {
-      const response = yield call(removeRule, payload);
-      yield put({
-        type: 'save',
-        payload: response,
-      });
-      if (callback) callback();
-    },
+   
     *update({ payload, callback }, { call, put }) {
-      const response = yield call(updateRule, payload);
+      const response = yield call(updateRole, payload);
       yield put({
-        type: 'save',
+        type: 'item',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *editRule({ payload, callback }, { call, put }) {
+      const response = yield call(editRl, payload);
+      yield put({
+        type: 'item',
         payload: response,
       });
       if (callback) callback();
     },
   },
+
+  
 
   reducers: {
     save(state, action) {
@@ -51,5 +56,11 @@ export default {
         data: action.payload,
       };
     },
+    item(state, action) {
+      return {
+        ...state,
+        res: action.payload
+      }
+    }
   },
 };

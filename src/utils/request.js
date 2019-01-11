@@ -127,8 +127,6 @@ export default function request(url, option) {
       sessionStorage.removeItem(`${hashcode}:timestamp`);
     }
   }
-  // const baseUrl = 'http://192.168.1.38'
-  // const baseUrl = 'https://maochenhui.top'
   const newUrl = url;
   return (
     fetch(newUrl, newOptions)
