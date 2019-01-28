@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
-import { Card, Button, Form, message, Divider, Popconfirm, Modal, Input, Select} from 'antd';
+import { Card, Button, Form, message, Divider, Modal, Input, Select} from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -37,7 +37,7 @@ class StaffPage extends Component {
 
   columns = [
     {
-      title: '昵称',
+      title: '手机号',
       dataIndex: 'username',
       key: 'username',
       align: 'center',
@@ -92,9 +92,7 @@ class StaffPage extends Component {
         <Fragment>
           <a href={`#/staff/setting?uid=${record.id}`}>完善信息</a>
           <Divider type="vertical" />
-          <Popconfirm title="是否要删除此行？" okText="确定" cancelText="取消" onConfirm={() => this.handleDelete(record)}>
-            <a>删除</a>
-          </Popconfirm>
+          <a href={`#/staff/center?uid=${record.id}`}>员工考核</a>
           
         </Fragment>
       ),
@@ -202,7 +200,7 @@ class StaffPage extends Component {
     const modalFooter = { okText: '保存', onOk: this.handleSubmit, onCancel: this.handleCancel };
     const getModalContent = () => (
       <Form onSubmit={this.handleSubmit}>
-        <FormItem label='姓名' {...this.formLayout}>
+        <FormItem label='手机号' {...this.formLayout}>
           {getFieldDecorator('username', {
             rules: [{ required: true, message: `请输入姓名` }],
             initialValue: current.username,

@@ -203,7 +203,8 @@ class TalentPage extends Component {
     const { dispatch } = this.props;
     this.handleFetch(dispatch);
     dispatch({
-      type: 'profession/fetch'
+      type: 'profession/fetch',
+      payload: {pageSize: 10000}
     })
   }
 

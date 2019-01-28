@@ -27,7 +27,6 @@ const getValue = obj =>
   
     constructor(props) {
       super(props);
-  
       this.state = {
         formVals: {
           equip_name: props.values.equip_name,
@@ -419,7 +418,15 @@ class EquipPage extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     this.handleFetch(dispatch);
-   
+     dispatch({
+        type: 'talent/fetchAll'
+      })
+      dispatch({
+        type: 'monster/fetch'
+      })
+      dispatch({
+        type: 'equip/fetchData1'
+      })
   }
 
   handleFetch = dispatch => {
@@ -550,7 +557,7 @@ class EquipPage extends Component {
     const {
       equip: { data },
       equip: { data1 },
-      talent: { all },
+      talent,
       loading,
     } = this.props;
     const needTypeList = []
@@ -563,7 +570,7 @@ class EquipPage extends Component {
       equipLocationList: data1.equipLocation || [],
       equipTypeList: data1.equipType || [],
       needTypeList: needTypeList || [],
-      talentList: all || [],
+      talentList: talent.all || [],
       monsterList: [] 
     } 
     const parentMethods = {

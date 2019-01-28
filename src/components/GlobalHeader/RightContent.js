@@ -76,16 +76,16 @@ export default class GlobalHeaderRight extends PureComponent {
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
         <Menu.Item key="userCenter">
           <Icon type="user" />
-          <FormattedMessage id="menu.account.center" defaultMessage="account center" />
+          <FormattedMessage id="menu.user" defaultMessage="menu.user" />
         </Menu.Item>
-        <Menu.Item key="userinfo">
+        {/* <Menu.Item key="userinfo">
           <Icon type="setting" />
           <FormattedMessage id="menu.account.settings" defaultMessage="account settings" />
         </Menu.Item>
         <Menu.Item key="triggerError">
           <Icon type="close-circle" />
           <FormattedMessage id="menu.account.trigger" defaultMessage="Trigger Error" />
-        </Menu.Item>
+        </Menu.Item> */}
         <Menu.Divider />
         <Menu.Item key="logout">
           <Icon type="logout" />
@@ -167,16 +167,16 @@ export default class GlobalHeaderRight extends PureComponent {
             emptyImage="https://gw.alipayobjects.com/zos/rmsportal/HsIsxMZiWKrNUavQUXqx.svg"
           />
         </NoticeIcon> */}
-        {currentUser.name ? (
+        {currentUser.username ? (
           <HeaderDropdown overlay={menu}>
             <span className={`${styles.action} ${styles.account}`}>
               <Avatar
                 size="small"
                 className={styles.avatar}
-                src={currentUser.avatar}
+                icon="user"
                 alt="avatar"
               />
-              <span className={styles.name}>{currentUser.name}</span>
+              <span className={styles.name}>{currentUser.real_name ||currentUser.username }</span>
             </span>
           </HeaderDropdown>
         ) : (

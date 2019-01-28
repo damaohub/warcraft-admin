@@ -23,6 +23,7 @@ export default class GlobalHeader extends PureComponent {
     this.triggerResizeEvent();
   };
   render() {
+    
     const { collapsed, isMobile, logo } = this.props;
     return (
       <div className={styles.header}>

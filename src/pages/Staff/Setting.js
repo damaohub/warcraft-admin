@@ -1,31 +1,29 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Form, message, Divider, Popconfirm,} from 'antd';
+import { Card, Form, Input,Button, Upload, message, Icon, DatePicker} from 'antd';
+import moment from 'moment';
 
+import 'moment/locale/zh-cn';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import saltMD5 from '@/utils/saltMD5';
 
 import styles from '../GameRole/game.less';
 
-
-
-const getValue = obj =>
-  Object.keys(obj)
-    .map(key => obj[key])
-    .join(',');
+const FormItem = Form.Item;
+const {Dragger} = Upload;
+moment.locale('zh-cn');
 
 
 @Form.create()
-/* eslint react/no-multi-comp:0 */
-@connect(({ staff, role }) => ({
+@connect(({ staff, loading }) => ({
   staff,
-  role
+  submitting: loading.effects['staff/update'],
 }))
 class SettingPage extends Component {
   state = {
- 
-    formValues: {},
+    uId: '',
+    cardBehind: '',
+    cardFront: ''
   };
 
   formLayout = {
@@ -36,104 +34,264 @@ class SettingPage extends Component {
   
   componentDidMount() {
     const { dispatch, location: {query: {uid}} } = this.props;
+    this.setState({
+      uId: uid
+    })
     dispatch({
         type: 'staff/current',
         payload: {id: uid}
     })
-    // if(uid) {
-      
+  }
 
-    // } else{
-    //     message.error('未获取用户')
-    // }
-  
+  normFileF = (e) => {
+    const {file:{response}} = e
+    if(e.error) {
+      message.error(e.error.message)
+      return
+    }
+    if(response) {
+      if(response.ret === 0) {
+        message.success('上传成功')
+          this.setState({
+            cardFront:  response.data
+          })
+         // eslint-disable-next-line
+        return response.data
+        
+      }
+     message.error(response.msg)
+     
+    }
+  }
+
+  normFileB = (e) => {
+    const {file:{response}} = e
+    if(e.error) {
+      message.error(e.error.message)
+      return
+    }
+    if(response) {
+      if(response.ret === 0) {
+        message.success('上传成功')
+          this.setState({
+            cardBehind:  response.data
+          })
+         // eslint-disable-next-line
+        return response.data
+        
+      }
+     message.error(response.msg)
+     
+    }
     
   }
-
  
-  handleCall = (okText, failText) => {
-    const {dispatch, staff: {res} } = this.props;
-    if(res && res.ret === 0) {
-      message.success(okText || res.msg);
-    } else {
-      message.error(failText || res.msg);
-    }
-    dispatch({
-      type: 'staff/fetch',
-    });
-  }
 
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch } = this.props;
-    const { formValues } = this.state;
-
-    const filters = Object.keys(filtersArg).reduce((obj, key) => {
-      const newObj = { ...obj };
-      newObj[key] = getValue(filtersArg[key]);
-      return newObj;
-    }, {});
-
-    const params = {
-      currentPage: pagination.current,
-      pageSize: pagination.pageSize,
-      ...formValues,
-      ...filters,
-    };
-    if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.order}`;
-    }
-    dispatch({
-      type: 'staff/fetch',
-      payload: params,
-    });
-  };
-
-  showModal = (e, item) => {
-    e.preventDefault()
-    let newCurrent
-    if(item) {
-      newCurrent = {pid: item.key}
-    }
-    this.setState({
- 
-      current: newCurrent
-    });
-  };
-
-  handleCancel = () => {
-    this.setState({
- 
-    });
-  };
 
   handleSubmit = e => {
     e.preventDefault();
     const { dispatch, form } = this.props;
-    const { current } = this.state;
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      if(fieldsValue.password) {
-        Object.assign (fieldsValue,{password: saltMD5.md5(fieldsValue.password)})
+    const { uId } = this.state
+    form.validateFieldsAndScroll((err, values) => {
+
+      if (!err) {
+        dispatch({
+          type: 'staff/update',
+          // eslint-disable-next-line
+          payload: {id: uId, ...values, 'entry_time': values['entry_time'].format('YYYY-MM-DD')},
+        }).then(
+          () => {
+            const { staff: {res} } = this.props;
+            if(res && res.ret === 0) {
+              message.success("提交成功！");
+            
+            } else {
+              message.error(res.msg);
+            }
+          }
+        );
       }
-      dispatch({
-        type: 'staff/add',
-        payload: {...current, ...fieldsValue},
-      }).then(
-        () => {
-          this.handleCancel()
-          this.handleCall('操作成功')
-        }
-      );
     });
   };
 
   render() {
+    const {
+      submitting,
+      form: { getFieldDecorator },
+      staff: {current}
+    } = this.props;
+    const { cardFront, cardBehind } = this.state;
+    const uploadProps = {
+      action: "http://192.168.0.128/user/upload-cardimg",
+      showUploadList: false,
+      onChange: this.handleChange,
+      data: {
+        time: Date.parse(new Date()) / 1000,
+        token: localStorage.getItem('token')? JSON.parse(localStorage.getItem('token')) : null,
+      }
+    }
+
+    const uploadHolder = (state) => {
+      if(state) {
+        return (
+          <img src={state} alt="" style={{maxHeight: '200px'}} />
+        )
+      } 
+      return <Icon type="idcard" style={{fontSize: '200px'}} theme="twoTone" twoToneColor="#dddddd" />
+    }
+    const config = {
+      rules: [{ type: 'object', required: true, message: '请选择日期' }],
+      
+    };
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 7 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 12 },
+        md: { span: 10 },
+      },
+    };
+
+    const submitFormLayout = {
+      wrapperCol: {
+        xs: { span: 24, offset: 0 },
+        sm: { span: 10, offset: 7 },
+      },
+    };
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
-              23123
+              <Form onSubmit={this.handleSubmit} hideRequiredMark style={{ marginTop: 8 }}>
+                <FormItem {...formItemLayout} label="手机号">
+                  {getFieldDecorator('username', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入',
+                    },
+                  ],
+                  initialValue: current.username
+                })(<Input placeholder="" disabled />)}
+                </FormItem>
+                <FormItem {...formItemLayout} label="在职状态">
+                  {getFieldDecorator('status', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入',
+                    },
+                  ],
+                  initialValue: current.status
+                })(<Input placeholder="" disabled />)}
+                </FormItem>
+                <FormItem {...formItemLayout} label="角色">
+                  {getFieldDecorator('role_name', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入',
+                    },
+                  ],
+                  initialValue: current.role_name
+                })(<Input placeholder="" disabled />)}
+                </FormItem>
+                <FormItem {...formItemLayout} label="姓名">
+                  {getFieldDecorator('real_name', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入姓名',
+                    },
+                  ],
+                  initialValue: current.real_name
+                })(<Input placeholder="请输入姓名" />)}
+                </FormItem>
+                <FormItem {...formItemLayout} label="基本工资">
+                  {getFieldDecorator('basic_salary', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入基本工资',
+                    },
+                  ],
+                  initialValue: current.basic_salary
+                })(<Input placeholder="请输入基本工资" />)}
+                </FormItem>
+                <FormItem {...formItemLayout} label="QQ号">
+                  {getFieldDecorator('qq', {
+                  rules: [
+                    {
+                      required: true,
+                      message: 'QQ号',
+                    },
+                  ],
+                  initialValue: current.qq
+                })(<Input placeholder="请输入QQ号" />)}
+                </FormItem>
+                <FormItem {...formItemLayout} label="入职时间">
+                  {getFieldDecorator('entry_time', {...config, initialValue: moment(current.entry_time, 'YYYY-MM-DD')})(<DatePicker placeholder="请选择入职日期" />)}
+                </FormItem>
+                <FormItem {...formItemLayout} label="身份证号">
+                  {getFieldDecorator('id_card', {
+                  rules: [
+                    {
+                      required: true,
+                      len: 18,
+                      message: '请输入身份证号',
+                    },
+                  ],
+                  initialValue: current.id_card
+                })(<Input placeholder="请输入身份证号" />)}
+                </FormItem>
+                <FormItem {...formItemLayout} label="上传身份证正面照">
+                  {getFieldDecorator('card_img_front', {
+                    rules: [
+                      {
+                        required: true,
+                        message: '未获取身份证正面照',
+                      },
+                    ],
+                    initialValue: current.card_img_front,
+                    getValueFromEvent:this.normFileF,
+                    validateTrigger: 'onSubmit'
+                  })(
+                    <Dragger {...uploadProps}>
+                      {uploadHolder(cardFront||current.card_img_front)}
+                    </Dragger>
+                  )}
+                
+                </FormItem>
+                <FormItem {...formItemLayout} label="上传身份证背面照">
+                  {getFieldDecorator('card_img_behind', {
+                    rules: [
+                      {
+                        required: true,
+                        message: '未获取身份证背面照',
+                      },
+                    ],
+                    initialValue: current.card_img_behind,
+                    getValueFromEvent: this.normFileB,
+                    validateTrigger:'onSubmit'
+                  })(
+                    <Dragger {...uploadProps}>
+                      {uploadHolder(cardBehind||current.card_img_behind)}
+                    </Dragger>
+                  )}
+                
+                </FormItem>
+
+                <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
+                  <Button type="primary" htmlType="submit" loading={submitting}>
+                    提交
+                  </Button>
+                </FormItem>
+              
+              </Form>
          
             </div>
             

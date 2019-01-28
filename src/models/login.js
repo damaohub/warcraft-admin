@@ -4,24 +4,26 @@ import { accountLogin, getFakeCaptcha } from '@/services/api';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import { reloadAuthorized } from '@/utils/Authorized';
+import { message } from 'antd';
 
 export default {
   namespace: 'login',
 
   state: {
     token: undefined,
+    userInfo: {}
   },
 
   effects: {
     *login({ payload }, { call, put }) {
       const response = yield call(accountLogin, payload);
-      console.log(response)
-      yield put({
-        type: 'changeLoginStatus',
-        payload: response,
-      });
+      
       // Login successfully
       if (response.ret === 0) {
+        yield put({
+          type: 'changeLoginStatus',
+          payload: response,
+        });
         reloadAuthorized();
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
@@ -39,6 +41,8 @@ export default {
           }
         }
         yield put(routerRedux.replace(redirect || '/'));
+      } else {
+        message.error(response.msg)
       }
     },
 
@@ -57,7 +61,7 @@ export default {
       reloadAuthorized();
       yield put(
         routerRedux.push({
-          pathname: '/user/login',
+          pathname: '/login',
           search: stringify({
             redirect: window.location.href,
           }),
@@ -77,5 +81,7 @@ export default {
         userInfo: payload.data.role_info,
       };
     },
+
+    
   },
 };

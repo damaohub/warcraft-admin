@@ -19,7 +19,8 @@ class RightsPage extends PureComponent {
     checkedKeys: [],
     expandedKeys:[],
     roleId: '2',
-    loading: false
+    loading: false,
+    checkedMap: {}
   }
 
   formLayout = {
@@ -29,19 +30,34 @@ class RightsPage extends PureComponent {
 
  
   componentWillMount() {
-    const { dispatch, location: {query: {roleId}} } = this.props;
+    const {location: {query: {roleId}} } = this.props;
+    this.init(roleId)
+  }
+
+  init = (roleId) => {
+    const {dispatch, role: {data:{list}}} = this.props
     dispatch({
       type: 'role/fetch',
     });
     dispatch({
       type: 'rule/fetch',
     });
-    if(roleId) {
-      this.setState({
-        roleId
+    const defaultId = roleId || '2'
+
+      const selectedMap = {}
+      // eslint-disable-next-line
+      list.map(item => {
+        const key = item.id
+        const value= item.role_rule.split(',')
+        selectedMap[key] = value
       })
-    }
-   
+      
+     const checked = selectedMap[defaultId]
+      this.setState({
+        checkedMap: selectedMap,
+        roleId: defaultId,
+        checkedKeys: checked
+      })
   }
 
   renderTreeNodes = data => data.map((item) => {
@@ -92,7 +108,7 @@ class RightsPage extends PureComponent {
     // or, you can remove all expanded children keys.
     this.setState({
       expandedKeys,
-      autoExpandParent: false,
+      autoExpandParent: true,
     });
   }
 
@@ -101,12 +117,15 @@ class RightsPage extends PureComponent {
   }
 
   onRoleChange = (e) => {
+    const {checkedMap} = this.state 
     this.setState({
       roleId: e.target.value,
+      checkedKeys: checkedMap[e.target.value]
     });
   }
  
   handleSubmit = e => {
+    console.log("sub")
     e.preventDefault();
     const { dispatch } = this.props;
     const { checkedKeys, roleId } = this.state;
@@ -123,10 +142,9 @@ class RightsPage extends PureComponent {
     }).then(
       () => {
         this.handleCall('授权成功！')
+        this.init(roleId)
         this.setState({
-          loading: false,
-          checkedKeys: [],
-          expandedKeys:[]
+          loading: false
         })
       }
     );

@@ -1,4 +1,4 @@
-import { query as queryUsers, queryCurrent } from '@/services/user';
+import { query as queryUsers, queryCurrent, fetchSalary } from '@/services/user';
 
 export default {
   namespace: 'user',
@@ -6,6 +6,7 @@ export default {
   state: {
     list: [],
     currentUser: {},
+    salary: {}
   },
 
   effects: {
@@ -16,10 +17,17 @@ export default {
         payload: response,
       });
     },
-    *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
+    *fetchCurrent({payload}, { call, put }) {
+      const response = yield call(queryCurrent, payload);
       yield put({
         type: 'saveCurrentUser',
+        payload: response,
+      });
+    },
+    *salary({payload}, { call, put }) {
+      const response = yield call(fetchSalary, payload);
+      yield put({
+        type: 'saveSalary',
         payload: response,
       });
     },
@@ -35,7 +43,13 @@ export default {
     saveCurrentUser(state, action) {
       return {
         ...state,
-        currentUser: action.payload || {},
+        currentUser: action.payload.data || {},
+      };
+    },
+    saveSalary(state, action) {
+      return {
+        ...state,
+        salary: action.payload.data || {},
       };
     },
     changeNotifyCount(state, action) {

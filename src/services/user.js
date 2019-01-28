@@ -4,6 +4,16 @@ export async function query() {
   return request('/api/users');
 }
 
-export async function queryCurrent() {
-  return request('/api/currentUser');
+export async function queryCurrent(params) {
+  return request('/api/user/userinfo', {
+    method: 'POST',
+    body: params
+  });
+}
+
+export async function fetchSalary(params) {
+  return request('/api/gamer/salary', {
+    method: 'POST',
+    body: params
+  });
 }

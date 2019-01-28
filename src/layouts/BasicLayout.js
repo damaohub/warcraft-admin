@@ -62,9 +62,9 @@ class BasicLayout extends React.PureComponent {
       dispatch,
       route: { routes, authority },
     } = this.props;
-    // dispatch({
-    //   type: 'user/fetchCurrent',
-    // });
+    dispatch({
+      type: 'user/fetchCurrent',
+    });
     dispatch({
       type: 'setting/getSetting',
     });
@@ -116,14 +116,14 @@ class BasicLayout extends React.PureComponent {
     const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
 
     if (!currRouterData) {
-      return 'Ant Design Pro';
+      return '莜蓝魔兽';
     }
     const pageName = formatMessage({
       id: currRouterData.locale || currRouterData.name,
       defaultMessage: currRouterData.name,
     });
 
-    return `${pageName} - Ant Design Pro`;
+    return `${pageName} - 莜蓝魔兽`;
   };
 
   getLayoutStyle = () => {
@@ -173,7 +173,7 @@ class BasicLayout extends React.PureComponent {
       <Layout>
         {isTop && !isMobile ? null : (
           <SiderMenu
-            logo={logo}
+            // logo={logo}
             theme={navTheme}
             onCollapse={this.handleMenuCollapse}
             menuData={menuData}

@@ -13,15 +13,16 @@ const { UserName, Password, Submit } = Login;
   login,
   submitting: loading.effects['login/login'],
 }))
+// ylms666 13733893092  
 class LoginPage extends Component {
-  handleSubmit = (err) => {
+  handleSubmit = (err, values) => {
     if (!err) {
       const { dispatch } = this.props;
+       Object.assign(values, {password: saltMD5.md5(values.password)})
       dispatch({
         type: 'login/login',
         payload: {
-          username: '13733893092',
-          password: saltMD5.md5('ylms666'),
+          ...values
         },
       });
     }

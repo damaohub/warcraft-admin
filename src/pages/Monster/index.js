@@ -1,4 +1,4 @@
-import React, { Component, Fragment, PureComponent } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
 import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm, Select } from 'antd';
 
@@ -14,34 +14,56 @@ const getValue = obj =>
     .map(key => obj[key])
     .join(',');
 
-const CreateForm = Form.create()(props => {
-  const { modalVisible, form, handleAdd, handleModalVisible, instanceList, IM } = props;
-  const title = IM === 0 ? "新建副本" : "添加怪兽"
-  const msg = IM === 0 ? "请输入副本" : "请输入怪兽"
-  const okHandle = () => {
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      form.resetFields();
-      handleAdd({instance_or_monster: IM, ...fieldsValue});
-    });
+@Form.create()
+class CreateForm extends Component {
+  static defaultProps = {
+    handleAdd: () => {},
+    handleModalVisible: () => {}
   };
 
-  return (
-    <Modal
-      destroyOnClose
-      title={title} 
-      visible={modalVisible}
-      onOk={okHandle}
-      onCancel={() => handleModalVisible()}
-    >
-   
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label={msg}>
-        {form.getFieldDecorator('name', {
-          rules: [{ required: true, message: {msg} }],
-        })(<Input placeholder="请输入" />)}
-      </FormItem>
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
 
-      {IM === 1 && 
+    this.formLayout = {
+      labelCol: { span: 7 },
+      wrapperCol: { span: 13 },
+    };
+  }
+
+
+
+  onSelectHandel = (value) => {
+    const { form } = this.props
+    form.setFieldsValue({
+      monster_id: value
+    })
+  }
+
+
+  renderContent = (IM) => {
+    const { form, instanceList} = this.props;
+  
+    return [
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label={IM === 0 ? "请输入副本" : "请输入怪兽"}>
+        {form.getFieldDecorator('name', {
+          rules: [{ required: true, message: IM === 0 ? "请输入副本" : "请输入怪兽"}],
+        })(<Input placeholder="请输入" />)}
+      </FormItem>,
+      
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="副本类型">
+        {form.getFieldDecorator('instance_type', {
+          rules: [{ required: true, message: '请选择副本类型！'}],
+        })(
+          <Select placeholder="请选择副本类型" style={{ width: '100%' }}>
+            <Option key='1'>地下城</Option>
+            <Option key='2'>团队副本</Option>
+          </Select>
+        )}
+      </FormItem>,
+      (
+        IM === 1 && 
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属副本">
           {form.getFieldDecorator('instance_id', {
             rules: [{ required: true, message: '请选择副本！'}],
@@ -53,17 +75,53 @@ const CreateForm = Form.create()(props => {
             </Select>
           )}
         </FormItem>
-      }
-      
-     
-      
-      
-    </Modal>
-  );
-});
+      )
+    ];
+  };
+
+  renderFooter = () => {
+    const { handleModalVisible, values } = this.props;
+    return [
+      <Button key="cancel" onClick={() => handleModalVisible(false, values)}>
+        取消
+      </Button>,
+      <Button key="submit" type="primary" onClick={() => this.handleNext(values)}>
+        完成
+      </Button>,
+    ];
+  };
+
+  handleNext = () => {
+    const { form, handleAdd, IM } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      form.resetFields();
+      handleAdd({instance_or_monster: IM, ...fieldsValue});
+    });
+  };
+
+  render() {
+    const { modalVisible, handleModalVisible, values, IM } = this.props;
+    return (
+      <Modal
+        width={640}
+        bodyStyle={{ padding: '32px 40px 48px' }}
+        destroyOnClose
+        title={IM === 0 ? "新建副本" : "添加怪兽"}
+        visible={modalVisible}
+        footer={this.renderFooter()}
+        onCancel={() => handleModalVisible(false, values)}
+        afterClose={() => handleModalVisible()}
+      >
+        {this.renderContent(IM)}
+      </Modal>
+    );
+  }
+}
+
 
 @Form.create()
-class UpdateForm extends PureComponent {
+class UpdateForm extends Component {
   static defaultProps = {
     handleUpdate: () => {},
     handleUpdateModalVisible: () => {},

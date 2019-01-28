@@ -34,3 +34,10 @@ export async function currentStaff(params) {
     body: params
   });
 }
+
+export async function salaryStaff(params) {
+  return request('/api/user/salary', {
+    method: 'POST',
+    body: params
+  });
+}

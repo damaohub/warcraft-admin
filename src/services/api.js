@@ -70,7 +70,6 @@ export async function updateFakeList(params) {
 }
 
 export async function accountLogin(params) {
-  console.log(params)
   return request('/api/login/login', {
     method: 'POST',
     body: params,

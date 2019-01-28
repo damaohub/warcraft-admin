@@ -76,7 +76,7 @@ export default {
   },
   proxy: {
     '/api': {
-      target: 'http://192.168.0.128/',
+      target: 'http://192.168.0.128',
       // target: 'https://maochenhui.top',
       changeOrigin: true,
       pathRewrite: { '^/api': '' },

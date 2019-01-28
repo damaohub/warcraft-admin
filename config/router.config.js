@@ -13,37 +13,21 @@ export default [
     path: '/',
     component: '../layouts/BasicLayout',
     Routes: ['src/pages/Authorized'],
-    authority: ['admin', 'user'],
     routes: [
       // dashboard
-      { path: '/', redirect: '/dashboard/analysis' },
+      { path: '/', redirect: '/dashboard' },
       {
         path: '/dashboard',
-        name: 'dashboard',
+        name: 'dashboard.workplace',
         icon: 'dashboard',
-        routes: [
-          {
-            path: '/dashboard/analysis',
-            name: 'analysis',
-            component: './Dashboard/Analysis',
-          },
-          {
-            path: '/dashboard/monitor',
-            name: 'monitor',
-            component: './Dashboard/Monitor',
-          },
-          {
-            path: '/dashboard/workplace',
-            name: 'workplace',
-            component: './Dashboard/Workplace',
-          },
-        ],
+        component: './Dashboard/Workplace'
       },
       //gameRole
       {
         path: '/gamerole',
         icon: 'table',
         name: 'gameRole',
+        authority: ['admin'],
         routes: [
           {
             path: '/gamerole/races',
@@ -83,6 +67,7 @@ export default [
         path: '/rr',
         icon: 'table',
         name: 'rr',
+        authority: ['admin'],
         routes: [
            //rule
           {
@@ -110,7 +95,7 @@ export default [
       //staff
       {
         path: '/staff',
-        icon: 'staff',
+        icon: 'table',
         name: 'staff',
         hideChildrenInMenu: true,
         routes: [
@@ -123,94 +108,89 @@ export default [
             path: '/staff/setting',
             name: 'setting',
             component: './Staff/Setting'
+          },
+          {
+            path: '/staff/center',
+            name: 'center',
+            component: './Staff/Center'
           }
         ]
       },
-      
-      // forms
+      //订单管理
       {
-        path: '/form',
-        icon: 'form',
-        name: 'form',
+        path: '/order',
+        icon: 'table',
+        name: 'order',
         routes: [
           {
-            path: '/form/basic-form',
-            name: 'basicform',
-            component: './Forms/BasicForm',
+            path: '/order/list',
+            name: 'list',
+            component: './Order/List'
           },
           {
-            path: '/form/step-form',
-            name: 'stepform',
-            component: './Forms/StepForm',
+            path: '/order/add',
+            name: 'add',
+            component: './Order/Add'
+          },
+          {
+            path: '/order/detail',
+            name: 'detail',
+            hideInMenu: true,
+            component: './Order/Detail'
+          }
+        ]
+      },
+      // team
+      {
+        path: '/team',
+        icon: 'table',
+        name: 'team',
+        routes: [
+          {
+            path: '/team/list',
+            name: 'list',
+            component: './Team/List'
+          },
+          {
+            path: '/team/detail',
+            name: 'detail',
+            hideInMenu: true,
+            component: './Team/Detail'
+          },
+          {
+            path: '/team/add',
+            name: 'add',
             hideChildrenInMenu: true,
+            component: './Team/Add',
             routes: [
               {
-                path: '/form/step-form',
-                redirect: '/form/step-form/info',
+                path: '/team/add',
+                redirect: '/team/add/info',
               },
               {
-                path: '/form/step-form/info',
+                path: '/team/add/info',
                 name: 'info',
-                component: './Forms/StepForm/Step1',
+                component: './Team/Add/Step1',
               },
               {
-                path: '/form/step-form/confirm',
+                path: '/team/add/confirm',
                 name: 'confirm',
-                component: './Forms/StepForm/Step2',
+                component: './Team/Add/Step2',
               },
               {
-                path: '/form/step-form/result',
+                path: '/team/add/result',
                 name: 'result',
-                component: './Forms/StepForm/Step3',
+                component: './Team/Add/Step3',
               },
-            ],
+            ]
           },
-          {
-            path: '/form/advanced-form',
-            name: 'advancedform',
-            authority: ['admin'],
-            component: './Forms/AdvancedForm',
-          },
-        ],
-      },
-     
-      {
-        path: '/profile',
-        name: 'profile',
-        icon: 'profile',
-        routes: [
-          // profile
-          {
-            path: '/profile/basic',
-            name: 'basic',
-            component: './Profile/BasicProfile',
-          },
-          {
-            path: '/profile/advanced',
-            name: 'advanced',
-            authority: ['admin'],
-            component: './Profile/AdvancedProfile',
-          },
-        ],
-      },
-      {
-        name: 'result',
-        icon: 'check-circle-o',
-        path: '/result',
-        routes: [
-          // result
-          {
-            path: '/result/success',
-            name: 'success',
-            component: './Result/Success',
-          },
-          { path: '/result/fail', name: 'fail', component: './Result/Error' },
-        ],
+        ]
       },
       {
         name: 'exception',
         icon: 'warning',
         path: '/exception',
+        hideInMenu: true,
         routes: [
           // exception
           {
@@ -236,7 +216,44 @@ export default [
           },
         ],
       },
-     
+      //个人中心
+      {
+        path: '/user',
+        icon: 'table',
+        name: 'user',
+        component: './User',
+        routes: [
+          {
+            path: '/user/',
+            redirect: '/user/salary',
+          },
+          {
+            path: '/user/salary',
+            component: './User/Salary',
+          }
+        ],
+      },
+      //游戏账号
+      {
+        path: '/account',
+        icon: 'table',
+        name: 'account',
+        component: "./Account"
+      },
+      // 可用游戏账号
+      {
+        path: '/player',
+        icon: 'table',
+        name: 'player',
+        component: "./Player"
+      },
+      //团员
+      {
+        path: '/group',
+        icon: 'table',
+        name: 'group',
+        component: "./Group"
+      },
       {
         component: '404',
       },
