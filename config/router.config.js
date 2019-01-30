@@ -20,14 +20,15 @@ export default [
         path: '/dashboard',
         name: 'dashboard.workplace',
         icon: 'dashboard',
-        component: './Dashboard/Workplace'
+        component: './Dashboard/Workplace',
+       
       },
       //gameRole
       {
         path: '/gamerole',
         icon: 'table',
         name: 'gameRole',
-        authority: ['admin'],
+        authority: ['1'],
         routes: [
           {
             path: '/gamerole/races',
@@ -51,6 +52,7 @@ export default [
         path: '/monster',
         icon: 'table',
         name: 'monster',
+        authority: ['1'],
         component: './Monster'
        
       },
@@ -59,6 +61,7 @@ export default [
         path: '/equip',
         icon: 'table',
         name: 'equip',
+        authority: ['1'],
         component: './Equip'
        
       },
@@ -67,7 +70,7 @@ export default [
         path: '/rr',
         icon: 'table',
         name: 'rr',
-        authority: ['admin'],
+        authority: ['1'],
         routes: [
            //rule
           {
@@ -97,6 +100,7 @@ export default [
         path: '/staff',
         icon: 'table',
         name: 'staff',
+        authority: ['1','4'],
         hideChildrenInMenu: true,
         routes: [
           {
@@ -121,6 +125,7 @@ export default [
         path: '/order',
         icon: 'table',
         name: 'order',
+        authority: ['1','4'],
         routes: [
           {
             path: '/order/list',
@@ -140,23 +145,26 @@ export default [
           }
         ]
       },
-      // team
+      // 排团
       {
         path: '/team',
         icon: 'table',
         name: 'team',
+        authority: ['1'],
         routes: [
           {
             path: '/team/list',
             name: 'list',
             component: './Team/List'
+            
           },
           {
-            path: '/team/detail',
+            path: '/team/list/detail',
             name: 'detail',
             hideInMenu: true,
             component: './Team/Detail'
           },
+         
           {
             path: '/team/add',
             name: 'add',
@@ -238,6 +246,7 @@ export default [
         path: '/account',
         icon: 'table',
         name: 'account',
+        authority: ['1','4'],
         component: "./Account"
       },
       // 可用游戏账号
@@ -245,13 +254,24 @@ export default [
         path: '/player',
         icon: 'table',
         name: 'player',
+        authority: ['1','2','3'],
         component: "./Player"
       },
+        // 团队操作
+        {
+          path: '/dashboard/player-team',
+          icon: 'table',
+          name: 'player-team',
+          authority: ['3'],
+          hideInMenu: true,
+          component: "./Player/Team"
+        },
       //团员
       {
         path: '/group',
         icon: 'table',
         name: 'group',
+        authority: ['2'],
         component: "./Group"
       },
       {

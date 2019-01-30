@@ -56,7 +56,7 @@ export default {
       const response = yield call(salaryStaff, payload);
       yield put({
         type: 'sy',
-        payload: response,
+        payload: response.data,
       });
     }
   },

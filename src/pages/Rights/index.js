@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'dva';
 import {message, Radio, Card, Tree, Button, Divider } from 'antd';
 
@@ -13,7 +13,7 @@ const { TreeNode } = Tree;
   role,
   rule
 }))
-class RightsPage extends PureComponent {
+class RightsPage extends Component {
   state ={
     autoExpandParent: true,
     checkedKeys: [],
@@ -30,18 +30,23 @@ class RightsPage extends PureComponent {
 
  
   componentWillMount() {
-    const {location: {query: {roleId}} } = this.props;
-    this.init(roleId)
-  }
-
-  init = (roleId) => {
-    const {dispatch, role: {data:{list}}} = this.props
+    const {dispatch, location: {query: {roleId}} } = this.props;
     dispatch({
       type: 'role/fetch',
-    });
+    }).then(
+      () => {
+        this.init(roleId)
+      }
+    )
     dispatch({
       type: 'rule/fetch',
     });
+   
+  }
+
+  init = (roleId) => {
+    const {role: {data:{list}}} = this.props
+  
     const defaultId = roleId || '2'
 
       const selectedMap = {}
@@ -51,7 +56,6 @@ class RightsPage extends PureComponent {
         const value= item.role_rule.split(',')
         selectedMap[key] = value
       })
-      
      const checked = selectedMap[defaultId]
       this.setState({
         checkedMap: selectedMap,

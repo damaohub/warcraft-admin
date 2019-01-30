@@ -21,6 +21,7 @@ export default {
   'menu.user': '个人中心',
   'menu.group': '团员管理',
   'menu.player': '可用账号',
+  'menu.player-team': '团队操作',
   'menu.order': '订单管理',
   'menu.order.list': '订单列表',
   'menu.order.add': '下单',

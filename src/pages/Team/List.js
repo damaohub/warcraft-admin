@@ -96,7 +96,7 @@ const getValue = obj =>
         title: '操作',
         render: (text, record) => (
           <Fragment>
-            <a href={`#/team/detail?id=${record.id}`}>排团详情</a>
+            <a href={`#/team/list/detail?id=${record.id}`}>排团详情</a>
           </Fragment>
         ),
         align: 'center',
@@ -144,7 +144,7 @@ const getValue = obj =>
   
     render() {
       const {
-        loading,
+        Loading,
         team: { data },
      
       } = this.props;
@@ -156,7 +156,7 @@ const getValue = obj =>
             <div className={styles.cardList}>
               
               <StandardTable
-                loading={loading}
+                loading={Loading}
                 data={data}
                 columns={this.columns}
                 onSelectRow={this.handleSelectRows}

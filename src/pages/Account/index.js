@@ -274,7 +274,7 @@ const getValue = obj =>
   
     render() {
       const {
-        loading,
+        Loading,
         account,
         profession,
         talent,
@@ -412,7 +412,7 @@ const getValue = obj =>
                 </Button>
               </div>
               <StandardTable
-                loading={loading}
+                loading={Loading}
                 data={data}
                 scroll={{ x: 1300 }} 
                 columns={this.columns}

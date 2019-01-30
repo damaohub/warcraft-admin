@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import { Card, Row, Col,  Divider, Avatar} from 'antd';
+import { Card, Row, Col,  Divider, Avatar, Spin} from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 
 import styles from './Center.less';
@@ -104,7 +104,7 @@ import styles from './Center.less';
                     <Divider dashed />
                   </div>
                 ) : (
-                  'loading...'
+                  <Spin size="large" />
                 )}
               </Card>
             </Col>

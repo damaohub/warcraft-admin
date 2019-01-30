@@ -111,7 +111,7 @@ const getValue = obj =>
   
     render() {
       const {
-        loading,
+        Loading,
         player: { data },
      
       } = this.props;
@@ -123,7 +123,7 @@ const getValue = obj =>
             <div className={styles.cardList}>
               
               <StandardTable
-                loading={loading}
+                loading={Loading}
                 data={data}
                 columns={this.columns}
                 onSelectRow={this.handleSelectRows}

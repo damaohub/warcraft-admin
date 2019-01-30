@@ -20,7 +20,7 @@ const getValue = obj =>
 /* eslint react/no-multi-comp:0 */
 @connect(({ group, loading }) => ({
     group,
-  loading: loading.models.gruop,
+  Loading: loading.models.group,
 }))
 class GroupPage extends Component {
   state = {};
@@ -138,7 +138,7 @@ class GroupPage extends Component {
   render() {
     const {
       group: { data },
-      loading
+      Loading
     } = this.props;
 
     return (
@@ -146,7 +146,7 @@ class GroupPage extends Component {
         <Card bordered={false}>
           <div className={styles.tableList}>
             <StandardTable
-              loading={loading}
+              loading={Loading}
               data={data}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}

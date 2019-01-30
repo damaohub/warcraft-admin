@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Form, message, Button, Row, Col, Modal, Input, Select, Divider } from 'antd';
+import { Card, Form, message, Button, Row, Col, Modal, Input, Select, Divider, Spin  } from 'antd';
 
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -27,6 +27,8 @@ class CenterPage extends Component {
   state = {
     visible: false,
     formValues: {},
+    success: false,
+   
   };
 
   formLayout = {
@@ -72,16 +74,23 @@ class CenterPage extends Component {
    
   ];
 
-  componentDidMount() {
+  componentWillMount() {
     const { dispatch, location: {query: {uid}} } = this.props;
     dispatch({
       type: 'staff/salary',
       payload: {id: uid}
-    });
+    }).then(
+      ()=> {
+        this.setState({
+          success: true
+        })
+      }
+    )
     dispatch({
       type: 'staff/current',
       payload: {id: uid}
     });
+    
   }
 
  
@@ -155,10 +164,10 @@ class CenterPage extends Component {
   };
 
   render() { 
-    const {staff:{salary}, staff:{current}, loading, form: { getFieldDecorator }} = this.props
-    const {visible} = this.state
-    const data = {list: salary.list, pagination: salary.pagenation}
-
+    const {staff: {salary}, staff:{current}, loading, form: { getFieldDecorator }} = this.props
+    const dataSorce = {list:salary.list, pagination: salary.pagination}
+    const {visible, success } = this.state
+    
     const Info = ({ title, value, bordered }) => (
       <div className={styles.headerInfo}>
         <span>{title}</span>
@@ -196,64 +205,64 @@ class CenterPage extends Component {
     )
 
     return (
-      <PageHeaderWrapper>
-        <Divider orientation="left">员工信息</Divider>
-        <Card bordered={false}>
-          <DescriptionList size="large">
-            <Description term="员工姓名">{current.real_name}</Description>
-            <Description term="联系电话">{current.username}</Description>
-            <Description term="系统角色">{current.role_name}</Description>
-            <Description term="在职状态">{current.status}</Description>
-            <Description term="基本工资">{current.basic_salary}</Description>
-            <Description term="入职时间">{current.entry_time}</Description>
-            <Description term="QQ号码">{current.qq}</Description>
-          </DescriptionList>
-        </Card>
-        <Divider orientation="left">本月总结</Divider>
-        <Card bordered={false}>
-          <Row>
-            <Col sm={12} xs={24}>
-              <Info title="基本工资" value={salary.basic_money?salary.basic_money: '0'} bordered />
-            </Col>
-            <Col sm={12} xs={24}>
-              <Info title="最终工资" value={salary.current_month_money?salary.current_month_money: '0'} />
-            </Col>
-           
-          </Row>
-        </Card>
-        <Divider orientation="left">考核记录</Divider>
-        <div className={styles.tableList}>
+      success?
+        <PageHeaderWrapper>
+          <Divider orientation="left">员工信息</Divider>
           <Card bordered={false}>
-            <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={(e) => this.showModal(e)}>
-                新建考核记录
-              </Button>
-            </div>
-            <StandardTable
-              loading={loading}
-              data={data}
-              columns={this.columns}
-              onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange} 
-            />
+            <DescriptionList size="large">
+              <Description term="员工姓名">{current.real_name}</Description>
+              <Description term="联系电话">{current.username}</Description>
+              <Description term="系统角色">{current.role_name}</Description>
+              <Description term="在职状态">{current.status}</Description>
+              <Description term="基本工资">{current.basic_salary}</Description>
+              <Description term="入职时间">{current.entry_time}</Description>
+              <Description term="QQ号码">{current.qq}</Description>
+            </DescriptionList>
           </Card>
+          <Divider orientation="left">本月总结</Divider>
+          <Card bordered={false}>
+            <Row>
+              <Col sm={12} xs={24}>
+                <Info title="基本工资" value={salary.basic_money?salary.basic_money: '0'} bordered />
+              </Col>
+              <Col sm={12} xs={24}>
+                <Info title="最终工资" value={salary.current_month_money?salary.current_month_money: '0'} />
+              </Col>
+            
+            </Row>
+          </Card>
+          <Divider orientation="left">考核记录</Divider>
+          <div className={styles.tableList}>
+            <Card bordered={false}>
+              <div className={styles.tableListOperator}>
+                <Button icon="plus" type="primary" onClick={(e) => this.showModal(e)}>
+                  新建考核记录
+                </Button>
+              </div>
+              <StandardTable
+                loading={loading}
+                data={dataSorce}
+                columns={this.columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange} 
+              />
+            </Card>
 
 
-        </div>
-        <Modal
-          title='账户添加'
-          className={styles.standardListForm}
-          width={640}
-          bodyStyle={{ padding: '28px 0 0' }}
-          destroyOnClose
-          visible={visible}
-          {...modalFooter}
-          maskClosable={false}
-        >
-          {getModalContent()}
-        </Modal>
-        
-      </PageHeaderWrapper>
+          </div>
+          <Modal
+            title='账户添加'
+            className={styles.standardListForm}
+            width={640}
+            bodyStyle={{ padding: '28px 0 0' }}
+            destroyOnClose
+            visible={visible}
+            {...modalFooter}
+            maskClosable={false}
+          >
+            {getModalContent()}
+          </Modal>  
+        </PageHeaderWrapper>:<Spin size="large" />
   
     );
   }

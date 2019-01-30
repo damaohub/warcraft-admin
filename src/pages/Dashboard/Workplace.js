@@ -2,65 +2,62 @@ import React, { PureComponent } from 'react';
 import moment from 'moment';
 import { connect } from 'dva';
 import Link from 'umi/link';
-import { Row, Col, Card, List, Avatar } from 'antd';
+import { Row, Col, Card, List, Avatar, Spin, Empty  } from 'antd';
 
 import { Radar } from '@/components/Charts';
-import EditableLinkGroup from '@/components/EditableLinkGroup';
+// import EditableLinkGroup from '@/components/EditableLinkGroup';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './Workplace.less';
 
-const links = [
-  {
-    title: '操作一',
-    href: '',
-  },
-  {
-    title: '操作二',
-    href: '',
-  },
-  {
-    title: '操作三',
-    href: '',
-  },
-  {
-    title: '操作四',
-    href: '',
-  },
-  {
-    title: '操作五',
-    href: '',
-  },
-  {
-    title: '操作六',
-    href: '',
-  },
-];
+// const links = [
+//   {
+//     title: '操作一',
+//     href: '',
+//   },
+//   {
+//     title: '操作二',
+//     href: '',
+//   },
+//   {
+//     title: '操作三',
+//     href: '',
+//   },
+//   {
+//     title: '操作四',
+//     href: '',
+//   },
+//   {
+//     title: '操作五',
+//     href: '',
+//   },
+//   {
+//     title: '操作六',
+//     href: '',
+//   },
+// ];
 
-@connect(({ user, project, activities, chart, loading }) => ({
+@connect(({ user, player, activities, chart, loading }) => ({
   currentUser: user.currentUser,
-  project,
+  player,
   activities,
   chart,
   currentUserLoading: loading.effects['user/fetchCurrent'],
-  projectLoading: loading.effects['project/fetchNotice'],
+  taskLoading: loading.effects['player/task'],
   activitiesLoading: loading.effects['activities/fetchList'],
 }))
 class Workplace extends PureComponent {
   componentDidMount() {
+    
     const { dispatch } = this.props;
+    // dispatch({
+    //   type: 'user/fetchCurrent',
+    // });
     dispatch({
-      type: 'user/fetchCurrent',
+      type: 'player/task',
     });
-    dispatch({
-      type: 'project/fetchNotice',
-    });
-    dispatch({
-      type: 'activities/fetchList',
-    });
-    dispatch({
-      type: 'chart/fetch',
-    });
+  
+
   }
 
   componentWillUnmount() {
@@ -111,12 +108,9 @@ class Workplace extends PureComponent {
     const {
       currentUser,
       currentUserLoading,
-      project: { notice },
-      projectLoading,
-      activitiesLoading,
-      chart: { radarData },
+      player: { task },
+      taskLoading,
     } = this.props;
-
     const pageHeaderContent =
       currentUser && Object.keys(currentUser).length ? (
         <div className={styles.pageHeaderContent}>
@@ -125,12 +119,12 @@ class Workplace extends PureComponent {
           </div>
           <div className={styles.content}>
             <div className={styles.contentTitle}>
-              早安，
-              {currentUser.name}
+              您好，
+              {currentUser.real_name}
               ，祝你开心每一天！
             </div>
             <div>
-              {currentUser.title} |{currentUser.group}
+              {currentUser.role_name} |{currentUser.status}
             </div>
           </div>
         </div>
@@ -140,18 +134,19 @@ class Workplace extends PureComponent {
       <div className={styles.extraContent}>
         <div className={styles.statItem}>
           <p>项目数</p>
-          <p>56</p>
+          <p>{task.my_team && task.my_team.length}</p>
         </div>
-        <div className={styles.statItem}>
-          <p>团队内排名</p>
+        {/* <div className={styles.statItem}>
+          <p>排名</p>
           <p>
+            
             8<span> / 24</span>
           </p>
-        </div>
-        <div className={styles.statItem}>
+        </div> */}
+        {/* <div className={styles.statItem}>
           <p>项目访问</p>
           <p>2,223</p>
-        </div>
+        </div> */}
       </div>
     );
 
@@ -166,72 +161,77 @@ class Workplace extends PureComponent {
             <Card
               className={styles.projectList}
               style={{ marginBottom: 24 }}
-              title="进行中的项目"
+              title="我的任务"
               bordered={false}
               extra={<Link to="/">全部项目</Link>}
-              loading={projectLoading}
+              loading={taskLoading}
               bodyStyle={{ padding: 0 }}
             >
-              {notice.map(item => (
-                <Card.Grid className={styles.projectGrid} key={item.id}>
-                  <Card bodyStyle={{ padding: 0 }} bordered={false}>
-                    <Card.Meta
-                      title={
-                        <div className={styles.cardTitle}>
-                          <Avatar size="small" src={item.logo} />
-                          <Link to={item.href}>{item.title}</Link>
-                        </div>
-                      }
-                      description={item.description}
-                    />
-                    <div className={styles.projectItemContent}>
-                      <Link to={item.memberLink}>{item.member || ''}</Link>
-                      {item.updatedAt && (
-                        <span className={styles.datetime} title={item.updatedAt}>
-                          {moment(item.updatedAt).fromNow()}
-                        </span>
-                      )}
-                    </div>
-                  </Card>
-                </Card.Grid>
-              ))}
+              {task.my_team ? task.my_team.map(item => (
+                item? 
+                  <Card.Grid className={styles.projectGrid} key={item.id}>
+                    <Card bodyStyle={{ padding: 0 }} bordered={false}>
+                      <Card.Meta
+                        title={
+                          <div className={styles.cardTitle}>
+                            <a href={`#/dashboard/player-team?id=${item.tid}`}>团号：{item.tid}</a>
+                          </div>
+                        }
+                        description={item.remark}
+                      />
+                      <div>开团时间： {item.reserve_time}</div>
+                      <div>团长： {item.leader_id}</div>
+                      <div>人数： {item.mem_num}</div>
+                      <div>副本： {item.instance_name}</div>
+                      <div className={styles.projectItemContent}>
+                        <a title={`创建人:${item.create_id}`}>{item.create_id}</a>
+                        {item.reserve_time && (
+                          <span className={styles.datetime} title={`创建时间:${item.create_time}`}>
+                            {moment(item.create_time).fromNow()}
+                          </span>
+                        )}
+                      </div>
+                    </Card>
+                  </Card.Grid>: <Empty />
+              )): <Spin size="large" />
+            }
             </Card>
             <Card
               bodyStyle={{ padding: 0 }}
               bordered={false}
               className={styles.activeCard}
               title="动态"
-              loading={activitiesLoading}
+              loading={{}}
             >
-              <List loading={activitiesLoading} size="large">
+              <List loading={{}} size="large">
                 <div className={styles.activitiesList}>{this.renderActivities()}</div>
               </List>
             </Card>
           </Col>
           <Col xl={8} lg={24} md={24} sm={24} xs={24}>
-            <Card
+            {/* <Card
               style={{ marginBottom: 24 }}
               title="快速开始 / 便捷导航"
               bordered={false}
               bodyStyle={{ padding: 0 }}
             >
               <EditableLinkGroup onAdd={() => {}} links={links} linkElement={Link} />
-            </Card>
+            </Card> */}
             <Card
               style={{ marginBottom: 24 }}
               bordered={false}
               title="XX 指数"
-              loading={radarData.length === 0}
+              // loading={radarData.length === 0}
             >
               <div className={styles.chart}>
-                <Radar hasLegend height={343} data={radarData} />
+                <Radar hasLegend height={343} data={{}} />
               </div>
             </Card>
-            <Card
+            {/* <Card
               bodyStyle={{ paddingTop: 12, paddingBottom: 12 }}
               bordered={false}
               title="团队"
-              loading={projectLoading}
+              loading={taskLoading}
             >
               <div className={styles.members}>
                 <Row gutter={48}>
@@ -245,7 +245,7 @@ class Workplace extends PureComponent {
                   ))}
                 </Row>
               </div>
-            </Card>
+            </Card> */}
           </Col>
         </Row>
       </PageHeaderWrapper>
