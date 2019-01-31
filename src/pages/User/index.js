@@ -1,19 +1,29 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import { Card, Row, Col,  Divider, Avatar, Spin} from 'antd';
+import { Card, Row, Col,  Divider, Avatar, Spin, Collapse, Icon, Form, Input, Button,message} from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
+import saltMD5 from '@/utils/saltMD5';
 
 import styles from './Center.less';
 
+const {Panel} = Collapse
+
+const customPanelStyle = {
+  border: 0,
+  overflow: 'hidden',
+};
+
 @connect(({ loading, user }) => ({
-  
+    user,
     currentUser: user.currentUser,
     currentUserLoading: loading.effects['user/fetchCurrent'],
+    passwordLoading: loading.effects['user/password']
   }))
-
+  @Form.create()
   class Center extends PureComponent {
     state = {
+      confirmDirty: false,
     };
   
     componentDidMount() {
@@ -24,6 +34,54 @@ import styles from './Center.less';
      
     }
   
+    handleSubmit = (e) => {
+      e.preventDefault();
+      const {dispatch ,form} = this.props;
+      form.validateFieldsAndScroll((err, values) => {
+        if (!err) {
+          dispatch({
+            type: 'user/password',
+            payload: {password: saltMD5.md5(values.password),new_password: saltMD5.md5(values.new_password), renew_password:saltMD5.md5(values.renew_password)}
+          }).then (
+            () => {
+              form.resetFields()
+              const{user:{res}}=this.props
+              if(res.ret === 0) {
+                message.success('密码已重置！')
+              } else {
+                message.error(res.msg)
+              }
+            }
+          )
+        }
+      });
+    }
+  
+    handleConfirmBlur = (e) => {
+      const {value} = e.target;
+      const {confirmDirty} =this.state
+      this.setState({ confirmDirty: confirmDirty || !!value });
+    }
+  
+    compareToFirstPassword = (rule, value, callback) => {
+      const {form} = this.props;
+      if (value && value !== form.getFieldValue('new_password')) {
+        callback('输入的密码不一致');
+      } else {
+        callback();
+      }
+    }
+  
+    validateToNextPassword = (rule, value, callback) => {
+      const {form} = this.props;
+      const {confirmDirty} =this.state
+      if (value && confirmDirty) {
+        form.validateFields(['renew_password'], { force: true });
+      }
+      callback();
+    }
+
+
     onTabChange = key => {
       const { match } = this.props;
       switch (key) {
@@ -40,14 +98,39 @@ import styles from './Center.less';
     render() {
 
       const {
+        passwordLoading,
         listLoading,
         currentUser,
         currentUserLoading,
         match,
         location,
-        children
+        children,
+        form: {getFieldDecorator}
       } = this.props;
-  
+      const formItemLayout = {
+        labelCol: {
+          xs: { span: 24 },
+          sm: { span: 8 },
+        },
+        wrapperCol: {
+          xs: { span: 24 },
+          sm: { span: 16 },
+        },
+      };
+
+      const tailFormItemLayout = {
+        wrapperCol: {
+          xs: {
+            span: 24,
+            offset: 0,
+          },
+          sm: {
+            span: 16,
+            offset: 8,
+          },
+        },
+      };
+
       const operationTabList = [
         {
           key: 'salary',
@@ -102,6 +185,60 @@ import styles from './Center.less';
 
                     </div>
                     <Divider dashed />
+                    <Collapse
+                      bordered={false}
+                      expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
+                      className={styles.collapse}
+                    >
+                      <Panel header="重置密码" key="1" style={customPanelStyle}>
+                        <Form onSubmit={this.handleSubmit}>
+                          <Form.Item
+                            {...formItemLayout}
+                            label="旧密码"
+                          >
+                            {getFieldDecorator('password', {
+                              rules: [{
+                                required: true, message: '输入旧密码!',
+                              }],
+                            })(
+                              <Input type="password" />
+                            )}
+                          </Form.Item>
+                          <Form.Item
+                            {...formItemLayout}
+                            label="新密码"
+                          >
+                            {getFieldDecorator('new_password', {
+                              rules: [{
+                                required: true, message: '输入密码!',
+                              }, {
+                                validator: this.validateToNextPassword,
+                              }],
+                            })(
+                              <Input type="password" />
+                            )}
+                          </Form.Item>
+                          <Form.Item
+                            {...formItemLayout}
+                            label="确认密码"
+                          >
+                            {getFieldDecorator('renew_password', {
+                              rules: [{
+                                required: true, message: '请再次输入新密码!',
+                              }, {
+                                validator: this.compareToFirstPassword,
+                              }],
+                            })(
+                              <Input type="password" onBlur={this.handleConfirmBlur} />
+                            )}
+                          </Form.Item>
+                          <Form.Item {...tailFormItemLayout}>
+                            <Button type="primary" loading={passwordLoading} htmlType="submit">重置</Button>
+                          </Form.Item>
+                        </Form>
+                      </Panel>
+                    </Collapse>
+
                   </div>
                 ) : (
                   <Spin size="large" />

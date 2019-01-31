@@ -14,7 +14,8 @@ import {
   Divider,
   Avatar,
   Modal,
- 
+  Popconfirm,
+  Empty
 } from 'antd';
 
 import DescriptionList from '@/components/DescriptionList';
@@ -29,7 +30,8 @@ const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
 @connect(({ player, loading }) => ({
     player,
     loading: loading.effects['player/team'],
-    submitting: loading.effects['player/screenadd']
+    submitting: loading.effects['player/screenadd'],
+    finishLoading: loading.effects['player/finish']
 }))
 @Form.create()
 class TeamDetailPage extends Component {
@@ -63,15 +65,13 @@ class TeamDetailPage extends Component {
    
   }
 
-
   componentWillUnmount() {
     window.removeEventListener('resize', this.setStepDirection);
   
   }
 
- 
-
-  handlePreview = (file) => {
+  handlePreview = (file,e) => {
+    if(e) e.preventDefault();
     this.setState({
       previewImage: file.url || file.thumbUrl,
       previewVisible: true,
@@ -79,23 +79,19 @@ class TeamDetailPage extends Component {
   }
 
   handleRemove = (file) => {
-    const {form} =this.props
     const {uploadList} =this.state
     const index = uploadList.findIndex(v=>(v === file.response.data))
     uploadList.splice(index,1)
     this.setState({uploadList})
-    console.log(uploadList)
-    form.setFieldsValue({'images': uploadList})
-    console.log(form.getFieldValue('images'))
   }
 
   handleCancel = () => this.setState({ previewVisible: false })
 
   normFileF = (e) => {
     const {file,file:{status}, fileList,file:{response}} = e
-   
+    this.setState({fileList})
     if(status==="error") {
-      message.error("上传失败！")
+      message.error("图片读取失败！")
       const index = fileList.findIndex(v=>(v.uid===file.uid))
       fileList.splice(index,1)
       return
@@ -103,13 +99,13 @@ class TeamDetailPage extends Component {
     if(status ==="done") {
       if(response.ret === 0) {
         const {uploadList} =this.state
+       
         uploadList.push(response.data)
         this.setState({uploadList},
           ()=>{
-            message.success('上传成功！')
+            message.success('图片读取成功！')
           }
         )
-        console.log(uploadList)
         // eslint-disable-next-line
         return uploadList
       } 
@@ -119,44 +115,107 @@ class TeamDetailPage extends Component {
   }
  
 
-
- 
   handleSubmit = e => {
     e.preventDefault();
     const { dispatch, form, player:{team} } = this.props;
-    const {tid} = this.state
+    const {tid, uploadList} = this.state
     const {aid, uid} = team.account_list
-   
+    form.setFieldsValue({'images': uploadList})
     form.validateFieldsAndScroll((err, values) => {
-      console.log({aid, uid, tid, ...values})
-      
-      // if (!err) {
-      //   dispatch({
-      //     type: 'player/screenadd',
-      //     payload: {aid, uid, tid, ...values}
-      //   }).then(
-      //     () => {
-      //       const { player: {res} } = this.props;
-      //       if(res && res.ret === 0) {
-              
-      //         this.setState({uploadList: []},() => {
-      //           message.success("提交成功！");
-      //           form.resetFields()
-      //         })
-      //       } else {
-      //         message.error(res.msg);
-      //       }
-      //     }
-      //   );
-      // }
+      if (!err) {
+        dispatch({
+          type: 'player/screenadd',
+          payload: {aid, uid, tid, ...values}
+        }).then(
+          () => {
+            const { player: {res} } = this.props;
+            if(res && res.ret === 0) { 
+              this.setState({uploadList: [], fileList: []},() => {
+                message.success("提交成功！");
+                form.resetFields()
+                dispatch({
+                  type: 'player/team',
+                  payload: {id: tid}
+                }).then(() => {
+                  // eslint-disable-next-line
+                  const {player: {team}} =this.props
+                  const screenshots = team.account_list.screenshots_arr
+                  this.setState({
+                    urlList: screenshots
+                  })
+                });
+              })
+            } else {
+              message.error(res.msg);
+            }
+          }
+        );
+      }
     });
   };
 
+  delScreen = (e,img) => {
+    e.preventDefault();
+    const {dispatch, player:{team}} = this.props
+    const {tid} = this.state
+    const {aid, uid} = team.account_list
+    dispatch({
+      type: 'player/screendel',
+      payload: {tid, aid, uid, images:img}
+    }).then(
+      () => {
+        const { player: {res} } = this.props;
+        if(res && res.ret === 0) { 
+          message.success('已删除！')
+          dispatch({
+            type: 'player/team',
+            payload: {id: tid}
+          }).then(() => {
+            // eslint-disable-next-line
+            const {player: {team}} =this.props
+            const screenshots = team.account_list.screenshots_arr
+            this.setState({
+              urlList: screenshots
+            })
+          });
+        } else {
+          message.error(res.msg)
+        }
+       
+      }
+    )
+  }
+
+  subFinish = (e) => {
+    e.preventDefault();
+    const {dispatch, player:{team}} = this.props
+    const {tid} = this.state
+    const {aid, uid} = team.account_list
+    dispatch({
+      type: 'player/finish',
+      payload: {tid,uid,aid}
+    }).then(
+      () => {
+        const { player: {res} } = this.props;
+        if(res && res.ret === 0) { 
+          message.success('已提交！')
+          dispatch({
+            type: 'player/team',
+            payload: {id: tid}
+          })
+        } else {
+          message.error(res.msg)
+        }
+       
+      }
+    ) 
+  }
+
 
   render() {
-    const {player:{team},  form: { getFieldDecorator }, submitting }=this.props
+    const {player:{team},  form: { getFieldDecorator }, submitting, finishLoading }=this.props
     
-    const {loaded, statusMap, previewImage, previewVisible, urlList, uploadList } =this.state
+    const {loaded, statusMap, previewImage, previewVisible, urlList, uploadList, fileList } =this.state
     const teamInfo= team.team_info
     const account = team.account_list
     const formItemLayout = {
@@ -208,6 +267,7 @@ class TeamDetailPage extends Component {
             <Description term="创建时间">{teamInfo.create_time}</Description>
             <Description term="团队配比">{teamInfo.battle_array}</Description>
             <Description term="开团时间">{teamInfo.reserve_time}</Description>
+            <Description term="订单状态">{statusMap[teamInfo.status]}</Description>
             <Description term="确认人">{teamInfo.check_name}</Description>
             <Description term="完成时间">{teamInfo.finish_time}</Description>
             <Description term="难度">{teamInfo.difficult }</Description>
@@ -217,18 +277,18 @@ class TeamDetailPage extends Component {
         }
         extraContent={
           <Row>
-            <Col xs={24} sm={12}>
+            {/* <Col xs={24} sm={12}>
               <div className={styles.textSecondary}>订单状态：{teamInfo.status==="2"?statusMap[teamInfo.status]: ''}</div>
               <div className={styles.heading}>
                 {
                   statusMap[teamInfo.status]
                 }
               </div>
-            </Col>
-            {/* <Col xs={24} sm={12}>
-              <div className={styles.textSecondary}>订单金额</div>
-              <div className={styles.heading}>¥ 0.00</div>
             </Col> */}
+            <Col xs={24} sm={12}>
+              {/* <div className={styles.textSecondary}>提交状态</div> */}
+              <div className={styles.heading}>{account.status==="0"?<Button type="primary" loading={finishLoading} onClick={e=> {this.subFinish(e)}}>提交完成</Button>:<Button type="primary" disabled>已提交</Button>}</div>
+            </Col>
           </Row>
         }
       >
@@ -260,21 +320,30 @@ class TeamDetailPage extends Component {
         >
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
-              {urlList.length !== 0 &&
-              <div>
-                <Divider orientation="left" dashed>该账号已上传截图</Divider>
-                <div className="ant-upload-list ant-upload-list-picture-card">
-                  {
-                    urlList.map(item => (
-                      <div className="ant-upload-list-item ant-upload-list-item-done">
-                        <div className="ant-upload-list-item-info">
-                          <span><a><img src={item} alt="已上传图片" /></a></span>
+              {urlList.length !== 0 ?
+                <div>
+                  <Divider orientation="left" dashed>该账号已上传截图</Divider>
+                  <div className="ant-upload-list ant-upload-list-picture-card">
+                    {
+                      urlList.map(item => (
+                        <div className="ant-upload-list-item ant-upload-list-item-done">
+                          <div className="ant-upload-list-item-info">
+                            <span><a><img src={item} alt="已上传图片" /></a></span>
+                            <span className="ant-upload-list-item-actions">
+                              <a href={item} target="_blank" rel="noopener noreferrer" title="预览">
+                                <Icon type="eye" onClick={e =>this.handlePreview({url: item},e)} />
+                              </a>
+                              <Popconfirm title="是否要删除该截图？" okText="确定" cancelText="取消" onConfirm={e=> this.delScreen(e,item)}>
+                                <Icon className="anticon anticon-delete" type="delete" title="删除" />
+                              </Popconfirm>
+                              
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    ))
-                  }
-                </div>
-              </div>
+                      ))
+                    }
+                  </div>
+                </div>:  <Empty description="该账号暂无上传截图" />
               }
               
 
@@ -294,7 +363,7 @@ class TeamDetailPage extends Component {
                     getValueFromEvent:this.normFileF,
                     validateTrigger: 'onSubmit'
                   })(
-                    <Upload {...uploadProps}>
+                    <Upload fileList={fileList} {...uploadProps}>
                       {uploadButton}
                     </Upload>
                   )}
@@ -304,7 +373,7 @@ class TeamDetailPage extends Component {
 
                 <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
                   <Button type="primary" htmlType="submit" loading={submitting}>
-                    提交
+                    提交截图
                   </Button>
                 </FormItem>
             

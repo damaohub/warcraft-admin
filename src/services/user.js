@@ -17,3 +17,10 @@ export async function fetchSalary(params) {
     body: params
   });
 }
+
+export async function resetPassword(params) {
+  return request('/api/gamer/editpwd', {
+    method: 'POST',
+    body: params
+  });
+}

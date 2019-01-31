@@ -150,7 +150,7 @@ export default [
         path: '/team',
         icon: 'table',
         name: 'team',
-        authority: ['1'],
+        authority: ['1','2'],
         routes: [
           {
             path: '/team/list',
@@ -246,7 +246,7 @@ export default [
         path: '/account',
         icon: 'table',
         name: 'account',
-        authority: ['1','4'],
+        authority: ['1','2','4'],
         component: "./Account"
       },
       // 可用游戏账号

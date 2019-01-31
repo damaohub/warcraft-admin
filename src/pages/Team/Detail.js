@@ -300,7 +300,7 @@ class TeamDetailPage extends Component {
     const {loaded, statusMap, visible, accountList} =this.state
     const teamInfo= info.team_info
 
-    const modalFooter = { okText: '保存', onOk: this.handleSubmit, onCancel: this.handleCancel };
+    const modalFooter = { okText: '保存', onOk: this.handleSubmit, cancelText:'取消', onCancel: this.handleCancel };
     
     const getModalContent = (data) => (
       data.length !== 0? 

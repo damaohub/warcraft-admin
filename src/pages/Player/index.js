@@ -1,6 +1,6 @@
-import React, { PureComponent  } from 'react';
+import React, { PureComponent,Fragment  } from 'react';
 import { connect } from 'dva';
-import { Card } from 'antd';
+import { Card, Divider } from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -60,9 +60,18 @@ const getValue = obj =>
       },
       {
         title: '天赋',
-        dataIndex: 'talent_name',
-        key: 'talent_name',
+        dataIndex: 'talent',
+        key: 'talent',
         align: 'center',
+        render: talents => (
+          <span>
+            {talents.map((talent,ids) => 
+              <Fragment>
+                <span color="blue" key={talent}>{talent}</span> { ids !== talents.length-1 && <Divider type="vertical" style={{margin: '0 2px'}} />}
+              </Fragment>)
+            }
+          </span>
+        ),
       },
       {
         title: '装备等级',
@@ -112,26 +121,36 @@ const getValue = obj =>
     render() {
       const {
         Loading,
-        player: { data },
-     
+        player: { teamList},
       } = this.props;
-
-
       return (
         <PageHeaderWrapper>
-          <Card bordered={false}>
+          {/* <Card title="可用账号" bordered={false}>
             <div className={styles.cardList}>
               
               <StandardTable
                 loading={Loading}
-                data={data}
+                data={{list}}
+                columns={this.columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
+            </div>
+          </Card> */}
+          <Divider />
+          <Card title="可用账号" bordered={false}>
+            <div className={styles.cardList}>
+              
+              <StandardTable
+                loading={Loading}
+                data={{list:teamList}}
                 columns={this.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
               />
             </div>
           </Card>
-         
+
         </PageHeaderWrapper>
       );
     }

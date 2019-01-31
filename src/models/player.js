@@ -1,13 +1,11 @@
-import { queryPlayer, queryTask, queryTeam, addScreen} from '@/services/player';
+import { queryPlayer, queryTask, queryTeam, addScreen, removeScreen, finish} from '@/services/player';
 
 export default {
   namespace: 'player',
 
   state: {
-    data: {
-      list: [],
-      pagination: {},
-    },
+   list:[],
+   teamList:[],
     res: {},
     task: {},
     team: {}
@@ -46,6 +44,23 @@ export default {
       });
     },
 
+    *screendel({ payload }, { call, put }) {
+      const response = yield call(removeScreen, payload);
+      yield put({
+        type: 'item',
+        payload: response,
+      });
+    },
+
+    *finish({ payload }, { call, put }) {
+      const response = yield call(finish, payload);
+      yield put({
+        type: 'item',
+        payload: response,
+      });
+    },
+    
+
   },
 
   
@@ -54,7 +69,8 @@ export default {
     save(state, action) {
       return {
         ...state,
-        data: action.payload,
+        list: action.payload.list,
+        teamList: action.payload.team_list,
       };
     },
     item(state, action) {

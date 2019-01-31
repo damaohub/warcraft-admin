@@ -29,6 +29,7 @@ class SalaryPage extends PureComponent {
       dataIndex: 'money',
       key: 'money',
       align: 'center',
+      
       render: (item, row) => {
         if(row.type === "1" || row.type === "3") {
           return (<span style={{color: 'green'}}>{`+${item}`}</span>)
@@ -113,10 +114,6 @@ class SalaryPage extends PureComponent {
       </div>
     );
 
-  
-
-
- 
 
   
     return (
@@ -144,7 +141,8 @@ class SalaryPage extends PureComponent {
           <StandardTable
             data={{list, pagination}}
             columns={this.columns}
-            onChange={this.handleStandardTableChange} 
+            onChange={this.handleStandardTableChange}
+           
           />
         </Card>
       </div>

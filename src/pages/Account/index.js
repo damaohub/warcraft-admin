@@ -1,6 +1,6 @@
 import React, { PureComponent ,Fragment } from 'react';
 import { connect } from 'dva';
-import { Card, Modal, Form, Input, Button, Divider, Popconfirm, message, Select } from 'antd';
+import { Card, Modal, Form, Input, Button, Divider, Popconfirm, message, Select, Row, Col } from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -32,12 +32,20 @@ const getValue = obj =>
     };
 
     columns = [
+    
+      {
+        title: '账号',
+        dataIndex: 'account_name',
+        key: 'account_name',
+        align: 'center',
+        width: 160,
+        fixed: 'left',
+      },
       {
         title: '账号类型',
         dataIndex: 'type',
         key: 'type',
         align: 'center',
-        fixed: 'left',
         // eslint-disable-next-line
         render: (item) => {
           switch(item) {
@@ -51,13 +59,6 @@ const getValue = obj =>
             break;  
           }
         }
-      },
-      {
-        title: '账号',
-        dataIndex: 'account_name',
-        key: 'account_name',
-        align: 'center',
-        fixed: 'left',
       },
       {
         title: '密码',
@@ -134,16 +135,14 @@ const getValue = obj =>
       },
       {
         title: '操作',
-        fixed: 'right',
+       
         render: (text, record) => (
           <Fragment>
             <a onClick={(e)=> this.showEditModal(e, record)}>修改</a>
             <Divider type="vertical" />
             <Popconfirm title="是否要删除此行？" okText="确定" cancelText="取消" onConfirm={() => this.handleDelete(record)}>
               <a>删除</a>
-            </Popconfirm>
-            <Divider type="vertical" />
-            <a href={`#/account/detail?id=${record.id}`}>详情</a>
+            </Popconfirm>     
           </Fragment>
         ),
         align: 'center',
@@ -271,7 +270,103 @@ const getValue = obj =>
         'need_talent_id': undefined
       });
     }
+
+    handleSearch = e => {
+      e.preventDefault();
   
+      const { dispatch, form } = this.props;
+      
+      form.validateFields((err, fieldsValue) => {
+        // if (err) return;
+        const values = {
+          account_name: fieldsValue.f_account_name,
+          organization: fieldsValue.f_organization,
+          game_role_name: fieldsValue.f_game_role_name,
+          profession_id: fieldsValue.f_profession_id
+        };
+  
+        this.setState({
+          formValues: values,
+        });
+  
+        dispatch({
+          type: 'account/fetch',
+          payload: values,
+        });
+      });
+    };
+
+    handleFormReset = () => {
+      const { form, dispatch } = this.props;
+      form.resetFields();
+      this.setState({
+        formValues: {},
+      });
+      dispatch({
+        type: 'account/fetch',
+        payload: {},
+      });
+    };
+
+    renderForm = (professionList) => {
+      const {
+        form: { getFieldDecorator },
+      } = this.props;
+      return (
+        <Form onSubmit={this.handleSearch} layout="inline">
+          <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="账号">
+                {getFieldDecorator('f_account_name')(<Input placeholder="请输入" />)}
+              </FormItem>
+            </Col>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="阵营">
+                {getFieldDecorator('f_organization')(
+                  <Select placeholder="请选择" style={{ width: '100%' }}>
+                    <Option value="0">联盟</Option>
+                    <Option value="1">部落</Option>
+                  </Select>
+                )}
+              </FormItem>
+            </Col>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="角色">
+                {getFieldDecorator('f_game_role_name')(<Input placeholder="请输入" />)}
+              </FormItem>
+            </Col>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="职业">
+                {getFieldDecorator('f_profession_id')(
+                  <Select placeholder="请选择" style={{ width: '100%' }}>
+                    {professionList.map( (item) => 
+                      (<Option key={item.id}>{item.profession_name}</Option>)
+                    )}
+                  </Select>
+                 )}
+              </FormItem>
+            </Col>
+          </Row>
+          {/* <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+            
+          </Row> */}
+          <div style={{ overflow: 'hidden' }}>
+            <div style={{ marginBottom: 24 }}>
+              <Button type="primary" htmlType="submit">
+                查询
+              </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
+             
+            </div>
+          </div>
+        </Form>
+      );
+    }
+    
+
+
     render() {
       const {
         Loading,
@@ -406,6 +501,7 @@ const getValue = obj =>
         <PageHeaderWrapper>
           <Card bordered={false}>
             <div className={styles.cardList}>
+              <div className={styles.tableListForm}>{this.renderForm(professionList)}</div>
               <div className={styles.tableListOperator}>
                 <Button icon="plus" type="primary" onClick={(e) => {this.showModal(e, false)}}>
                   添加账号

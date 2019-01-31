@@ -36,3 +36,17 @@ export async function addScreen(params) {
   });
 }
 
+export async function removeScreen(params) {
+  return request('/api/gamer/screendel', {
+    method: 'POST',
+    body: params
+  });
+}
+
+export async function finish(params) {
+  return request('/api/team/teamfinish', {
+    method: 'POST',
+    body: params
+  });
+}
+

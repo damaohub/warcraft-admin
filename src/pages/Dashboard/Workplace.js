@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import moment from 'moment';
 import { connect } from 'dva';
-import Link from 'umi/link';
+// import Link from 'umi/link';
 import { Row, Col, Card, List, Avatar, Spin, Empty  } from 'antd';
 
 import { Radar } from '@/components/Charts';
@@ -163,7 +163,7 @@ class Workplace extends PureComponent {
               style={{ marginBottom: 24 }}
               title="我的任务"
               bordered={false}
-              extra={<Link to="/">全部项目</Link>}
+              // extra={<Link to="/">全部项目</Link>}
               loading={taskLoading}
               bodyStyle={{ padding: 0 }}
             >
@@ -180,11 +180,11 @@ class Workplace extends PureComponent {
                         description={item.remark}
                       />
                       <div>开团时间： {item.reserve_time}</div>
-                      <div>团长： {item.leader_id}</div>
+                      {/* <div>团长： {item.leader_id}</div> */}
                       <div>人数： {item.mem_num}</div>
                       <div>副本： {item.instance_name}</div>
                       <div className={styles.projectItemContent}>
-                        <a title={`创建人:${item.create_id}`}>{item.create_id}</a>
+                        {/* <a title={`创建人:${item.create_id}`}>{item.create_id}</a> */}
                         {item.reserve_time && (
                           <span className={styles.datetime} title={`创建时间:${item.create_time}`}>
                             {moment(item.create_time).fromNow()}

@@ -1,4 +1,4 @@
-import { query as queryUsers, queryCurrent, fetchSalary } from '@/services/user';
+import { query as queryUsers, queryCurrent, fetchSalary, resetPassword } from '@/services/user';
 
 export default {
   namespace: 'user',
@@ -6,7 +6,8 @@ export default {
   state: {
     list: [],
     currentUser: {},
-    salary: {}
+    salary: {},
+    res: {}
   },
 
   effects: {
@@ -31,7 +32,16 @@ export default {
         payload: response,
       });
     },
+    *password({payload}, { call, put }) {
+      const response = yield call(resetPassword, payload);
+      yield put({
+        type: 'item',
+        payload: response,
+      });
+    },
   },
+
+ 
 
   reducers: {
     save(state, action) {
@@ -61,6 +71,12 @@ export default {
           unreadCount: action.payload.unreadCount,
         },
       };
+    },
+    item(state, action) {
+      return {
+        ...state,
+        res: action.payload
+      }
     },
   },
 };
