@@ -195,7 +195,7 @@ class Step2 extends React.Component {
         const{team:{res}} = this.props
         if(res.ret===0) {
           message.success('提交成功！')
-          router.push(`/team/detail?id=${res.data.tid}?from=add`);
+          router.push(`/team/list/detail?id=${res.data.tid}?from=add`);
         }else{
           message.error(res.msg)
         }
