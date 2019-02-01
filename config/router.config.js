@@ -138,7 +138,7 @@ export default [
             component: './Order/Add'
           },
           {
-            path: '/order/detail',
+            path: '/order/list/detail',
             name: 'detail',
             hideInMenu: true,
             component: './Order/Detail'

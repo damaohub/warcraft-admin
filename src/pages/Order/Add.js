@@ -13,6 +13,7 @@ import {
 } from 'antd';
 
 import { connect } from 'dva';
+import router from 'umi/router';
 import FooterToolbar from '@/components/FooterToolbar';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import Item from './Item';
@@ -162,6 +163,8 @@ class AdvancedForm extends Component {
             resetFields()
             this.setState({items: [{...item}]})
             this.handleCall('操作成功')
+            const {order: {res}} =this.props
+            router.push(`/order/list/detail?oid=${res.data}?from=add`);
           }
         )
       }

@@ -48,7 +48,7 @@ const getValue = obj =>
                 case 'm':
                     return '史诗' 
                 default:
-                   return `史诗'-${item}`
+                   return `史诗-${item}`
             }
         }
       },

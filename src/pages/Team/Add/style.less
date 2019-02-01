@@ -108,22 +108,37 @@
 }
 
 .modalList{
-  :global{
-    .ant-radio-wrapper{
-      display: flex;
-      border-bottom: 1px solid @border-color-split;
-      .ant-radio{
-        align-self: center;
-      }
-      .ant-list-item{
-        .ant-list-item-meta{
-          .ant-avatar{
-            margin-top:5px; 
+
+    :global{
+      overflow: hidden;
+      justify-content: center;
+      .ant-radio-wrapper{
+        display: flex;
+        overflow: hidden;
+        border-bottom: 1px solid @border-color-split;
+        &>span{
+          display: block;
+          &.ant-radio{
+            display: inline-block;
+            align-self: center;
+          }
+          .ant-list-item{
+            .ant-list-item-meta{
+              .ant-avatar{
+                margin-top:5px; 
+              }
+            }
+            .ant-list-item-content{
+              flex: auto;
+            }
           }
         }
+  
       }
+      
     }
-  }
+  
+
   
 }
 

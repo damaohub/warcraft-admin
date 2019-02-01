@@ -1,18 +1,23 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Card , Table} from 'antd';
+import { Card , Table, Tooltip, Divider, Form, Select, Row, Col, Input, Button} from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from '../GameRole/game.less';
 
-
+const FormItem = Form.Item;
+const { Option } = Select;
+const statusMap= {'1': '未完成', '2': '已完成'}
+const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
+const usedMap ={'0': '本周可用','1':'本周已排','3':'本周已完成'}
 const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
 
+@Form.create()
 @connect(({ loading, order }) => ({
     order,
     Loading: loading.models.order,
@@ -24,62 +29,85 @@ const getValue = obj =>
 
     columns = [
       {
+        title: '订单号',
+        dataIndex: 'id',
+        key: 'id',
+        align: 'center',
+        render:item =>(<a href={`#/order/list/detail?oid=${item}`}>{item}</a>)
+      },
+      {
+        title: '联系电话',
+        dataIndex: 'phone',
+        key: 'phone',
+        align: 'center',
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        align: 'center',
+        width: 80,
+        render: item => (statusMap[item])
+      },
+     
+      {
+        title: '创建时间',
+        dataIndex: 'create_time',
+        key: 'create_time',
+        width: 140,
+        align: 'center',
+      },
+      {
+        title: '完成时间',
+        dataIndex: 'finish_time',
+        key: 'finish_time',
+        width: 140,
+        align: 'center',
+      },
+      {
         title: '账号',
         dataIndex: 'account_name',
         key: 'account_name',
         align: 'center',
+        render: (item,record) => (
+          <Tooltip 
+            placement="right" 
+            title={
+              <div style={{display:"flex",flexDirection:"column"}}>
+                <div>密码：{record.account_pwd}</div>
+                <div>账号类型：{typeMap[record.type]}</div>
+                <div>子账号：{record.child_name}</div>
+                <div>服务器：{record.region_id}</div>
+                <div>角色名：{record.game_role_name}</div>
+                <div>角色等级：{record.level}</div>
+                <div>阵营：{record.organization ===0 ?"联盟": '部落'}</div>
+                <div>职业：{record.profession_name}</div>
+                <div>可用天赋：{record.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
+                <div>装备等级：{record.equip_level}</div>
+                
+              </div>     
+              }
+          >
+            {item}
+          </Tooltip>
+        )
       },
+      
       {
-        title: '密码',
-        dataIndex: 'account_pwd',
-        key: 'account_pwd',
-        align: 'center',
+        title: '备注',
+        dataIndex: 'remark',
+        key: 'remark',
+        align: 'left',
       },
-      {
-        title: '子账号',
-        dataIndex: 'child_name',
-        key: 'child_name',
-        align: 'center',
-      },
-      {
-        title: '游戏角色',
-        dataIndex: 'game_role_name',
-        key: 'game_role_name',
-        align: 'center',
-      },
-      {
-        title: '角色等级',
-        dataIndex: 'level',
-        key: 'level',
-        align: 'center',
-      },
-      {
-        title: '职业',
-        dataIndex: 'profession_name',
-        key: 'profession_name',
-        align: 'center',
-      },
-      {
-        title: '天赋',
-        dataIndex: 'talent_name',
-        key: 'talent_name',
-        align: 'center',
-      },
-      {
-        title: '装备等级',
-        dataIndex: 'equip_level',
-        key: 'equip_level',
-        align: 'center',
-      },
-      {
-        title: '操作',
-        render: (text, record) => (
-          <Fragment>
-            <a href={`#/order/detail?oid=${record.id}`}>订单详情</a>
-          </Fragment>
-        ),
-        align: 'center',
-      },
+      // {
+      //   title: '操作',
+      //   render: (text, record) => (
+      //     <Fragment>
+      //       <a href={`#/order/detail?oid=${record.id}`}>订单详情</a>
+      //     </Fragment>
+      //   ),
+      //   align: 'center',
+      // },
     
     ];
 
@@ -94,13 +122,26 @@ const getValue = obj =>
 
     expandedRowRender = (data) => {
       const columns = [
-        { title: '订单ID', dataIndex: 'oid', key: 'oid' },
-        { title: '项目ID', dataIndex: 'item_id', key: 'item_id' },
-        { title: '类型', dataIndex: 'instance_or_secret',  key: 'instance_or_secret' },
-        { title: '副本', dataIndex: 'instance_id', key: 'instance_id' },
-        { title: '难度', dataIndex: 'difficult', key: 'difficult' },
-        { title: '完成数量', dataIndex: 'num', key: 'num' },
-        { title: '订单状态', dataIndex: 'item_status', key: 'item_status' },
+        { title: '项目号', dataIndex: 'item_id', key: 'item_id', align:'center'  },
+        { title: '类型', dataIndex: 'instance_or_secret', align:'center',  key: 'instance_or_secret',render:item=>(item==="1"?'地下城':'团本') },
+        { title: '副本', dataIndex: 'instance_name', key: 'instance_name',align:'center' },
+        { title: '难度', dataIndex: 'difficult', key: 'difficult', render: item => {
+          switch (item) {
+              case 'p':
+                  return '普通'
+              case 'h':
+                  return '英雄' 
+              case 'm':
+                  return '史诗' 
+              default:
+                 return `史诗-${item}`
+          }
+      } },
+        { title: '项目数量', dataIndex: 'num', key: 'num', align:'center', render: item=> (item==="-1"?'包版本': item) },
+        { title: '完成数量', dataIndex: 'finish_num', key: 'finish_num',align:'center', },
+        { title: '账号可用状态', dataIndex: 'week_used', key: 'week_used',align:'center',render: item=> (usedMap[item]) },
+        { title: '项目状态', dataIndex: 'item_status', key: 'item_status',align:'center', render:item=>(item==="0"?'未完成': '已完成')},
+        { title: '上次完成时间', dataIndex: 'last_finish_time', key: 'last_finish_time',align:'center', }
       ];
   
       return (
@@ -138,6 +179,108 @@ const getValue = obj =>
     };
   
 
+    handleSearch = e => {
+      e.preventDefault();
+  
+      const { dispatch, form } = this.props;
+      
+      form.validateFields((err, fieldsValue) => {
+        // if (err) return;
+        const values = {
+          ...fieldsValue
+        };
+  
+        this.setState({
+          formValues: values,
+        });
+  
+        dispatch({
+          type: 'order/fetch',
+          payload: values,
+        });
+      });
+    };
+
+    handleFormReset = () => {
+      const { form, dispatch } = this.props;
+      form.resetFields();
+      this.setState({
+        formValues: {},
+      });
+      dispatch({
+        type: 'order/fetch',
+        payload: {},
+      });
+    };
+
+    renderForm = () => {
+      const {
+        form: { getFieldDecorator },
+      } = this.props;
+      return (
+        <Form onSubmit={this.handleSearch} layout="inline">
+          <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="订单号">
+                {getFieldDecorator('id')(<Input placeholder="请输入" />)}
+              </FormItem>
+            </Col>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="订单状态">
+                {getFieldDecorator('status')(
+                  <Select placeholder="请选择" style={{ width: '100%' }}>
+                    <Option value="1">未完成</Option>
+                    <Option value="2">已完成</Option>
+                  </Select>
+                )}
+              </FormItem>
+            </Col>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="账号">
+                {getFieldDecorator('account_name')(<Input placeholder="请输入" />)}
+              </FormItem>
+            </Col>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="角色名">
+                {getFieldDecorator('game_role_name')(
+                  <Input placeholder="请输入" />)
+                }
+              </FormItem>
+            </Col>
+          </Row>
+          <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="手机号">
+                {getFieldDecorator('phone')(
+                  <Input placeholder="请输入" />)
+                }
+              </FormItem>
+            </Col>
+            <Col lg={6} md={6} sm={24}>
+              <Button type="primary" htmlType="submit">
+                  查询
+              </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
+            </Col>
+          </Row>
+          
+          {/* <div style={{ overflow: 'hidden' }}>
+            <div style={{ marginBottom: 24 }}>
+              <Button type="primary" htmlType="submit">
+                查询
+              </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
+             
+            </div>
+          </div> */}
+        </Form>
+      );
+    }
+
   
     render() {
       const {
@@ -151,7 +294,7 @@ const getValue = obj =>
         <PageHeaderWrapper>
           <Card bordered={false}>
             <div className={styles.cardList}>
-              
+              <div className={styles.tableListForm}>{this.renderForm()}</div>
               <StandardTable
                 loading={Loading}
                 data={data}

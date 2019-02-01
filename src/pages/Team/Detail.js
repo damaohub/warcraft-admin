@@ -69,7 +69,7 @@ class TeamDetailPage extends Component {
               <div>服务器：{record.region_id}</div>
               <div>角色名：{record.game_role_name}</div>
               <div>角色等级：{record.level}</div>
-              <div>阵营：{record.organization}</div>
+              <div>阵营：{record.organization==='0'?'联盟':'部落'}</div>
               <div>职业：{record.profession_name}</div>
               <div>可用天赋：{record.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
               <div>装备等级：{record.equip_level}</div>

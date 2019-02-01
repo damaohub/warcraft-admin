@@ -45,19 +45,29 @@
 
 .modalList{
   :global{
+    padding: 0 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     .ant-radio-wrapper{
-      display: inline-flex;
+      display: flex;
       border-bottom: 1px solid @border-color-split;
-      .ant-radio{
-        align-self: center;
-      }
-      .ant-list-item{
-        .ant-list-item-meta{
-          .ant-avatar{
-            margin-top:5px; 
+      &>span{
+        display: block;
+        &.ant-radio{
+          display: inline-block;
+          align-self: center;
+        }
+        
+        .ant-list-item{
+          .ant-list-item-meta{
+            .ant-avatar{
+              margin-top:5px; 
+            }
           }
         }
       }
+      
     }
   }
   

@@ -47,8 +47,8 @@ class Addmodal extends Component {
                   title={item.account_name}
                   description={item.child_name}
                 />
-                <div style={{margin:"0 30px"}}><div>{item.game_role_name}</div><div>{item.far_name}</div></div>
-                <div>{item.ptb.map((i,)=>(<Tag color="blue">{i}</Tag>))}</div>
+                <div style={{margin:"0 30px"}}><div title="角色名">{item.game_role_name}</div><div>{item.far_name}</div></div>
+                <div style={{display:"flex", flexWrap:'wrap'}}>{item.ptb.map((i,)=>(<Tag color="blue">{i}</Tag>))}</div>
               </List.Item>  
             </Radio>
           ))
@@ -86,7 +86,7 @@ class Addmodal extends Component {
     const { modalVisible, handleModalVisible, list } = this.props;
     return (
       <Modal
-        width={640}
+        width={680}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
         title="添加"
