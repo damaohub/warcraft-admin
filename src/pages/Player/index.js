@@ -79,6 +79,20 @@ const getValue = obj =>
         key: 'equip_level',
         align: 'center',
       },
+
+      {
+        title: '联系方式',
+        dataIndex: 'account_phone',
+        key: 'account_phone',
+        align: 'center',
+      },
+
+      {
+        title: '备注',
+        dataIndex: 'account_remark',
+        key: 'account_remark',
+        align: 'left',
+      },
      
     
     ];

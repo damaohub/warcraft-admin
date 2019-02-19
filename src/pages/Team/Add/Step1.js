@@ -66,13 +66,17 @@ class Step1 extends React.PureComponent {
       
     };
     const onValidateForm = () => {
+     
       validateFields((err, values) => {
+       
         if (!err) {
           // eslint-disable-next-line
           if(values.difficultLevel) { values.difficult = values.difficultLevel}
+          
           dispatch({
             type: 'team/group',
-            payload: values,
+             // eslint-disable-next-line
+            payload: {...values,  'reserve_time': values['reserve_time'].format('YYYY-MM-DD HH:mm:ss'),},
           }).then(
             () =>{
               router.push('/team/add/confirm');

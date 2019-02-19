@@ -41,8 +41,9 @@ export default {
       },
 
       *group({ payload }, { call, put }) {
+      
         const response = yield call(queryGroup, payload);
-        
+ 
         const resp = {...response, req: payload}
         yield put({
           type: 'getGroup',

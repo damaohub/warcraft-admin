@@ -10,10 +10,24 @@ import saltMD5 from './saltMD5'
 const createSign = (obj) => {
   let str = ''
   const sortedKeys = Object.keys(obj).sort()
+  let tmp
   // eslint-disable-next-line
   for (let elem of sortedKeys.values()) {
-    str += (elem.toString() + obj[elem])
+    tmp = obj[elem]
+   if(typeof  obj[elem] !== "string") {
+      // eslint-disable-next-line
+     tmp =JSON.stringify(obj[elem])
+   }
+
+  //  console.log(elem)
+  //  console.log(obj[elem])
+  //  console.log(typeof obj[elem])
+  //  console.log('----')
+
+    str += (elem.toString() + tmp)
+    // console.log(str)
   }
+
   return saltMD5.md5(str)
 }
 
@@ -43,6 +57,7 @@ service.interceptors.request.use(
   },
   error => {
     // Do something with request error
+    
     console.log(error) // for debug
     Promise.reject(error)
   }
@@ -51,16 +66,7 @@ service.interceptors.request.use(
 // response 拦截器
 service.interceptors.response.use(
   response => {
-    if(response.status < 200 && response.status >= 300) {
-      notification.error({
-        message: `请求错误 ${response.status}: ${response.url}`,
-        description: response.statusText,
-      });
-      const error = new Error(response.statusText);
-      error.name = response.status;
-      error.response = response;
-      throw error;
-    }
+ 
     const res = response.data
     return new Promise((resolve) => {
      if(res.ret === 2006) {
@@ -80,6 +86,19 @@ service.interceptors.response.use(
      resolve(res)
     })
   },
+
+  error => {
+    notification.error({
+      message: `请求错误 ${error.response.status}: ${error.response.request.responseURL}`,
+      description: error.response.statusText,
+    });
+    // const err = new Error(error.response.statusText);
+    // err.name = error.response.status;
+    // err.response = error.response;
+    // throw err;
+
+    return Promise.reject(error.response.data)
+  }
  
 )
 

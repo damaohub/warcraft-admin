@@ -21,7 +21,12 @@ const removeSuffix = (arr) => {
   if(arr.length!==0 && arr[arr.length-1] === false){
     arr.pop()
   }
-  return arr
+  const tmp = []
+  arr.map(item => {  
+   tmp.push({aid: item.aid, oid: item.oid, oiid: item.oiid,battle_site: item.battle_site}) 
+    return tmp.aid
+  })
+  return tmp
 }
 
 const removeItemFromArr = (arr,itemId) => {
@@ -185,7 +190,11 @@ class Step2 extends React.Component {
   submit = () => {
     const{dispatch} = this.props
     const{req, dAccount, tAccount, nAccount} = this.state
-    const accountArr = [...removeSuffix(dAccount),...removeSuffix(tAccount),...removeSuffix(nAccount)]
+    const accountArr = [
+      ...removeSuffix(dAccount),
+      ...removeSuffix(tAccount),
+      ...removeSuffix(nAccount)
+  ]
     const data = {...req, account_arr:accountArr}
     dispatch({
       type:'team/add',
@@ -195,7 +204,13 @@ class Step2 extends React.Component {
         const{team:{res}} = this.props
         if(res.ret===0) {
           message.success('提交成功！')
-          router.push(`/team/list/detail?id=${res.data.tid}?from=add`);
+          router.push({
+            pathname: '/team/list/detail',
+            query:{
+              id: res.data.tid,
+              from: 'add'
+            }
+          })
         }else{
           message.error(res.msg)
         }

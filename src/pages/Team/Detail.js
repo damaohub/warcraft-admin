@@ -73,6 +73,8 @@ class TeamDetailPage extends Component {
               <div>职业：{record.profession_name}</div>
               <div>可用天赋：{record.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
               <div>装备等级：{record.equip_level}</div>
+              <div>联系方式：{record.account_phone}</div>
+              {record.account_remark? <div>备注：{record.account_remark}</div>: null}
               
             </div>     
             }

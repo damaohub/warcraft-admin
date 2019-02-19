@@ -1,6 +1,6 @@
 import React, { PureComponent ,Fragment } from 'react';
 import { connect } from 'dva';
-import { Card, Modal, Form, Input, Button, Divider, Popconfirm, message, Select, Row, Col } from 'antd';
+import { Card, Modal, Form, Input, Button, Divider, Popconfirm, message, Select, Row, Col, Tooltip, Tag } from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -9,11 +9,15 @@ import styles from '../GameRole/game.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const { TextArea } = Input;
 const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
 
+const typeMaps = {"0":'工作室账号',"1":"客户账号", "2": "借用账号"}
+const typeTag = {"0":'工',"1":"客", "2": "借"}
+const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
 @connect(({ loading, account, profession, talent }) => ({
     account,
     profession,
@@ -34,50 +38,46 @@ const getValue = obj =>
     columns = [
     
       {
-        title: '账号',
+        title:<div style={{textAlign: 'center',margin: '0 auto'}}>账号</div>,
         dataIndex: 'account_name',
         key: 'account_name',
-        align: 'center',
+        align: 'left',
         width: 160,
         fixed: 'left',
+        render: (item,record) => (
+          <Fragment>
+            <Tooltip
+              placement="topLeft" 
+              title={typeMaps[record.type]}
+            >
+              <Tag style={{display: "inline"}} color={typeTagColor[record.type]}>{typeTag[record.type]}</Tag>
+            </Tooltip>
+            <Tooltip 
+              placement="right" 
+              title={
+                <div style={{display:"flex",flexDirection:"column"}}>
+                  <div>密码：{record.account_pwd}</div>
+                 
+                  <div>子账号：{record.child_name}</div>
+                
+                </div>     
+                }
+            >
+              {item}
+            </Tooltip>
+          </Fragment>
+          
+        )
       },
-      {
-        title: '账号类型',
-        dataIndex: 'type',
-        key: 'type',
-        align: 'center',
-        // eslint-disable-next-line
-        render: (item) => {
-          switch(item) {
-            case '0':
-              return '工作室账号'
-            case '1' :
-              return '客户账号'
-            case '2' :  
-              return '借用账号'
-            default: 
-            break;  
-          }
-        }
-      },
-      {
-        title: '密码',
-        dataIndex: 'account_pwd',
-        key: 'account_pwd',
-        align: 'center',
-      },
+   
+     
       {
         title: '服务器',
         dataIndex: 'region_id',
         key: 'region_id',
         align: 'center',
       },
-      {
-        title: '子账号',
-        dataIndex: 'child_name',
-        key: 'child_name',
-        align: 'center',
-      },
+    
       {
         title: '游戏角色',
         dataIndex: 'game_role_name',
@@ -132,6 +132,18 @@ const getValue = obj =>
         dataIndex: 'equip_level',
         key: 'equip_level',
         align: 'center',
+      },
+      {
+        title: '联系方式',
+        dataIndex: 'account_phone',
+        key: 'account_phone',
+        align: 'center',
+      },
+      {
+        title: '备注',
+        dataIndex: 'account_remark',
+        key: 'account_remark',
+        align: 'left',
       },
       {
         title: '操作',
@@ -247,9 +259,15 @@ const getValue = obj =>
       const typeIndex = current && current.id ? 0 : 1
       form.validateFields((err, fieldsValue) => {
         if (err) return;
+        const values = fieldsValue
+        delete values.f_account_name
+        delete values.f_organization
+        delete values.f_game_role_name
+        delete values.f_profession_id
+     
         dispatch({
           type: typeMap[typeIndex],
-          payload: Object.assign(dataMap[typeIndex], fieldsValue),
+          payload: Object.assign(dataMap[typeIndex], values),
         }).then(
           () => {
             this.handleCancel()
@@ -493,6 +511,17 @@ const getValue = obj =>
               rules: [{ required: true, message: '请输入装备等级' }],
               initialValue: current.equip_level,
             })(<Input placeholder="请输入" />)}
+          </FormItem>
+          <FormItem label="联系方式" {...this.formLayout}>
+            {getFieldDecorator('account_phone', {
+              rules: [{ required: true, message: `请输入联系方式` }],
+              initialValue: current.account_phone,
+            })(<Input placeholder="请输入" />)}
+          </FormItem>
+          <FormItem label="备注" {...this.formLayout}>
+            {getFieldDecorator('account_remark', {
+              initialValue: current.account_remark,
+            })(<TextArea placeholder="备注" />)}
           </FormItem>
         </Form>
       );
