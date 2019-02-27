@@ -16,6 +16,7 @@ export default {
 
   effects: {
     *login({ payload }, { call, put }) {
+      
       const response = yield call(accountLogin, payload);
       
       // Login successfully
