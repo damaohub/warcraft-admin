@@ -264,6 +264,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
         delete values.f_organization
         delete values.f_game_role_name
         delete values.f_profession_id
+        delete values.f_type
      
         dispatch({
           type: typeMap[typeIndex],
@@ -300,7 +301,8 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           account_name: fieldsValue.f_account_name,
           organization: fieldsValue.f_organization,
           game_role_name: fieldsValue.f_game_role_name,
-          profession_id: fieldsValue.f_profession_id
+          profession_id: fieldsValue.f_profession_id,
+          type: fieldsValue.f_type
         };
   
         this.setState({
@@ -365,10 +367,29 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
               </FormItem>
             </Col>
           </Row>
-          {/* <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-            
-          </Row> */}
-          <div style={{ overflow: 'hidden' }}>
+          <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="账号类型">
+                {getFieldDecorator('f_type')(
+                  <Select placeholder="请选择" style={{ width: '100%' }}>
+                    <Option key="0">工作室账号</Option>
+                    <Option key="1">客户账号</Option>
+                    <Option key="2">借用账号</Option>
+                  </Select>
+                 )
+                }
+              </FormItem>
+            </Col>
+            <Col lg={6} md={6} sm={24}>
+              <Button type="primary" htmlType="submit">
+                  查询
+              </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
+            </Col>
+          </Row>
+          {/* <div style={{ overflow: 'hidden' }}>
             <div style={{ marginBottom: 24 }}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -378,7 +399,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
               </Button>
              
             </div>
-          </div>
+          </div> */}
         </Form>
       );
     }
