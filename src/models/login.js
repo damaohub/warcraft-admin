@@ -18,7 +18,6 @@ export default {
     *login({ payload }, { call, put }) {
       
       const response = yield call(accountLogin, payload);
-      
       // Login successfully
       if (response.ret === 0) {
         yield put({
