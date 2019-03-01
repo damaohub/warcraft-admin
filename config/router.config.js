@@ -4,7 +4,7 @@ export default [
     path: '/login',
     component: '../layouts/UserLayout',
     routes: [
-      { path: './', component: '/Login' },
+      { path: './', component: './Login' },
       
     ]
   },

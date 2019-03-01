@@ -24,7 +24,9 @@ const createSign = (obj) => {
   //  console.log(typeof obj[elem])
   //  console.log('----')
 
+  if(obj[elem]) {
     str += (elem.toString() + tmp)
+   }
     // console.log(str)
   }
 
