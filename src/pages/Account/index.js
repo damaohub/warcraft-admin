@@ -1,4 +1,5 @@
 import React, { PureComponent ,Fragment } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { connect } from 'dva';
 import { Card, Modal, Form, Input, Button, Divider, Popconfirm, message, Select, Row, Col, Tooltip, Tag } from 'antd';
 
@@ -150,6 +151,13 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
        
         render: (text, record) => (
           <Fragment>
+            <CopyToClipboard
+              onCopy={this.copy}
+              text={this.getText(record)}
+            >
+              <Button type="primary" ghost size="small">一键复制</Button>
+            </CopyToClipboard> 
+            <Divider type="vertical" />
             <a onClick={(e)=> this.showEditModal(e, record)}>修改</a>
             <Divider type="vertical" />
             <Popconfirm title="是否要删除此行？" okText="确定" cancelText="取消" onConfirm={() => this.handleDelete(record)}>
@@ -158,6 +166,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           </Fragment>
         ),
         align: 'center',
+        width: 200
       },
     
     ];
@@ -248,6 +257,38 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           this.handleCall('已删除','删除失败')
         }  
       )
+    };
+
+    getText = (record) => {
+      const talentsName = []
+      record.talents.map(
+        (item) => (
+          talentsName.push(item.talent_name)
+        )
+      )
+      const str = 
+      `'账号'：${record.account_name}
+'密码':${record.account_pwd}
+'子账号':${record.child_name}
+'服务器':${record.region_id}
+'游戏角色':${record.game_role_name}
+'所属阵营':${record.organization === '0'?'联盟': '部落'}
+'角色等级':${record.level}
+'职业':${record.profession_name}
+'可用天赋':${JSON.stringify(talentsName)}
+'拾取天赋':${record.need_talent_name}
+'装备等级':${record.equip_level}
+'联系方式':${record.account_phone}`
+      return str
+  };
+
+    copy = (text, result) => {
+      if(result) {
+        message.success('已经赋值到剪切板')
+      } else {
+        message.error('操作失败')
+      }
+    
     };
 
     handleSubmit = e => {
