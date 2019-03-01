@@ -1,7 +1,7 @@
 import fetch from 'dva/fetch';
-import { notification } from 'antd';
+import { notification, message } from 'antd';
 import Cookies from 'js-cookie'
-// import router from 'umi/router';
+import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
 
@@ -85,7 +85,6 @@ export default function request(url, option) {
 
   const TOKEN = localStorage.getItem('token')
   const csrftoken = Cookies.get('csrfToken');
-  console.log(csrftoken)
 
   const defaultData = {
     time: `${Date.parse(new Date()) / 1000}`,
@@ -103,7 +102,7 @@ export default function request(url, option) {
       newOptions.headers = {
         Accept: 'application/json',
         'Content-Type': 'application/json; charset=utf-8',
-        
+        'Authorization':  `Bearer ${defaultData.token}`,
         ...newOptions.headers,
       };
     } else {
@@ -140,13 +139,32 @@ export default function request(url, option) {
       .then(checkStatus)
       // .then(response => cachedSave(response, hashcode))
       .then(response => {
-        
+       
         // DELETE and 204 do not return data by default
         // using .json will report an error.
         if (newOptions.method === 'DELETE' || response.status === 204) {
           return response.text();
         }
-        return response.json()
+        return response.json().then (
+          // 对自定义业务错误码的处理
+          (res) => (
+            new Promise((resolve) => {
+              if(res.ret !== 0) {
+                message.error(res.msg)
+                if(res.ret === 2006) {   
+                  router.push('/exception/403');
+                 }
+                if(res.ret === 1000 || res.ret === 1003 || res.ret === 1004) {
+                  localStorage.removeItem('token')
+                  router.push('/login');
+                }
+              }
+              resolve(res)
+            })
+          )
+        )
+      
+       
       })
       .catch(e => {
         const status = e.name;

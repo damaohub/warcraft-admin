@@ -4,7 +4,7 @@ import { accountLogin, getFakeCaptcha, accountLogout } from '@/services/api';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import { reloadAuthorized } from '@/utils/Authorized';
-import { message } from 'antd';
+// import { message } from 'antd';
 
 export default {
   namespace: 'login',
@@ -18,6 +18,7 @@ export default {
     *login({ payload }, { call, put }) {
       
       const response = yield call(accountLogin, payload);
+      console.log(response)
       // Login successfully
       if (response.ret === 0) {
         yield put({
@@ -41,8 +42,6 @@ export default {
           }
         }
         yield put(routerRedux.replace(redirect || '/'));
-      } else {
-        message.error(response.msg)
       }
     },
 
@@ -69,8 +68,6 @@ export default {
             }),
           })
         );
-      } else {
-        message.error(response.msg)
       }
       
     },
