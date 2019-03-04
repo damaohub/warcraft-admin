@@ -75,6 +75,10 @@ service.interceptors.response.use(
       message.error(res.msg)
       router.push('/exception/403');
      }
+     if(res.ret === 1001) {
+      message.error(res.msg)
+      router.push('/exception/404');
+     }
      if(res.ret ===1000) {
       message.error(res.msg)
       localStorage.removeItem('token')
