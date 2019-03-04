@@ -190,7 +190,7 @@ class RacesPage extends Component {
         type: 'races/fetch',
       });
     } else {
-      message.error(failText || res.msg);
+      // message.error(failText || res.msg);
     }
     
   }
