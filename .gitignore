@@ -26,7 +26,6 @@ package-lock.json
 # visual studio code
 .history
 *.log
-
 functions/mock
 .temp/**
 
