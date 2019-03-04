@@ -173,32 +173,40 @@ class RacesPage extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    this.handleFetch(dispatch);
-  }
-
-  handleFetch = dispatch => {
     dispatch({
       type: 'races/fetch',
     });
-  };
+   
+  }
 
-  handleCall = (okText, failText) => {
-    const {dispatch, races: {res} } = this.props;
+ 
+
+  handleCall = (okText, localLast = false) => {
+    const { dispatch, races: {res} } = this.props;
+    const { pagination } = this.state;
+    const lastPage = Math.ceil(pagination.total / pagination.pageSize);
+    const currentPage = localLast? lastPage : pagination.current;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
       dispatch({
         type: 'races/fetch',
-      });
-    } else {
-      // message.error(failText || res.msg);
+        payload: { currentPage, pageSize: pagination.pageSize},
+      }).then(
+        ()=> {
+          pagination.current = currentPage;
+          this.setState({
+            pagination
+          },()=> {console.log(pagination)})
+        }
+      )
     }
+    
     
   }
 
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  handleStandardTableChange = (pagination, filtersArg = {}, sorter) => {
     const { dispatch } = this.props;
     const { formValues } = this.state;
-
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
       newObj[key] = getValue(filtersArg[key]);
@@ -219,6 +227,9 @@ class RacesPage extends Component {
       type: 'races/fetch',
       payload: params,
     });
+    this.setState({
+      pagination
+    },()=> {console.log(pagination)});
   };
 
   handleModalVisible = flag => {
@@ -244,20 +255,21 @@ class RacesPage extends Component {
     }).then(
       () => {
         this.handleModalVisible()
-        this.handleCall()
+        this.handleCall('添加成功！', true)
       }
     )
   };
 
   handleUpdate = fields => {
     const { dispatch } = this.props;
+    const { pagination } = this.state;
     dispatch({
       type: 'races/update',
-      payload: fields
+      payload: {...fields, ... pagination }
     }).then(
       () => {
         this.handleUpdateModalVisible()
-        this.handleCall('更新成功','更新失败')
+        this.handleCall('更新成功！')
       }  
     )
     
@@ -270,7 +282,7 @@ class RacesPage extends Component {
       payload: { id: record.id },
     }).then(
       () => {
-        this.handleCall('已删除','删除失败')
+        this.handleCall('已删除')
       }  
     )
   };
