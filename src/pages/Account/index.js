@@ -267,24 +267,25 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
         )
       )
       const str = 
-      `'账号'：${record.account_name}
-'密码':${record.account_pwd}
-'子账号':${record.child_name}
-'服务器':${record.region_id}
-'游戏角色':${record.game_role_name}
-'所属阵营':${record.organization === '0'?'联盟': '部落'}
-'角色等级':${record.level}
-'职业':${record.profession_name}
-'可用天赋':${JSON.stringify(talentsName)}
-'拾取天赋':${record.need_talent_name}
-'装备等级':${record.equip_level}
-'联系方式':${record.account_phone}`
+      `账号：${record.account_name}; 
+密码: ${record.account_pwd}; 
+子账号: ${record.child_name}; 
+服务器: ${record.region_id}; 
+游戏角色: ${record.game_role_name};   
+所属阵营: ${record.organization === '0'?'联盟': '部落'}; 
+角色等级: ${record.level}; 
+职业: ${record.profession_name};  
+可用天赋: ${JSON.stringify(talentsName)}; 
+拾取天赋: ${record.need_talent_name};  
+装备等级: ${record.equip_level}; 
+联系方式: ${record.account_phone}; 
+备注: ${record.account_remark};`
       return str
   };
 
     copy = (text, result) => {
       if(result) {
-        message.success('已经赋值到剪切板')
+        message.success('已经复制到剪切板')
       } else {
         message.error('操作失败')
       }
