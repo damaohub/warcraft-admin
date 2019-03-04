@@ -186,12 +186,13 @@ class RacesPage extends Component {
     const {dispatch, races: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
+      dispatch({
+        type: 'races/fetch',
+      });
     } else {
       message.error(failText || res.msg);
     }
-    dispatch({
-      type: 'races/fetch',
-    });
+    
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
