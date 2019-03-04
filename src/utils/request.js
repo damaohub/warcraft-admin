@@ -150,7 +150,7 @@ export default function request(url, option) {
           (res) => (
             new Promise((resolve) => {
               if(res.ret !== 0) {
-                message.error(res.msg)
+                message.error(res.msg) // 这里可能会和页面写的错误提示 重复弹出
                 if(res.ret === 2006) {   
                   router.push('/exception/403');
                  }
