@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
-import { Card, Button, Form, message, Divider, Modal, Input, Select} from 'antd';
+import { Card, Button, Form, message, Divider, Modal, Input, Select, Popconfirm, Tag} from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -10,6 +10,7 @@ import styles from '../GameRole/game.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+
 
 const getValue = obj =>
   Object.keys(obj)
@@ -59,6 +60,17 @@ class StaffPage extends Component {
       dataIndex: 'status',
       key: 'status',
       align: 'center',
+      render: (text,record) => (
+        <Fragment>
+          {
+            text ==="在职" ?
+              <Popconfirm title="确定该员工离职？" onConfirm={(e) => this.getWay(e, record)}>
+                <Tag color="#108ee9">{text}</Tag>
+              </Popconfirm> : 
+              <Tag>{text}</Tag>
+          }
+        </Fragment>
+      ),
     },
     {
       title: '入职时间',
@@ -112,16 +124,15 @@ class StaffPage extends Component {
   }
 
  
-  handleCall = (okText, failText) => {
+  handleCall = (okText) => {
     const {dispatch, staff: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
-    } else {
-      message.error(failText || res.msg);
-    }
-    dispatch({
-      type: 'staff/fetch',
-    });
+      dispatch({
+        type: 'staff/fetch',
+      });
+    } 
+    
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -182,11 +193,24 @@ class StaffPage extends Component {
       }).then(
         () => {
           this.handleCancel()
-          this.handleCall('操作成功')
+          this.handleCall('操作成功!');
         }
       );
     });
   };
+
+  getWay = (e, record) => {
+    e.preventDefault()
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'staff/getway',
+      payload: {id: record.id}
+    }).then(
+      () => {
+        this.handleCall('操作成功!');
+      }
+    )
+  }
 
   render() {
     const {

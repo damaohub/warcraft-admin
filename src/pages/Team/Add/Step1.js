@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
-import { Form, Button, Select, Radio, InputNumber, Card, DatePicker } from 'antd';
+import { Form, Button, Select, Radio, InputNumber, Card, DatePicker, Input} from 'antd';
 import router from 'umi/router';
 
 import locale from 'antd/lib/date-picker/locale/zh_CN';
@@ -130,6 +130,19 @@ class Step1 extends React.PureComponent {
                 </Select>
               )}
             </Form.Item>
+            {
+              getFieldValue('instance_or_secret') ==='2' && getFieldValue('difficult')==="m" &&
+                <Form.Item {...formItemLayout} label="选择服务器">
+                  {getFieldDecorator('region_id', {
+                    rules: [ {required: true, message: '选择服务器'}],
+                    initialValue: '全服',
+                  })(
+                    <Input placeholder='服务器' />
+                    
+                  )}
+                </Form.Item>
+            }
+            
             <Form.Item {...formItemLayout} label="选择阵营">
               {getFieldDecorator('organization', {
                 rules: [ {required: true, message: '请选择阵营'}],
@@ -175,57 +188,61 @@ class Step1 extends React.PureComponent {
               }
             { 
               getFieldValue('instance_or_secret') === '2' &&
-              <Fragment>
-                <Form.Item {...formItemLayout} label="坦克个数">
+              <div style={{display: "flex"}}>
+                <Form.Item labelCol={{span: 12,}} wrapperCol={{span: 12,}} label="坦克">
                   {getFieldDecorator('t', {
                     rules: [
                       { required: true, message: '请输入坦克个数' }
                     ],
                   })(
-                    <InputNumber 
+                    <InputNumber
+                      style={{width:'auto'}}
                       min={1} 
                       max={5}
                     />
                   )}
                 </Form.Item>
-                <Form.Item {...formItemLayout} label="近战输出个数">
+                <Form.Item labelCol={{span: 12,}} wrapperCol={{span: 12,}} label="近战">
                   {getFieldDecorator('c', {
                     rules: [
                       { required: true, message: '请输入近战输出个数' }
                     ],
                   })(
-                    <InputNumber 
+                    <InputNumber
+                      style={{width:'auto'}} 
                       min={1} 
                       max={25}
                     />
                   )}
                 </Form.Item>
 
-                <Form.Item {...formItemLayout} label="远战输出个数">
+                <Form.Item labelCol={{span: 12,}} wrapperCol={{span: 12,}} label="远战">
                   {getFieldDecorator('f', {
                     rules: [
                       { required: true, message: '请输入远战输出个数' }
                     ],
                   })(
-                    <InputNumber 
+                    <InputNumber
+                      style={{width:'auto'}}
                       min={1} 
                       max={25}
                     />
                   )}
                 </Form.Item>
-                <Form.Item {...formItemLayout} label="治疗个数">
+                <Form.Item labelCol={{span: 12,}} wrapperCol={{span: 12,}} label="治疗">
                   {getFieldDecorator('n', {
                     rules: [
                       { required: true, message: '请输入治疗个数' }
                     ],
                   })(
-                    <InputNumber 
+                    <InputNumber
+                      style={{width:'auto'}} 
                       min={1} 
                       max={10}
                     />
                   )}
                 </Form.Item>
-              </Fragment>
+              </div>
               }
             
             <Form.Item

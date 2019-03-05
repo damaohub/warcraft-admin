@@ -149,6 +149,7 @@ class AdvancedForm extends Component {
         const prjs = []
         // eslint-disable-next-line
         itemsMap.map((ele) => {
+         // eslint-disable-next-line
           const prj = Object.values(ele.onValidate())[0]
           if(prj.instance_or_secret) prjs.push(prj)
           if(prj.difficultLevel) {

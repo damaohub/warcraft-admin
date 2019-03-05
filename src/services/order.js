@@ -17,9 +17,23 @@ export async function addOrder(params) {
 }
 
 export async function queryOrderInfo(params) {
-    return request('/api/order/info', {
-      method: 'POST',
-      body: params
-    });
-  }
+  return request('/api/order/info', {
+    method: 'POST',
+    body: params
+  });
+}
 
+export async function removeOrder(params) {
+  return request('/api/order/del', {
+    method: 'POST',
+    body: params
+  });
+}
+export async function updateOrder(params) {
+  return request('/api/order/edit', {
+    method: 'POST',
+    body: params
+  });
+}
+
+  

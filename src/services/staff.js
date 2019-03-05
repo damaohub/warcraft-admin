@@ -41,3 +41,11 @@ export async function salaryStaff(params) {
     body: params
   });
 }
+
+export async function getwayStaff(params) {
+  return request('/api/user/getaway', {
+    method: 'POST',
+    body: params
+  });
+}
+
