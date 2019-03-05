@@ -186,6 +186,9 @@ class RacesPage extends Component {
     const { pagination } = this.state;
     const lastPage = Math.ceil(pagination.total / pagination.pageSize);
     const currentPage = localLast? lastPage : pagination.current;
+    // if (currentPage === lastPage) {
+    //   console.log(pagination.pageSize)
+    // }
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
       dispatch({
@@ -193,7 +196,11 @@ class RacesPage extends Component {
         payload: { currentPage, pageSize: pagination.pageSize},
       }).then(
         ()=> {
-          pagination.current = currentPage;
+          const {races: { data }} = this.props;
+          const paginationProps = data.pagination
+          pagination.pageSize = paginationProps.pageSize;
+          pagination.total = paginationProps.total
+          pagination .current = currentPage
           this.setState({
             pagination
           },()=> {console.log(pagination)})
