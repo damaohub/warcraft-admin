@@ -71,25 +71,22 @@ service.interceptors.response.use(
  
     const res = response.data
     return new Promise((resolve) => {
-     if(res.ret === 2006) {
-      message.error(res.msg)
-      router.push('/exception/403');
-     }
-     if(res.ret === 1001) {
-      message.error(res.msg)
-      router.push('/exception/404');
-     }
-     if(res.ret ===1000) {
-      message.error(res.msg)
-      localStorage.removeItem('token')
-      router.push('/login');
-     }
-     if(res.ret ===1003) {
-      message.error(res.msg)
-      localStorage.removeItem('token')
-      router.push('/login');
-     }
-     resolve(res)
+    if(res.ret !==0 ) {
+      message.error(res.msg) // 需要修改很多
+      if(res.ret === 2006) {
+        router.push('/exception/403');
+       }
+       if(res.ret === 1001) {
+        router.push('/exception/404');
+       }
+       if(res.ret ===1003 || res.ret ===1000) {
+        localStorage.removeItem('token')
+        router.push('/login');
+       }
+    } else {
+      resolve(res)
+    }
+     
     })
   },
 
