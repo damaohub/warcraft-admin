@@ -1,9 +1,10 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Card , Table, Tooltip, Divider, Form, Select, Row, Col, Input, Button} from 'antd';
+import { Card , Table, Tooltip, Divider, Form, Select, Row, Col, Input, Button, Popconfirm, Modal, message} from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Ellipsis from '@/components/Ellipsis';
 
 import styles from '../GameRole/game.less';
 
@@ -25,7 +26,11 @@ const getValue = obj =>
   class OrderListPage extends PureComponent {
     state = {
     };
-  
+
+    formLayout = {
+      labelCol: { span: 7 },
+      wrapperCol: { span: 13 },
+    };
 
     columns = [
       {
@@ -40,6 +45,20 @@ const getValue = obj =>
         dataIndex: 'phone',
         key: 'phone',
         align: 'center',
+        render: (text, record) => {
+          if (record.editable) {
+            return (
+              <Input
+                value={text}
+                autoFocus
+                onChange={e => this.handleFieldChange(e, 'name', record.key)}
+                onKeyPress={e => this.handleKeyPress(e, record.key)}
+                placeholder="联系电话"
+              />
+            );
+          }
+          return text;
+        },
       },
       {
         title: '状态',
@@ -54,14 +73,14 @@ const getValue = obj =>
         title: '创建时间',
         dataIndex: 'create_time',
         key: 'create_time',
-        width: 140,
+        width: 200,
         align: 'center',
       },
       {
         title: '完成时间',
         dataIndex: 'finish_time',
         key: 'finish_time',
-        width: 140,
+        width: 200,
         align: 'center',
       },
       {
@@ -97,17 +116,35 @@ const getValue = obj =>
         title: '备注',
         dataIndex: 'remark',
         key: 'remark',
-        align: 'left',
+        align: 'center',
+        render: (text) => (
+          <Ellipsis
+            lines={1}
+            tooltip={text}
+          >
+            {text}
+          </Ellipsis>
+
+        )
       },
-      // {
-      //   title: '操作',
-      //   render: (text, record) => (
-      //     <Fragment>
-      //       <a href={`#/order/detail?oid=${record.id}`}>订单详情</a>
-      //     </Fragment>
-      //   ),
-      //   align: 'center',
-      // },
+      {
+        title: '操作',
+        key: 'action',
+        width: 200,
+        align: 'center',
+        render: (text, record) => 
+        (
+          <Fragment>
+            <a onClick={e => this.showModal(e, record)}>编辑</a>
+            <Divider type="vertical" />
+            <Popconfirm title="是否要删除此行？" onConfirm={(e) => this.remove(e, record)}>
+              <a>删除</a>
+            </Popconfirm>
+          </Fragment>
+        )
+     
+      },
+     
     
     ];
 
@@ -119,7 +156,7 @@ const getValue = obj =>
      
     }
   
-
+  
     expandedRowRender = (data) => {
       const columns = [
         { title: '项目号', dataIndex: 'item_id', key: 'item_id', align:'center'  },
@@ -152,6 +189,7 @@ const getValue = obj =>
         />
       );
     };
+
 
     handleStandardTableChange = (pagination, filtersArg, sorter) => {
       const { dispatch } = this.props;
@@ -281,14 +319,81 @@ const getValue = obj =>
       );
     }
 
+    showModal = (e, item) => {
+      e.preventDefault()
+      this.setState({
+        visible: true,
+        current: {id: item.id,phone: item.phone, remark: item.remark}
+      });
+    };
+
+    handleCancel = () => {
+      this.setState({
+        visible: false,
+      });
+    };
   
+    handleSubmit = e => {
+      e.preventDefault();
+      const { dispatch, form } = this.props;
+      const { current } = this.state;
+      form.validateFields((err, fieldsValue) => {
+        if (err) return;
+        const {phone, remark} = fieldsValue
+        dispatch({
+          type: 'order/update',
+          payload: {id:current.id, phone, remark},
+        }).then(
+          () => {
+            this.handleCancel()
+            dispatch({
+              type: 'order/fetch',
+            });
+            message.success('更新成功！')
+          }
+        );
+      });
+    };
+  
+    remove = (e,record) => {
+      e.preventDefault()
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'order/remove',
+        payload: {id:record.id,}
+      }).then(
+        () => {
+          dispatch({
+            type: 'order/fetch',
+          });
+          message.success('已删除！')
+        }
+      );
+    } 
+
     render() {
       const {
         Loading,
         order: { data },
-     
+        form: { getFieldDecorator }
       } = this.props;
-
+      const {visible, current={}} = this.state
+      const modalFooter = { okText: '保存', onOk: this.handleSubmit, onCancel: this.handleCancel };
+      const getModalContent = () => (
+        <Form onSubmit={this.handleSubmit}>
+          <FormItem label='联系电话' {...this.formLayout}>
+            {getFieldDecorator('phone', {
+              initialValue: current.phone,
+            })(<Input placeholder="请输入" />)}
+          </FormItem>
+          <FormItem label='备注' {...this.formLayout}>
+            {getFieldDecorator('remark', {
+              initialValue: current.remark,
+            })(<Input.TextArea placeholder="请输入" autosize />)}
+          </FormItem>
+          
+        </Form>
+      )
 
       return (
         <PageHeaderWrapper>
@@ -305,7 +410,18 @@ const getValue = obj =>
               />
             </div>
           </Card>
-         
+          <Modal
+            title='修改信息'
+            className={styles.standardListForm}
+            width={640}
+            bodyStyle={{ padding: '28px 0 0' }}
+            destroyOnClose
+            visible={visible}
+            {...modalFooter}
+            maskClosable={false}
+          >
+            {getModalContent()}
+          </Modal>
         </PageHeaderWrapper>
       );
     }

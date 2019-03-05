@@ -1,4 +1,4 @@
-import { queryStaff, addStaff,updateStaff, rD, currentStaff, salaryStaff} from '@/services/staff';
+import { queryStaff, addStaff,updateStaff, rD, currentStaff, salaryStaff, getwayStaff} from '@/services/staff';
 
 export default {
   namespace: 'staff',
@@ -56,6 +56,13 @@ export default {
       const response = yield call(salaryStaff, payload);
       yield put({
         type: 'sy',
+        payload: response.data,
+      });
+    },
+    *getway({ payload }, { call, put }) {
+      const response = yield call(getwayStaff, payload);
+      yield put({
+        type: 'item',
         payload: response.data,
       });
     }

@@ -149,6 +149,7 @@ class AdvancedForm extends Component {
         const prjs = []
         // eslint-disable-next-line
         itemsMap.map((ele) => {
+         // eslint-disable-next-line
           const prj = Object.values(ele.onValidate())[0]
           if(prj.instance_or_secret) prjs.push(prj)
           if(prj.difficultLevel) {
@@ -160,25 +161,23 @@ class AdvancedForm extends Component {
           payload: { account: values, proj: prjs }
         }).then(
           () => {
-            resetFields()
             this.setState({items: [{...item}]})
-            this.handleCall('操作成功')
             const {order: {res}} =this.props
-            router.push(`/order/list/detail?oid=${res.data}?from=add`);
+            if(res && res.ret === 0){
+              message.success('操作成功' || res.msg);
+              resetFields()
+              router.push(`/order/list/detail?oid=${res.data}?from=add`);
+            } else{
+              message.error(res.msg)
+            }
+            
           }
         )
       }
     });
   };
 
-  handleCall = (okText, failText) => {
-    const { order: {res} } = this.props;
-    if(res && res.ret === 0) {
-      message.success(okText || res.msg);
-    } else {
-      message.error(failText || res.msg);
-    }
-  }
+ 
 
   onRef = (ref) => {
     itemsMap.push(ref)
@@ -361,7 +360,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.phone}>
                   {getFieldDecorator('phone', {
-                    rules: [{ required: true, message: `请输入${fieldLabels.phone}` }],
+                    
                   })(
                     <Input
                       placeholder="请输入"

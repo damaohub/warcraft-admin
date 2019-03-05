@@ -15,7 +15,8 @@ import {
   Divider,
   message,
   Popconfirm,
-  Tooltip
+  Tooltip,
+  Avatar,
 } from 'antd';
 
 import DescriptionList from '@/components/DescriptionList';
@@ -54,33 +55,39 @@ class TeamDetailPage extends Component {
   colums = [
     
     {
-      title: '账号',
+      title: <div style={{textAlign: 'center',margin: '0 auto'}}>账号</div>,
       dataIndex: 'account_name',
       key: 'account_name',
-      align: 'center',
+      align: 'justify',
+      width: 300,
       render: (item,record) => (
-        <Tooltip 
-          placement="right" 
-          title={
-            <div style={{display:"flex",flexDirection:"column"}}>
-              <div>密码：{record.account_pwd}</div>
-              <div>账号类型：{typeMap[record.type]}</div>
-              <div>子账号：{record.child_name}</div>
-              <div>服务器：{record.region_id}</div>
-              <div>角色名：{record.game_role_name}</div>
-              <div>角色等级：{record.level}</div>
-              <div>阵营：{record.organization==='0'?'联盟':'部落'}</div>
-              <div>职业：{record.profession_name}</div>
-              <div>可用天赋：{record.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
-              <div>装备等级：{record.equip_level}</div>
-              <div>联系方式：{record.account_phone}</div>
-              {record.account_remark? <div>备注：{record.account_remark}</div>: null}
-              
-            </div>     
-            }
-        >
-          {item}
-        </Tooltip>
+        <Fragment>
+          <Tooltip title={record.profession_name}>
+            <Avatar src={record.profession_img} />
+          </Tooltip>
+          <Tooltip 
+            placement="right" 
+            title={
+              <div style={{display:"flex",flexDirection:"column"}}>
+                <div>密码：{record.account_pwd}</div>
+                <div>账号类型：{typeMap[record.type]}</div>
+                <div>子账号：{record.child_name}</div>
+                <div>服务器：{record.region_id}</div>
+                <div>角色名：{record.game_role_name}</div>
+                <div>角色等级：{record.level}</div>
+                <div>阵营：{record.organization==='0'?'联盟':'部落'}</div>
+                <div>职业：{record.profession_name}</div>
+                <div>可用天赋：{record.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
+                <div>装备等级：{record.equip_level}</div>
+                <div>联系方式：{record.account_phone}</div>
+                {record.account_remark? <div>备注：{record.account_remark}</div>: null}
+                
+              </div>     
+              }
+          >
+            <div style={{display: "inline-block"}}>{item}</div>
+          </Tooltip>
+        </Fragment>
       )
     },
    

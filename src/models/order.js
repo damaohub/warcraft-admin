@@ -1,4 +1,4 @@
-import { queryOrder, addOrder, queryOrderInfo } from '@/services/order';
+import { queryOrder, addOrder, queryOrderInfo, removeOrder,updateOrder } from '@/services/order';
 
 export default {
   namespace: 'order',
@@ -36,22 +36,22 @@ export default {
           payload: response.data,
         });
       },
-    // *remove({ payload, callback }, { call, put }) {
-    //   const response = yield call(removeOrder, payload);
-    //   yield put({
-    //     type: 'item',
-    //     payload: response,
-    //   });
-    //   if (callback) callback();
-    // },
-    // *update({ payload, callback }, { call, put }) {
-    //   const response = yield call(updateOrder, payload);
-    //   yield put({
-    //     type: 'item',
-    //     payload: response,
-    //   });
-    //   if (callback) callback();
-    // },
+    *remove({ payload, callback }, { call, put }) {
+      const response = yield call(removeOrder, payload);
+      yield put({
+        type: 'item',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *update({ payload, callback }, { call, put }) {
+      const response = yield call(updateOrder, payload);
+      yield put({
+        type: 'item',
+        payload: response,
+      });
+      if (callback) callback();
+    },
    
   },
 

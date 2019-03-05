@@ -5,6 +5,7 @@ import { Card, Modal, Form, Input, Button, Divider, Popconfirm, message, Select,
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Ellipsis from '@/components/Ellipsis';
 
 import styles from '../GameRole/game.less';
 
@@ -77,6 +78,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
         dataIndex: 'region_id',
         key: 'region_id',
         align: 'center',
+        width: 120,
       },
     
       {
@@ -84,12 +86,14 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
         dataIndex: 'game_role_name',
         key: 'game_role_name',
         align: 'center',
+        width: 120,
       },
       {
         title: '所属阵营',
         dataIndex: 'organization',
         key: 'organization',
         align: 'center',
+        width: 100,
         render: (item) => (
           item ==='0'? '联盟': '部落'
         )
@@ -99,18 +103,21 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
         dataIndex: 'level',
         key: 'level',
         align: 'center',
+        width: 100,
       },
       {
         title: '职业',
         dataIndex: 'profession_name',
         key: 'profession_name',
         align: 'center',
+        width: 100,
       },
       {
         title: '可用天赋',
         dataIndex: 'talents',
         key: 'talents',
         align: 'center',
+        width: 100,
         render: talents => (
           <span>
             {talents.map((talent,ids) => 
@@ -127,12 +134,14 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
         dataIndex: 'need_talent_name',
         key: 'need_talent_name',
         align: 'center',
+        width: 100,
       },
       {
         title: '装备等级',
         dataIndex: 'equip_level',
         key: 'equip_level',
         align: 'center',
+        width: 100,
       },
       {
         title: '联系方式',
@@ -144,7 +153,15 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
         title: '备注',
         dataIndex: 'account_remark',
         key: 'account_remark',
-        align: 'left',
+        align: 'center',
+        render: remarks => (
+          <Ellipsis
+            lines={1}
+            tooltip={remarks}
+          >
+            {remarks}
+          </Ellipsis>
+        )
       },
       {
         title: '操作',
@@ -157,9 +174,9 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
             >
               <Button type="primary" ghost size="small">一键复制</Button>
             </CopyToClipboard> 
-            <Divider type="vertical" />
+            <Divider type="vertical" style={{marginLeft:"2px",marginRight:"2px"}} />
             <a onClick={(e)=> this.showEditModal(e, record)}>修改</a>
-            <Divider type="vertical" />
+            <Divider type="vertical" style={{marginLeft:"2px",marginRight:"2px"}} />
             <Popconfirm title="是否要删除此行？" okText="确定" cancelText="取消" onConfirm={() => this.handleDelete(record)}>
               <a>删除</a>
             </Popconfirm>     
@@ -285,7 +302,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
 
     copy = (text, result) => {
       if(result) {
-        message.success('已经赋值到剪切板')
+        message.success('已经复制到剪切板')
       } else {
         message.error('操作失败')
       }
