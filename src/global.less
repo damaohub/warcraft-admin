@@ -31,3 +31,35 @@ ul,
 ol {
   list-style: none;
 }
+
+/* 扩展ant design pro按钮组件颜色 */
+
+.color-loop(@ruleset) when (length( @colors ) >= 1) {
+  @length: length( @colors ) ;
+  .looper( 1 ) ;
+  .looper( @index ) when ( @index <= @length ) and (length(extract( @colors, @index )) = 2) {
+    @pair: extract( @colors, @index );
+    @colorName: extract( @pair, 1 ) ;
+    @colorValue: extract( @pair, 2 ) ;
+    @ruleset();
+    .looper( @index + 1 ) ;
+  }
+}
+
+@colors: red #ff3b30, green #4cd964, blue #007aff, pink #ff2d55, yellow #ffcc00, orange #ff9500, gray #8e8e93, white #ffffff, black #000000;
+.color-loop({
+  .button-color-@{colorName} {
+    border-color: @colorValue;
+    background-color: @colorValue;
+    &:active, &.active {
+      border-color: @colorValue;
+      background-color: @colorValue;
+    }
+   
+    &:hover, &:focus {
+      background: rgba(red(@colorValue), green(@colorValue), blue(@colorValue), .70);
+      border-color: @colorValue;
+    }
+
+  }
+});
