@@ -95,6 +95,7 @@ service.interceptors.response.use(
       message: `请求错误 ${error.response.status}: ${error.response.request.responseURL}`,
       description: error.response.statusText,
     });
+    router.push('/exception/500');
     // const err = new Error(error.response.statusText);
     // err.name = error.response.status;
     // err.response = error.response;
