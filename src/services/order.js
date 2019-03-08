@@ -36,4 +36,9 @@ export async function updateOrder(params) {
   });
 }
 
-  
+export async function changeOrder(params) {
+  return request('/api/order/change', {
+    method: 'POST',
+    body: params
+  });
+}

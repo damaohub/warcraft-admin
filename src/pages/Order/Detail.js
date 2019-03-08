@@ -95,6 +95,7 @@ class DetailPage extends Component {
                     <DescriptionList size="small" style={{ marginBottom: 16 }}>
                       <Description term="类型">{v.instance_or_secret==="1"?'地下城':'团本'}</Description>
                       <Description term="副本">{v.instance_name}</Description>
+                      <Description term="怪物">{v.monster_id}</Description>
                       <Description term="难度">{difficultMap(v.difficult)}</Description>
                       <Description term="项目数量">{v.num==="-1"?'包版本':v.num}</Description>
                       <Description term="完成数量">{v.finish_num}</Description>

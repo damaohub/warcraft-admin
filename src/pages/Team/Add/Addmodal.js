@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
-import { Button, Modal, Avatar, Radio, List, Tag, Empty  } from 'antd';
+import React, { Component, Fragment } from 'react';
+import { Button, Modal, Avatar, Radio, List, Tag, Empty, Input  } from 'antd';
 
 import styles from './style.less';
 
 const RadioGroup = Radio.Group;
+const { Search } = Input;
 
 class Addmodal extends Component {
   static defaultProps = {
@@ -23,15 +24,23 @@ class Addmodal extends Component {
   radioChange= (e) => {
     e.preventDefault()
     this.setState({
-      selectID: e.target.value
+      selectItem: e.target.value
     })
   }
 
   handleNext = () => {
     const {handleAdd} = this.props;
-    const { selectID } = this.state
-    handleAdd(selectID)
+    const { selectItem } = this.state
+    handleAdd(selectItem)
   };
+
+  handleVisible = () => {
+    const {handleModalVisible} = this.props;
+    this.setState({
+      selectItem: undefined
+    })
+    handleModalVisible(false)
+  }
 
   renderContent = (data) => (
     data.length !== 0? 
@@ -60,18 +69,18 @@ class Addmodal extends Component {
     
 
   renderFooter = () => {
-    const { handleModalVisible, list} = this.props;
+    const { list} = this.props;
     return [
-      <Button key="cancel" onClick={() => handleModalVisible(false)}>
+      <Button key="cancel" onClick={() => this.handleVisible(false)}>
         取消
       </Button>,
       list.length !== 0 ? 
       (
         <Button key="submit" type="primary" onClick={() => this.handleNext()}>
-          完成
+          添加
         </Button>
       ):(
-        <Button key="cancel" type="primary" onClick={() => handleModalVisible(false)}>
+        <Button key="cancel" type="primary" onClick={() => this.handleVisible(false)}>
           关闭
         </Button>
       )
@@ -89,7 +98,16 @@ class Addmodal extends Component {
         width={680}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
-        title="添加"
+        title={
+          <Fragment>
+            <span>添加账号</span> 
+            <Search
+              placeholder="输入查找账号"
+              onSearch={value => console.log(value)}
+              enterButton
+              style={{ width: '340px', marginLeft: '80px' }}
+            />
+          </Fragment>}
         visible={modalVisible}
         footer={this.renderFooter()}
         onCancel={() => handleModalVisible(false)}

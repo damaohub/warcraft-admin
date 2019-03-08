@@ -34,3 +34,10 @@ export async function queryInstance(params) {
       body: params,
     });
   }
+
+  export async function queryInstancemonsters(params) {
+    return request('/api/monster/instancemonsters', {
+      method: 'POST',
+      body: params,
+    });
+  }

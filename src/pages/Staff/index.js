@@ -38,28 +38,33 @@ class StaffPage extends Component {
 
   columns = [
     {
+      title: '姓名',
+      dataIndex: 'real_name',
+      key: 'real_name',
+      align: 'center',
+      width: 80,
+    },
+    {
       title: '手机号',
       dataIndex: 'username',
       key: 'username',
       align: 'center',
+      width: 110
     },
     {
       title: '角色名称',
       dataIndex: 'role_name',
       key: 'role_name',
       align: 'center',
+      width: 110
     },
-    {
-      title: '姓名',
-      dataIndex: 'real_name',
-      key: 'real_name',
-      align: 'center',
-    },
+    
     {
       title: '在职状态',
       dataIndex: 'status',
       key: 'status',
       align: 'center',
+      width: 100,
       render: (text,record) => (
         <Fragment>
           {
@@ -77,24 +82,28 @@ class StaffPage extends Component {
       dataIndex: 'entry_time',
       key: 'entry_time',
       align: 'center',
+      width: 160
     },
     {
       title: '基本工资',
       dataIndex: 'basic_salary',
       key: 'basic_salary',
       align: 'center',
+      width: 150,
     },
     {
       title: 'QQ号',
       dataIndex: 'qq',
       key: 'qq',
       align: 'center',
+      width: 120,
     },
     {
       title: '上次登录',
       dataIndex: 'last_login_time',
       key: 'last_login_time',
       align: 'center',
+      width: 160
     },
     
     
@@ -109,6 +118,7 @@ class StaffPage extends Component {
         </Fragment>
       ),
       align: 'center',
+      width: 160
     },
   ];
 
@@ -267,7 +277,7 @@ class StaffPage extends Component {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              
+              scroll={{ x: 1300 }}
             />
           </div>
         </Card>
