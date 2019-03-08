@@ -166,7 +166,7 @@ class SettingPage extends Component {
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
-              <Form onSubmit={this.handleSubmit} hideRequiredMark style={{ marginTop: 8 }}>
+              <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
                 <FormItem {...formItemLayout} label="手机号">
                   {getFieldDecorator('username', {
                   rules: [

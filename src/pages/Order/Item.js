@@ -1,8 +1,10 @@
 import React from 'react';
 import { connect } from 'dva';
-import {Card, Form, Radio, Select, InputNumber, Input } from 'antd';
+import {Card, Form, Radio, Select, InputNumber, Input, Checkbox  } from 'antd';
 
 const{Option} = Select
+const CheckboxGroup = Checkbox.Group;
+
 @connect(({ loading, monster }) => ({
   monster,
   Loading: loading.models.monster,
@@ -12,7 +14,9 @@ class Item extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
-      isRendering: true
+      isRendering: true,
+      mOptions: [],
+      sortArr: []
     }
   }
 
@@ -35,6 +39,7 @@ class Item extends React.Component{
 
     const item = {}
     validateFieldsAndScroll((error, values) => {
+      console.log(values)
       if (!error) {
         item[id] = {...values}
       }
@@ -59,6 +64,56 @@ class Item extends React.Component{
     });
   }
 
+  handleSelectChange = (value) => {
+    const{ dispatch } =this.props
+    dispatch({
+      type: 'monster/Instancemonsters',
+      payload: {instance_id: value }
+    }).then (
+      ()=> {
+        const { monster: { monstersList }} =this.props;
+        if(monstersList.length !== 0) {
+          const mOptions = []
+          const sortArr =[]
+          monstersList.map((item) => {
+            sortArr.push(item.sort)
+            mOptions.push({label: item.name, value: item.sort })
+            return item
+          })
+          this.setState({
+            mOptions,
+            sortArr,
+            mSelect: true
+          })
+        }
+      }
+    )
+    
+  
+  }
+
+  checkOnChange =(value) => {
+    this.setState({
+      sortArr: value
+    })
+  }
+
+  checkArr = (rule, value, callback) =>{
+    const result = value.sort().every((item , index, arr) => {
+
+      if(index === (arr.length-1)) {
+        return parseInt(item, 10) - parseInt(arr[index-1], 10) === 1
+      }
+      return parseInt(arr[index+1], 10) - parseInt(item, 10) === 1
+    })
+    if(result) {
+      callback()
+    } else {
+      callback('选择顺序需要连续！')
+    }
+    
+  }
+
   render() {
     const {
       monster:{instanceList},
@@ -67,8 +122,7 @@ class Item extends React.Component{
       elemt,
       form: { getFieldDecorator, getFieldValue },
     } = this.props;
-    const {isRendering} =this.state
-
+    const {isRendering, mSelect, mOptions, sortArr} =this.state
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -83,7 +137,7 @@ class Item extends React.Component{
     return (
       isRendering?
         <Card title='项目信息' extra={id>0? <a onClick={() => this.delete(false)}>删除</a>: null} style={{marginBottom: "15px" }} bordered={false}>
-          <Form layout="horizontal" hideRequiredMark> 
+          <Form layout="horizontal"> 
             <Form.Item {...formItemLayout} label={labels.instance_or_secret}>
               {getFieldDecorator('instance_or_secret', {
                 rules: [{ required: true, message: `请选择${labels.instance_or_secret}` }],
@@ -105,12 +159,24 @@ class Item extends React.Component{
                 rules: [{ required: true, message: `请选择${labels.instance_id}` }],
                 initialValue: elemt.instance_id,
               })(
-                <Select placeholder={`请选择${labels.instance_id}`}>
+                <Select placeholder={`请选择${labels.instance_id}`} onChange={this.handleSelectChange}>
                   {instanceList.map( i => (<Option key={i.id}>{i.name}</Option>))}
                 </Select>
               )}
             </Form.Item>
-          
+
+            {
+              getFieldValue('instance_or_secret')==='2' && getFieldValue('difficult')==="m" && mSelect && 
+              <Form.Item {...formItemLayout} label={labels.monster_id}>
+                {getFieldDecorator('monster_id', {
+                  rules: [{ required: true, message: `请选择${labels.monster_id}` },{validator: this.checkArr}],
+                  initialValue: sortArr,
+                })(
+                  <CheckboxGroup options={mOptions} onChange={this.checkOnChange} />
+                )}
+              </Form.Item>
+            }
+
             <Form.Item {...formItemLayout} label={labels.difficult}>
               {getFieldDecorator('difficult', {
                 rules: [{ required: true, message: `请选择${labels.difficult}`   }],

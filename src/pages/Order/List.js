@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Card , Table, Tooltip, Divider, Form, Select, Row, Col, Input, Button, Popconfirm, Modal, message} from 'antd';
+import { Card , Table, Tooltip, Divider, Form, Select, Row, Col, Input, Button, Popconfirm, Modal, message, Radio, Icon} from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -10,7 +10,9 @@ import styles from '../GameRole/game.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const RadioGroup = Radio.Group;
 const statusMap= {'1': '未完成', '2': '已完成'}
+const statusColors ={'1': '#ff9500', '2': '#4cd964'}
 const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
 const usedMap ={'0': '本周可用','1':'本周已排','3':'本周已完成'}
 const getValue = obj =>
@@ -18,19 +20,24 @@ const getValue = obj =>
     .map(key => obj[key])
     .join(',');
 
+
 @Form.create()
+
 @connect(({ loading, order }) => ({
     order,
     Loading: loading.models.order,
   }))
   class OrderListPage extends PureComponent {
     state = {
+ 
     };
 
     formLayout = {
       labelCol: { span: 7 },
       wrapperCol: { span: 13 },
     };
+
+    
 
     columns = [
       {
@@ -65,22 +72,42 @@ const getValue = obj =>
         dataIndex: 'status',
         key: 'status',
         align: 'center',
-        width: 80,
-        render: item => (statusMap[item])
+        width: 120,
+        render: (item, record) => (
+          <Fragment>
+            <span style={{color:statusColors[item], marginRight: '5px'}}>{statusMap[item]}</span>
+            <Popconfirm 
+              title={
+                <RadioGroup style={{width:"100%", }} defaultValue={item} onChange={e => {this.setState({newStatus: e.target.value})}}>
+                  <Radio value="1" style={{display: "block",borderBottom:'1px solid #eee',padding: "0 0 5px"}}>{statusMap["1"]}</Radio>
+                  <Radio value="2" style={{display: "block", padding: "5px 0"}}>{statusMap["2"]}</Radio>
+                  {/* <Radio value="3" style={{display: "block",borderBottom:'1px solid #eee', padding: "5px 0"}}>代练中</Radio> */}
+                  <Divider style={{margin:"0"}} />
+                </RadioGroup>
+              }
+              icon={<span />}
+              placement="rightTop"
+              onConfirm={e => {this.changeStatus(e,record)}}
+            >
+              <Icon type="edit" title="修改状态" />
+            </Popconfirm>
+          </Fragment>
+         
+          )
       },
      
       {
         title: '创建时间',
         dataIndex: 'create_time',
         key: 'create_time',
-        width: 200,
+        width: 160,
         align: 'center',
       },
       {
         title: '完成时间',
         dataIndex: 'finish_time',
         key: 'finish_time',
-        width: 200,
+        width: 160,
         align: 'center',
       },
       {
@@ -88,6 +115,7 @@ const getValue = obj =>
         dataIndex: 'account_name',
         key: 'account_name',
         align: 'center',
+        width: 200,
         render: (item,record) => (
           <Tooltip 
             placement="right" 
@@ -111,6 +139,14 @@ const getValue = obj =>
           </Tooltip>
         )
       },
+
+      {
+        title: '淘宝订单ID',
+        dataIndex: 'taobaoid',
+        key: 'taobaoid',
+        align: 'center',
+        width: 160,
+      },
       
       {
         title: '备注',
@@ -130,7 +166,7 @@ const getValue = obj =>
       {
         title: '操作',
         key: 'action',
-        width: 200,
+        width: 120,
         align: 'center',
         render: (text, record) => 
         (
@@ -156,12 +192,15 @@ const getValue = obj =>
      
     }
   
+   
+  
   
     expandedRowRender = (data) => {
       const columns = [
         { title: '项目号', dataIndex: 'item_id', key: 'item_id', align:'center'  },
         { title: '类型', dataIndex: 'instance_or_secret', align:'center',  key: 'instance_or_secret',render:item=>(item==="1"?'地下城':'团本') },
         { title: '副本', dataIndex: 'instance_name', key: 'instance_name',align:'center' },
+        { title: '怪物', dataIndex: 'monster_id', key: 'monster_id',align:'center' },
         { title: '难度', dataIndex: 'difficult', key: 'difficult', render: item => {
           switch (item) {
               case 'p':
@@ -178,7 +217,8 @@ const getValue = obj =>
         { title: '完成数量', dataIndex: 'finish_num', key: 'finish_num',align:'center', },
         { title: '账号可用状态', dataIndex: 'week_used', key: 'week_used',align:'center',render: item=> (usedMap[item]) },
         { title: '项目状态', dataIndex: 'item_status', key: 'item_status',align:'center', render:item=>(item==="0"?'未完成': '已完成')},
-        { title: '上次完成时间', dataIndex: 'last_finish_time', key: 'last_finish_time',align:'center', }
+        { title: '上次完成时间', dataIndex: 'last_finish_time', key: 'last_finish_time',align:'center', },
+       
       ];
   
       return (
@@ -289,7 +329,7 @@ const getValue = obj =>
           <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
             <Col lg={6} md={6} sm={24}>
               <FormItem label="手机号">
-                {getFieldDecorator('phone')(
+                {getFieldDecorator('phone', {initialValue: '',})(
                   <Input placeholder="请输入" />)
                 }
               </FormItem>
@@ -371,6 +411,23 @@ const getValue = obj =>
       );
     } 
 
+    changeStatus = (e, record) => {
+      e.preventDefault()
+      const { dispatch }=this.props;
+      const { newStatus } = this.state;
+      dispatch({
+        type: 'order/change',
+        payload: {id: record.id,new_status: newStatus}
+      }).then(
+        () => {
+          dispatch({
+            type: 'order/fetch',
+          });
+          message.success('修改成功！')
+        }
+      )
+    }
+
     render() {
       const {
         Loading,
@@ -407,6 +464,7 @@ const getValue = obj =>
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 expandedRowRender={this.expandedRowRender}
+                scroll={{ x: 1300 }}
               />
             </div>
           </Card>

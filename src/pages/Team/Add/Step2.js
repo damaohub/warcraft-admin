@@ -1,6 +1,6 @@
-import React from 'react';
+import React ,{ Fragment }from 'react';
 import { connect } from 'dva';
-import { Row, Col, List, Icon, Card, Button, Avatar, Divider, Spin, Popconfirm, message  } from 'antd';
+import { Row, Col, List, Icon, Card, Button, Avatar, Divider, Spin, Popconfirm, message, Tooltip  } from 'antd';
 import router from 'umi/router';
 // import { digitUppercase } from '@/utils/utils';
 import Ellipsis from '@/components/Ellipsis';
@@ -44,7 +44,7 @@ const removeItemFromArr = (arr,itemId) => {
  const onPrev = () => {
   router.push('/team/add/info');
 };
-
+const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
 
 @connect(({ team, loading }) => ({
   submitting: loading.effects['team/add'],
@@ -128,21 +128,26 @@ class Step2 extends React.Component {
     })
   }
 
-  handleAdd = (acnt) => {
+  handleAdd = (selectItem) => {
     const {AllAcountIds ,local, dAccount, tAccount, nAccount} = this.state
+    if(!selectItem || AllAcountIds.includes(selectItem.aid)) {
+      this.handleModalVisible()
+      message.warning('未选择任何账号')
+      return
+    }
     switch(local) {
       case 'd':
-        dAccount.splice(-1, 0 ,acnt)
+        dAccount.splice(-1, 0 ,selectItem)
       break;
       case 't':
-        tAccount.splice(-1, 0,acnt)
+        tAccount.splice(-1, 0,selectItem)
       break;
       case 'n':
-        nAccount.splice(-1, 0, acnt)
+        nAccount.splice(-1, 0, selectItem)
       break;
       default:
     }
-    AllAcountIds.push(acnt.aid)
+    AllAcountIds.push(selectItem.aid)
     this.setState({
       AllAcountIds,
       dAccount,
@@ -227,50 +232,6 @@ class Step2 extends React.Component {
         success ?
           <Row gutter={{xs:1,sm: 4, md: 16, lg:32 }}>
             <Col span={8} className={styles.cardList}>
-              <Divider>输出(D)</Divider>
-              <List
-                itemLayout="vertical"
-                size="small"
-                split={false}
-                dataSource={dAccount}
-                renderItem={item => (
-                  item ? (
-                    <List.Item
-                      key={item.id}
-                    >
-                      <Card 
-                        hoverable 
-                        className={styles.card}
-                        actions={[
-                          <Popconfirm title="是否要删除此账号？" okText="确定" cancelText="取消" onConfirm={e => {this.delItem(e, item,"d")}}>
-                            <a>删除</a>
-                          </Popconfirm>, 
-                          ]}
-                      >
-                        <Card.Meta
-                          avatar={<Avatar size="large" src={item.profession_img} style={{margin: "68% 0"}} />}
-                          title={<a>{item.account_name}</a>}
-                          description={
-                            <Ellipsis className={styles.item} lines={3}>
-                              <div>{item.game_role_name}</div>
-                              <div>{item.profession_name}</div>
-                              <div>子号：{item.child_name}</div>
-                            </Ellipsis>
-                          }
-                        />
-                      </Card>
-                    </List.Item>
-                  ): (
-                    <List.Item>
-                      <Button type="dashed" className={styles.newButton} loading={addAccountLoading} onClick={e => {this.showModal(e,'d')}}>
-                        <Icon type="plus" /> 补充账号
-                      </Button>
-                    </List.Item>
-                  )
-                  )}
-              />
-            </Col> 
-            <Col span={8} className={styles.cardList}>
               <Divider>坦克(T)</Divider>
               <List
                 itemLayout="vertical"
@@ -293,12 +254,38 @@ class Step2 extends React.Component {
                       >
                         <Card.Meta
                           avatar={<Avatar size="large" src={item.profession_img} style={{margin: "68% 0"}} />}
-                          title={<a>{item.account_name}</a>}
+                          title={item.game_role_name}
                           description={
-                            <Ellipsis className={styles.item} lines={3}>
-                              <div>角色名：{item.game_role_name}</div>
-                              <div>{item.profession_name}</div>
-                              <div>子号：{item.child_name}</div>
+                            <Ellipsis className={styles.item} lines={9}>
+                              {item.talent.map(((v, i)=>(
+                                <Fragment>
+                                  <span color="blue" key={`${i+1}`}>{v}</span> { i !== item.talent.length-1 && <Divider type="vertical" style={{margin: '0 3px'}} />}
+                                </Fragment>
+                              )))}
+                             
+                              <div>
+                                <Tooltip
+                                  placement="right" 
+                                  title={
+                                    <div style={{display:"flex",flexDirection:"column"}}>
+                                      <div>密码：{item.account_pwd}</div>
+                                      <div>账号类型：{typeMap[item.type]}</div>
+                                      <div>子账号：{item.child_name}</div>
+                                      <div>服务器：{item.region_id}</div>
+                                      <div>角色名：{item.game_role_name}</div>
+                                      <div>角色等级：{item.level}</div>
+                                      <div>阵营：{item.organization ===0 ?"联盟": '部落'}</div>
+                                      <div>职业：{item.profession_name}</div>
+                                      <div>可用天赋：{item.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
+                                      <div>装备等级：{item.equip_level}</div>
+                                      
+                                    </div>     
+                                    }
+                                >
+                                  {item.account_name}
+                                </Tooltip> 
+                                
+                              </div>
                             </Ellipsis>
                           }
                         />
@@ -338,12 +325,39 @@ class Step2 extends React.Component {
                       >
                         <Card.Meta
                           avatar={<Avatar size="large" src={item.profession_img} style={{margin: "68% 0"}} />}
-                          title={<a>{item.account_name}</a>}
+                          title={item.game_role_name}
                           description={
                             <Ellipsis className={styles.item} lines={3}>
-                              <div>{item.game_role_name}</div>
-                              <div>{item.profession_name}</div>
-                              <div>子号：{item.child_name}</div>
+                              <div>{item.talent.map(((v, i)=>(
+                                <Fragment>
+                                  <span color="blue" key={`${i+1}`}>{v}</span> { i !== item.talent.length-1 && <Divider type="vertical" style={{margin: '0 3px'}} />}
+                                </Fragment>
+                              )))}
+                              </div>
+                              <div>
+                                <Tooltip
+                                  placement="right" 
+                                  title={
+                                    <div style={{display:"flex",flexDirection:"column"}}>
+                                      <div>密码：{item.account_pwd}</div>
+                                      <div>账号类型：{typeMap[item.type]}</div>
+                                      <div>子账号：{item.child_name}</div>
+                                      <div>服务器：{item.region_id}</div>
+                                      <div>角色名：{item.game_role_name}</div>
+                                      <div>角色等级：{item.level}</div>
+                                      <div>阵营：{item.organization ===0 ?"联盟": '部落'}</div>
+                                      <div>职业：{item.profession_name}</div>
+                                      <div>可用天赋：{item.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
+                                      <div>装备等级：{item.equip_level}</div>
+                                      
+                                    </div>     
+                                    }
+                                >
+                                  {item.account_name}
+                                </Tooltip> 
+                                
+                              </div>
+                              
                             </Ellipsis>
                           }
                         />
@@ -360,6 +374,77 @@ class Step2 extends React.Component {
                   )}
               />
             </Col>
+            <Col span={8} className={styles.cardList}>
+              <Divider>输出(D)</Divider>
+              <List
+                itemLayout="vertical"
+                size="small"
+                split={false}
+                dataSource={dAccount}
+                renderItem={item => (
+                  item ? (
+                    <List.Item
+                      key={item.id}
+                    >
+                      <Card 
+                        hoverable 
+                        className={styles.card}
+                        actions={[
+                          <Popconfirm title="是否要删除此账号？" okText="确定" cancelText="取消" onConfirm={e => {this.delItem(e, item,"d")}}>
+                            <a>删除</a>
+                          </Popconfirm>, 
+                          ]}
+                      >
+                        <Card.Meta
+                          avatar={<Avatar size="large" src={item.profession_img} style={{margin: "68% 0"}} />}
+                          title={item.game_role_name}
+                          description={
+                            <Ellipsis className={styles.item} lines={3}>
+                              <div>{item.talent.map(((v, i)=>(
+                                <Fragment>
+                                  <span color="blue" key={`${i+1}`}>{v}</span> { i !== item.talent.length-1 && <Divider type="vertical" style={{margin: '0 3px'}} />}
+                                </Fragment>
+                              )))}
+                              </div>
+                              <div>
+                                <Tooltip
+                                  placement="right" 
+                                  title={
+                                    <div style={{display:"flex",flexDirection:"column"}}>
+                                      <div>密码：{item.account_pwd}</div>
+                                      <div>账号类型：{typeMap[item.type]}</div>
+                                      <div>子账号：{item.child_name}</div>
+                                      <div>服务器：{item.region_id}</div>
+                                      <div>角色名：{item.game_role_name}</div>
+                                      <div>角色等级：{item.level}</div>
+                                      <div>阵营：{item.organization ===0 ?"联盟": '部落'}</div>
+                                      <div>职业：{item.profession_name}</div>
+                                      <div>可用天赋：{item.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
+                                      <div>装备等级：{item.equip_level}</div>
+                                      
+                                    </div>     
+                                    }
+                                >
+                                  {item.account_name}
+                                </Tooltip> 
+                                
+                              </div>
+                              
+                            </Ellipsis>
+                          }
+                        />
+                      </Card>
+                    </List.Item>
+                  ): (
+                    <List.Item>
+                      <Button type="dashed" className={styles.newButton} loading={addAccountLoading} onClick={e => {this.showModal(e,'d')}}>
+                        <Icon type="plus" /> 补充账号
+                      </Button>
+                    </List.Item>
+                  )
+                  )}
+              />
+            </Col> 
           </Row> :  <Spin size="large" />
         }
         <AddModal modalVisible={modalVisible} list={accountList} handleModalVisible={this.handleModalVisible} handleAdd={this.handleAdd} />

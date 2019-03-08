@@ -1,4 +1,4 @@
-import { queryMonster, removeMonster, addMonster, updateMonster, queryInstance } from '@/services/monster';
+import { queryMonster, removeMonster, addMonster, updateMonster, queryInstance, queryInstancemonsters } from '@/services/monster';
 
 export default {
   namespace: 'monster',
@@ -9,7 +9,8 @@ export default {
       pagination: {},
     },
     res: {},
-    instanceList: []
+    instanceList: [],
+    monstersList: []
   },
 
   effects: {
@@ -50,6 +51,13 @@ export default {
         type: 'instance',
         payload: response.data,
       });
+    },
+    *Instancemonsters({ payload }, { call, put }) {
+      const response = yield call(queryInstancemonsters, payload);
+      yield put({
+        type: 'monsters',
+        payload: response.data,
+      });
     }
   },
 
@@ -72,6 +80,12 @@ export default {
       return {
         ...state,
       instanceList: action.payload.list,
+      }
+    },
+    monsters(state, action) {
+      return {
+        ...state,
+        monstersList: action.payload.list
       }
     }
   },

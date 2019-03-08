@@ -89,7 +89,7 @@ class Step1 extends React.PureComponent {
     return (
       <Card bordered={false}>
         <Fragment>
-          <Form layout="horizontal" className={styles.stepForm} hideRequiredMark> 
+          <Form layout="horizontal" className={styles.stepForm}> 
             <Form.Item {...formItemLayout} label="开团时间">
               {getFieldDecorator('reserve_time', {
                 ...config

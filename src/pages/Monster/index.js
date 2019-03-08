@@ -247,11 +247,18 @@ class MonsterPage extends Component {
       align: 'center',
     },
     {
+      title: '编号',
+      dataIndex: 'sort',
+      key: 'sort',
+      align: 'center',
+    },
+    {
       title: '副本名称',
       dataIndex: 'instance_name',
       key: 'instance_name',
       align: 'center',
     },
+   
     {
       title: '操作',
       render: (text, record) => (

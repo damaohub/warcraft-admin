@@ -1,4 +1,4 @@
-import { queryOrder, addOrder, queryOrderInfo, removeOrder,updateOrder } from '@/services/order';
+import { queryOrder, addOrder, queryOrderInfo, removeOrder,updateOrder,changeOrder } from '@/services/order';
 
 export default {
   namespace: 'order',
@@ -52,7 +52,14 @@ export default {
       });
       if (callback) callback();
     },
-   
+    *change({ payload, callback }, { call, put }) {
+      const response = yield call(changeOrder, payload);
+      yield put({
+        type: 'item',
+        payload: response,
+      });
+      if (callback) callback();
+    },
   },
 
   

@@ -27,18 +27,21 @@ const getValue = obj =>
         dataIndex: 'leader_name',
         key: 'leader_name',
         align: 'center',
+        width: 80
       },
       {
         title: '人数',
         dataIndex: 'mem_num',
         key: 'mem_num',
         align: 'center',
+        width: 60
       },
       {
         title: '难度',
         dataIndex: 'difficult',
         key: 'difficult',
         align: 'center',
+        width: 60,
         render: item => {
             switch (item) {
                 case 'p':
@@ -57,12 +60,14 @@ const getValue = obj =>
         dataIndex: 'instance_name',
         key: 'instance_name',
         align: 'center',
+        width: 150
       },
       {
         title: '阵营',
         dataIndex: 'organization',
         key: 'organization',
         align: 'center',
+        width: 60,
         render: item=> (
             item==="1"? '联盟': '部落'
         )
@@ -72,6 +77,7 @@ const getValue = obj =>
         dataIndex: 'battle_array_name',
         key: 'battle_array_name',
         align: 'center',
+        width: 160
         
       },
       {
@@ -79,18 +85,21 @@ const getValue = obj =>
         dataIndex: 'reserve_time',
         key: 'reserve_time',
         align: 'center',
+        width: 160
       },
       {
         title: '创建时间',
         dataIndex: 'create_time',
         key: 'create_time',
         align: 'center',
+        width: 160
       },
       {
         title: '完成时间',
         dataIndex: 'finish_time',
         key: 'finish_time',
         align: 'center',
+        width: 160
       },
       {
         title: '操作',
@@ -100,6 +109,7 @@ const getValue = obj =>
           </Fragment>
         ),
         align: 'center',
+        width: 100
       },
     
     ];
@@ -161,7 +171,7 @@ const getValue = obj =>
                 columns={this.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                
+                scroll={{ x: 1300 }}
               />
             </div>
           </Card>

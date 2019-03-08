@@ -37,6 +37,7 @@ const fieldLabels = {
   talent_id: '可用天赋',
   need_talent_id: '拾取天赋',
   equip_level: '当前装等',
+  taobaoid: '淘宝ID',
   remark: '备注',
   phone:'联系电话'
 };
@@ -44,6 +45,7 @@ const fieldLabels = {
 const itemLabels = {
   instance_or_secret: '项目类型',
   instance_id: '副本',
+  monster_id: '怪物',
   difficult: '难度',
   num: '项目次数'
 }
@@ -224,11 +226,11 @@ class AdvancedForm extends Component {
         wrapperClassName={styles.advancedForm}
       > 
         <Card title="账号信息" className={styles.card} bordered={false}>
-          <Form layout="vertical" hideRequiredMark>
+          <Form layout="vertical">
             <Row gutter={16}>
               <Col lg={6} md={12} sm={24}>
                 <Form.Item label={fieldLabels.account_name}>
-                  {getFieldDecorator('account_name', {
+                  {getFieldDecorator('account_name', { 
                     rules: [{ required: true, message: `请选择${fieldLabels.account_name}` }],
                   })(
                     <Input
@@ -371,7 +373,19 @@ class AdvancedForm extends Component {
               </Col>
             </Row>
             <Row gutter={16}>
-              <Col sm={24}>
+              <Col sm={{span: 6}}>
+                <Form.Item label={fieldLabels.taobaoid}>
+                  {getFieldDecorator('taobaoid', {
+                    
+                  })(
+                    <Input
+                      placeholder="请输入"
+                    />
+                  )}
+                </Form.Item>
+                  
+              </Col>
+              <Col sm={{span: 14, offset: 2}}>
                 <Form.Item label={fieldLabels.remark}>
                   {getFieldDecorator('remark', {
                       rules: [{ required: false, message: `请输入${fieldLabels.remark}` }],
