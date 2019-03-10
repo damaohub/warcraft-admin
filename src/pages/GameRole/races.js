@@ -175,20 +175,41 @@ class RacesPage extends Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'races/fetch',
-    });
+    }).then(
+      () => {
+        const {races: { data }} = this.props
+        this.setState({
+          pagination: data.pagination
+        })
+      }
+      
+    );
    
   }
 
- 
+/**
+ * @param okText str 请求成功后提示信息，如果是默认undifined, 会提示接口返回信息
+ * @param around number 数据增减到分页临界情况时，1:自动跳转到下一页，－1:自动跳转到上一页, 0:还在当前页, 默认0。
+ * @param localLast boolean 是否定位到最后一页, 默认false
+ */
 
-  handleCall = (okText, localLast = false) => {
+  handleCall = (okText = undefined, around = 0, localLast = false) => {
     const { dispatch, races: {res} } = this.props;
     const { pagination } = this.state;
-    const lastPage = Math.ceil(pagination.total / pagination.pageSize);
-    const currentPage = localLast? lastPage : pagination.current;
-    // if (currentPage === lastPage) {
-    //   console.log(pagination.pageSize)
-    // }
+
+    const temPage = Math.ceil(pagination.total / pagination.pageSize)
+    let lastPage = temPage
+    let currentPage
+    if(temPage === pagination.current) { // 在最后一页的操作
+      const remainder = pagination.total % pagination.pageSize
+      if(remainder === 0 || remainder === 1) { // 临界情况
+        lastPage = temPage + around; 
+      }
+      currentPage = lastPage
+    } else {
+      currentPage = localLast ? lastPage : pagination.current;
+    }
+
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
       dispatch({
@@ -200,15 +221,13 @@ class RacesPage extends Component {
           const paginationProps = data.pagination
           pagination.pageSize = paginationProps.pageSize;
           pagination.total = paginationProps.total
-          pagination .current = currentPage
+          pagination.current = currentPage
           this.setState({
             pagination
-          },()=> {console.log(pagination)})
+          })
         }
       )
     }
-    
-    
   }
 
   handleStandardTableChange = (pagination, filtersArg = {}, sorter) => {
@@ -236,7 +255,7 @@ class RacesPage extends Component {
     });
     this.setState({
       pagination
-    },()=> {console.log(pagination)});
+    });
   };
 
   handleModalVisible = flag => {
@@ -262,7 +281,7 @@ class RacesPage extends Component {
     }).then(
       () => {
         this.handleModalVisible()
-        this.handleCall('添加成功！', true)
+        this.handleCall('添加成功！', 1, true)
       }
     )
   };
@@ -289,7 +308,7 @@ class RacesPage extends Component {
       payload: { id: record.id },
     }).then(
       () => {
-        this.handleCall('已删除')
+        this.handleCall('已删除', -1)
       }  
     )
   };
