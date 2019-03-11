@@ -2,11 +2,8 @@ import React, { Component, } from 'react';
 import { connect } from 'dva';
 import {
   Card,
-  Row,
-  Col,
   Spin,
   Button,
-  Form,
   message,
   Upload,
   Icon,
@@ -15,7 +12,8 @@ import {
   Avatar,
   Modal,
   Popconfirm,
-  Empty
+  Empty,
+  Alert
 } from 'antd';
 
 import DescriptionList from '@/components/DescriptionList';
@@ -24,7 +22,6 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from '../Team/AdvancedProfile.less';
 
 const { Description } = DescriptionList;
-const FormItem = Form.Item;
 
 const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
 @connect(({ player, loading }) => ({
@@ -33,13 +30,13 @@ const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
     submitting: loading.effects['player/screenadd'],
     finishLoading: loading.effects['player/finish']
 }))
-@Form.create()
 class TeamDetailPage extends Component {
   state = {
     loaded: false,
     statusMap: {"1": "未完成","2": "待审核", "3": "已完成"},
+    fileList: [],
     urlList: [],
-    uploadList: []
+    uploading: false,
   };
 
   componentWillMount() {
@@ -52,13 +49,13 @@ class TeamDetailPage extends Component {
       const { player:{team} } =this.props
       const screenshots = team.account_list.screenshots_arr
       this.setState({
-        urlList: screenshots,
+        screenList: screenshots,
         loaded: true
       })
     });
     this.setState({
       tid: id,
-      uploadList: []
+      urlList: []
     })
   
     window.addEventListener('resize', this.setStepDirection, { passive: true });
@@ -78,80 +75,41 @@ class TeamDetailPage extends Component {
     });
   }
 
-  handleRemove = (file) => {
-    const {uploadList} =this.state
-    const index = uploadList.findIndex(v=>(v === file.response.data))
-    uploadList.splice(index,1)
-    this.setState({uploadList})
-  }
+
 
   handleCancel = () => this.setState({ previewVisible: false })
 
-  normFileF = (e) => {
-    const {file,file:{status}, fileList,file:{response}} = e
-    this.setState({fileList})
-    if(status==="error") {
-      message.error("图片读取失败！")
-      const index = fileList.findIndex(v=>(v.uid===file.uid))
-      fileList.splice(index,1)
-      return
-    }
-    if(status ==="done") {
-      if(response.ret === 0) {
-        const {uploadList} =this.state
-       
-        uploadList.push(response.data)
-        this.setState({uploadList},
-          ()=>{
-            message.success('图片读取成功！')
-          }
-        )
-        // eslint-disable-next-line
-        return uploadList
-      } 
-      message.error(response.msg)
-    }
-   
-  }
- 
-
-  handleSubmit = e => {
+  handleUpload = e => {
     e.preventDefault();
-    const { dispatch, form, player:{team} } = this.props;
-    const {tid, uploadList} = this.state
+    const { dispatch, player:{team} } = this.props;
+    const {tid, urlList} = this.state
     const {aid, uid} = team.account_list
-    form.setFieldsValue({'images': uploadList})
-    form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        dispatch({
-          type: 'player/screenadd',
-          payload: {aid, uid, tid, ...values}
-        }).then(
-          () => {
-            const { player: {res} } = this.props;
-            if(res && res.ret === 0) { 
-              this.setState({uploadList: [], fileList: []},() => {
-                message.success("提交成功！");
-                form.resetFields()
-                dispatch({
-                  type: 'player/team',
-                  payload: {id: tid}
-                }).then(() => {
-                  // eslint-disable-next-line
-                  const {player: {team}} =this.props
-                  const screenshots = team.account_list.screenshots_arr
-                  this.setState({
-                    urlList: screenshots
-                  })
-                });
+    dispatch({
+      type: 'player/screenadd',
+      payload: {aid, uid, tid, images: urlList}
+    }).then(
+      () => {
+        const { player: {res} } = this.props;
+        if(res && res.ret === 0) { 
+          this.setState({ fileList: [], urlList: [] },() => {
+            message.success("提交成功！");
+            dispatch({
+              type: 'player/team',
+              payload: {id: tid}
+            }).then(() => {
+              // eslint-disable-next-line
+              const {player: {team}} =this.props
+              const screenshots = team.account_list.screenshots_arr
+              this.setState({
+                screenList: screenshots || []
               })
-            } else {
-              message.error(res.msg);
-            }
-          }
-        );
+            });
+          })
+        }
       }
-    });
+    );
+      
+  
   };
 
   delScreen = (e,img) => {
@@ -175,11 +133,9 @@ class TeamDetailPage extends Component {
             const {player: {team}} =this.props
             const screenshots = team.account_list.screenshots_arr
             this.setState({
-              urlList: screenshots
+              screenList: screenshots
             })
           });
-        } else {
-          message.error(res.msg)
         }
        
       }
@@ -203,8 +159,6 @@ class TeamDetailPage extends Component {
             type: 'player/team',
             payload: {id: tid}
           })
-        } else {
-          message.error(res.msg)
         }
        
       }
@@ -213,49 +167,64 @@ class TeamDetailPage extends Component {
 
 
   render() {
-    const {player:{team},  form: { getFieldDecorator }, submitting, finishLoading }=this.props
+    const {player:{team}, finishLoading }=this.props
     
-    const {loaded, statusMap, previewImage, previewVisible, urlList, uploadList, fileList } =this.state
+    const {loaded, statusMap, previewImage, previewVisible, screenList, uploading, fileList } =this.state
     const teamInfo= team.team_info
     const account = team.account_list
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 3 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 20 },
-        md: { span: 16 },
-      },
-    };
-
-    const submitFormLayout = {
-      wrapperCol: {
-        xs: { span: 24, offset: 0 },
-        sm: { span: 10, offset: 7 },
-      },
-    };
-
-
+ 
     const uploadProps = {
+      onRemove: (file) => {
+        this.setState((state) => {
+          const index = state.fileList.indexOf(file);
+          const newFileList = state.fileList.slice();
+          newFileList.splice(index, 1);
+          return {
+            fileList: newFileList,
+          };
+        });
+      },
+      beforeUpload: (file) => {
+        const r = new FileReader();
+        r.readAsDataURL(file);
+        r.onload = e => {
+          // eslint-disable-next-line
+          file.thumbUrl = e.target.result;
+          this.setState(state => ({
+            fileList: [...state.fileList, file],
+          }));
+       }
+       
+        return true;
+      },
+      onChange: (info) => {
+        if(info.file.response ){
+          const urlArr = []
+          info.fileList.map(item => {
+            const { response } = item
+            if(response) {
+              if(response.ret === 0) {
+                urlArr.push(response.data)
+              } else {
+                message.error(response.msg)
+              }
+            }
+            return item
+          })
+          this.setState({
+            urlList: urlArr,
+          })
+        }
+        this.setState( {fileList: [...fileList]})
+      },
+      multiple: true,
+      listType: 'picture',
       action: "http://192.168.0.128/gamer/upload-screen",
-      listType: "picture-card",
-      onPreview: this.handlePreview,
-      onRemove:this.handleRemove,
-      onChange: this.handleChange,
       data: {
         time: Date.parse(new Date()) / 1000,
         token: localStorage.getItem('token')? JSON.parse(localStorage.getItem('token')) : null,
       }
-    }
-
-    const uploadButton = (
-      <div>
-        <Icon type="plus" style={{fontSize:'50px', color:'#999'}} />
-        <div className="ant-upload-text">点击上传</div>
-      </div>
-    );
+    };
 
     return (loaded? 
       <PageHeaderWrapper
@@ -276,20 +245,25 @@ class TeamDetailPage extends Component {
           </DescriptionList>
         }
         extraContent={
-          <Row>
-            {/* <Col xs={24} sm={12}>
-              <div className={styles.textSecondary}>订单状态：{teamInfo.status==="2"?statusMap[teamInfo.status]: ''}</div>
-              <div className={styles.heading}>
-                {
-                  statusMap[teamInfo.status]
-                }
-              </div>
-            </Col> */}
-            <Col xs={24} sm={12}>
-              {/* <div className={styles.textSecondary}>提交状态</div> */}
-              <div className={styles.heading}>{account.status==="0"?<Button type="primary" loading={finishLoading} onClick={e=> {this.subFinish(e)}}>提交完成</Button>:<Button type="primary" disabled>已提交</Button>}</div>
-            </Col>
-          </Row>
+          <div>
+            
+            {/* <Row>
+               <Col xs={24} sm={12}>
+                <div className={styles.textSecondary}>订单状态：{teamInfo.status==="2"?statusMap[teamInfo.status]: ''}</div>
+                <div className={styles.heading}>
+                  {
+                    statusMap[teamInfo.status]
+                  }
+                </div>
+              </Col>
+              <Col xs={24} sm={12}> */}
+                
+            <div className={styles.heading} style={{textAlign: 'center'}}> {account.status==="0"?<Button type="primary" loading={finishLoading} onClick={e=> {this.subFinish(e)}}>提交完成</Button>:<Button type="primary" disabled>已提交</Button>}</div>
+            <Alert style={{fontSize:'12px', textAlign:'left',marginTop: '5px'}} message="提交完成后，上传截图只能增不能删" type="warning" closable />
+            {/* </Col>
+          </Row> */}
+          </div>
+          
         }
       >
         
@@ -320,12 +294,12 @@ class TeamDetailPage extends Component {
         >
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
-              {urlList.length !== 0 ?
+              {screenList.length !== 0 ?
                 <div>
                   <Divider orientation="left" dashed>该账号已上传截图</Divider>
                   <div className="ant-upload-list ant-upload-list-picture-card">
                     {
-                      urlList.map(item => (
+                      screenList.map(item => (
                         <div className="ant-upload-list-item ant-upload-list-item-done">
                           <div className="ant-upload-list-item-info">
                             <span><a><img src={item} alt="已上传图片" /></a></span>
@@ -349,36 +323,23 @@ class TeamDetailPage extends Component {
 
               
               <Divider orientation="left" dashed style={{paddingTop:"20px"}}>上传截图</Divider>
-              <Form onSubmit={this.handleSubmit} hideRequiredMark style={{ marginTop: 8 }}>
+             
+              <Upload fileList={fileList} {...uploadProps}>
+                <Button>
+                  <Icon type="upload" />选择文件
+                </Button>
+              </Upload>
               
-                <FormItem {...formItemLayout} label="上传">
-                  {getFieldDecorator('images', {
-                    rules: [
-                      {
-                        required: true,
-                        message: '未获取截图',
-                      },
-                    ],
-                    initialValue: uploadList,
-                    getValueFromEvent:this.normFileF,
-                    validateTrigger: 'onSubmit'
-                  })(
-                    <Upload fileList={fileList} {...uploadProps}>
-                      {uploadButton}
-                    </Upload>
-                  )}
-              
-                </FormItem>
-              
+              <Button
+                type="primary"
+                onClick={e=>{this.handleUpload(e)}}
+                disabled={fileList.length === 0}
+                loading={uploading}
+                style={{ marginTop: 16 }}
+              >
+                {uploading ? '上传中...' : '开始上传' }
+              </Button>
 
-                <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
-                  <Button type="primary" htmlType="submit" loading={submitting}>
-                    提交截图
-                  </Button>
-                </FormItem>
-            
-              </Form>
-              
             </div>
             
           </div>

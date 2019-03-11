@@ -70,9 +70,9 @@ service.interceptors.response.use(
   response => {
  
     const res = response.data
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
     if(res.ret !==0 ) {
-      message.error(res.msg) // 需要修改很多
+      message.error(`错误：${res.msg}`) // 需要修改很多
       if(res.ret === 2006) {
         router.push('/exception/403');
        }
@@ -82,11 +82,11 @@ service.interceptors.response.use(
        if(res.ret ===1003 || res.ret ===1000) {
         localStorage.removeItem('token')
         router.push('/login');
+        reject();
        }
-    } else {
-      resolve(res)
-    }
-     
+    } 
+    resolve(res)
+       
     })
   },
 

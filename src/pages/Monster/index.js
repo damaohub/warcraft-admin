@@ -287,16 +287,15 @@ class MonsterPage extends Component {
     });
   };
 
-  handleCall = (okText, failText) => {
+  handleCall = (okText) => {
     const {dispatch, monster: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
-    } else {
-      message.error(failText || res.msg);
-    }
-    dispatch({
-      type: 'monster/fetch',
-    });
+      dispatch({
+        type: 'monster/fetch',
+      });
+    } 
+    
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -375,7 +374,7 @@ class MonsterPage extends Component {
     }).then(
       () => {
         this.handleUpdateModalVisible()
-        this.handleCall('更新成功','更新失败')
+        this.handleCall('更新成功')
       }  
     )
     
@@ -388,7 +387,7 @@ class MonsterPage extends Component {
       payload: { id: record.id },
     }).then(
       () => {
-        this.handleCall('已删除','删除失败')
+        this.handleCall('已删除')
       }  
     )
   };

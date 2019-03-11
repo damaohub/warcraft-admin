@@ -435,16 +435,15 @@ class EquipPage extends Component {
     });
   };
 
-  handleCall = (okText, failText) => {
+  handleCall = (okText) => {
     const {dispatch, equip: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
-    } else {
-      message.error(failText || res.msg);
+      dispatch({
+        type: 'equip/fetch',
+      });
     }
-    dispatch({
-      type: 'equip/fetch',
-    });
+    
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -535,7 +534,7 @@ class EquipPage extends Component {
     }).then(
       () => {
         this.handleUpdateModalVisible()
-        this.handleCall('更新成功','更新失败')
+        this.handleCall('更新成功')
       }  
     )
     
@@ -548,7 +547,7 @@ class EquipPage extends Component {
       payload: { id: record.id },
     }).then(
       () => {
-        this.handleCall('已删除','删除失败')
+        this.handleCall('已删除')
       }  
     )
   };

@@ -41,8 +41,6 @@ export default {
           }
         }
         yield put(routerRedux.replace(redirect || '/'));
-      } else {
-        message.error(response.msg)
       }
     },
 
