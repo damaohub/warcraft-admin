@@ -39,7 +39,6 @@ class Item extends React.Component{
 
     const item = {}
     validateFieldsAndScroll((error, values) => {
-      console.log(values)
       if (!error) {
         item[id] = {...values}
       }
