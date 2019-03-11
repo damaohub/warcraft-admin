@@ -156,12 +156,10 @@ class RightsPage extends Component {
   };
 
 
-  handleCall = (okText, failText) => {
+  handleCall = (okText) => {
     const {role: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
-    } else {
-      message.error(failText || res.msg);
     }
   }
 

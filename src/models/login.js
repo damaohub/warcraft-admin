@@ -4,7 +4,7 @@ import { accountLogin, getFakeCaptcha, accountLogout } from '@/services/api';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import { reloadAuthorized } from '@/utils/Authorized';
-// import { message } from 'antd';
+import { message } from 'antd';
 
 export default {
   namespace: 'login',
@@ -16,9 +16,8 @@ export default {
 
   effects: {
     *login({ payload }, { call, put }) {
-      
       const response = yield call(accountLogin, payload);
-      console.log(response)
+      
       // Login successfully
       if (response.ret === 0) {
         yield put({
@@ -68,6 +67,8 @@ export default {
             }),
           })
         );
+      } else {
+        message.error(response.msg)
       }
       
     },

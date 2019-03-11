@@ -90,16 +90,15 @@ class RulePage extends Component {
   };
 
 
-  handleCall = (okText, failText) => {
+  handleCall = (okText) => {
     const {dispatch, rule: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
-    } else {
-      message.error(failText || res.msg);
+      dispatch({
+        type: 'rule/fetch',
+      });
     }
-    dispatch({
-      type: 'rule/fetch',
-    });
+    
   }
 
   onExpand = (expandedKeys) => {
@@ -163,16 +162,15 @@ class RulePage extends Component {
     />;
   })
 
-  handleCall = (okText, failText) => {
+  handleCall = (okText) => {
     const {dispatch, rule: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
-    } else {
-      message.error(failText || res.msg);
+      dispatch({
+        type: 'rule/fetch',
+      });
     }
-    dispatch({
-      type: 'rule/fetch',
-    });
+    
   }
 
   render() {

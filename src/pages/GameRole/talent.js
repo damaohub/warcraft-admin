@@ -214,16 +214,15 @@ class TalentPage extends Component {
     });
   };
 
-  handleCall = (okText, failText) => {
+  handleCall = (okText) => {
     const {dispatch, talent: {res} } = this.props;
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
-    } else {
-      message.error(failText || res.msg);
+      dispatch({
+        type: 'talent/fetch',
+      });
     }
-    dispatch({
-      type: 'talent/fetch',
-    });
+   
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -286,7 +285,7 @@ class TalentPage extends Component {
     }).then(
       () => {
         this.handleUpdateModalVisible()
-        this.handleCall('更新成功','更新失败')
+        this.handleCall('更新成功')
       }  
     )
     
@@ -299,7 +298,7 @@ class TalentPage extends Component {
       payload: { id: record.id },
     }).then(
       () => {
-        this.handleCall('已删除','删除失败')
+        this.handleCall('已删除')
       }  
     )
   };

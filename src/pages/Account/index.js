@@ -226,16 +226,15 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
       });
     };
   
-    handleCall = (okText, failText) => {
+    handleCall = (okText) => {
       const {dispatch, account: {res} } = this.props;
       if(res && res.ret === 0) {
         message.success(okText || res.msg);
-      } else {
-        message.error(failText || res.msg);
+        dispatch({
+          type: 'account/fetch',
+        });
       }
-      dispatch({
-        type: 'account/fetch',
-      });
+     
     }
 
     showModal = (e) => {
@@ -271,7 +270,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
         payload: { id: record.id },
       }).then(
         () => {
-          this.handleCall('已删除','删除失败')
+          this.handleCall('已删除')
         }  
       )
     };
