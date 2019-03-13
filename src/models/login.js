@@ -52,11 +52,7 @@ export default {
       const response = yield call(accountLogout, payload);
       if(response.ret === 0) {
         yield put({
-          type: 'changeLoginStatus',
-          payload: {
-            status: false,
-            currentAuthority: 'guest',
-          },
+          type: 'logoutStatus',
         });
         reloadAuthorized();
         yield put(
@@ -86,6 +82,15 @@ export default {
       };
     },
 
+    logoutStatus(state) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('warcraft-admin-authority')
+      return {
+        ...state,
+        token: undefined,
+        roleInfo: {}
+      };
+    }
     
   },
 };
