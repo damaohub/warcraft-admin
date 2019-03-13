@@ -40,6 +40,17 @@ const removeItemFromArr = (arr,itemId) => {
   arr.splice(idx, 1)
   return arr
 }
+/**
+ * 判断数组是否为另一个数组的子集, 是子集返回true,否则false
+ * @param {Array} tarArr 目标数组
+ * @param {Array} SrcArr  源数组
+ */
+const includesArr = (tarArr,SrcArr) => (
+    tarArr.every(item => (
+      SrcArr.includes(item)
+    )
+  )
+)
 
  const onPrev = () => {
   router.push('/team/add/info');
@@ -96,29 +107,16 @@ class Step2 extends React.Component {
     
   }
 
-  showModal = (e,local) => {
-    const{dispatch} = this.props
-    const { req, AllAcountIds } = this.state
+
+  showModal = (e,local,) => {
     e.preventDefault()
-    dispatch({
-      type: 'team/account',
-      payload: {...req, battle_site:local,showed_accounts: AllAcountIds}
-    }).then(
-      () => {
-        const{team:{account:{data}}} =this.props
-        if(data){
-          const showData = data.filter(v => (!AllAcountIds.includes(v.aid)))
-          this.setState({
-            modalVisible: true,
-            accountList: showData,
-            local
-          })
-        } else{
-          message.error('未获取待选列表！')
-        }
-        
-      }
-    ).catch(err=>message.error(err))
+
+    this.setState({
+      local
+    }, () => {
+      this.handleSearch(0, true)
+    })
+   
     
   }
 
@@ -128,26 +126,26 @@ class Step2 extends React.Component {
     })
   }
 
-  handleAdd = (selectItem) => {
+  handleAdd = (selectedItemKeys, selectItems) => {
     const {AllAcountIds ,local, dAccount, tAccount, nAccount} = this.state
-    if(!selectItem || AllAcountIds.includes(selectItem.aid)) {
+    if(!selectItems || selectItems.length === 0 || includesArr(selectedItemKeys,AllAcountIds)) {
       this.handleModalVisible()
       message.warning('未选择任何账号')
       return
     }
     switch(local) {
       case 'd':
-        dAccount.splice(-1, 0 ,selectItem)
+        dAccount.splice(-1, 0 , ...selectItems)
       break;
       case 't':
-        tAccount.splice(-1, 0,selectItem)
+        tAccount.splice(-1, 0, ...selectItems)
       break;
       case 'n':
-        nAccount.splice(-1, 0, selectItem)
+        nAccount.splice(-1, 0, ...selectItems)
       break;
       default:
     }
-    AllAcountIds.push(selectItem.aid)
+    selectItems.map(v => (!AllAcountIds.includes(v) && AllAcountIds.push(v.aid)))
     this.setState({
       AllAcountIds,
       dAccount,
@@ -192,6 +190,40 @@ class Step2 extends React.Component {
     
   }
 
+  handleSearch = (values, isShow = false) => {
+    const{dispatch} = this.props
+    const { req, AllAcountIds, local } = this.state
+    const types = ['team/account1', 'team/account2'];
+    const type = parseInt(values.type, 10)
+    const payLoad = {...req, battle_site:local,showed_accounts: AllAcountIds}
+    if(values.f_account_name) Object.assign(payLoad, {account_name: values.f_account_name})
+    if(values.f_game_role_name) Object.assign(payLoad, {game_role_name: values.f_game_role_name})
+    dispatch({
+      type: types[type] || types[0],
+      payload: payLoad
+    }).then(
+      () => {
+        const{team:{account:{data}}} =this.props
+        if(data){
+          const showData = data.list.filter(v => (!AllAcountIds.includes(v.aid)))
+          
+            this.setState({
+              accountList: {list: showData, pagination: Object.assign(data.pagination, {showQuickJumper: false}) },
+            })
+            if(isShow) {
+              this.setState({
+                modalVisible: true
+              })
+            }
+          
+        } else{
+          message.error('未获取待选列表！')
+        }
+        
+      }
+    ).catch(err=>message.error(err))
+  }
+
   submit = () => {
     const{dispatch} = this.props
     const{req, dAccount, tAccount, nAccount} = this.state
@@ -226,6 +258,11 @@ class Step2 extends React.Component {
   render() {
     const {addAccountLoading } = this.props
     const { dAccount, tAccount, nAccount, success, modalVisible, accountList, submitting} = this.state
+    const parentMethods = {
+      handleAdd: this.handleAdd,
+      handleModalVisible: this.handleModalVisible,
+      handleSearch: this.handleSearch
+    };
     return (
       <div>
         {
@@ -447,7 +484,7 @@ class Step2 extends React.Component {
             </Col> 
           </Row> :  <Spin size="large" />
         }
-        <AddModal modalVisible={modalVisible} list={accountList} handleModalVisible={this.handleModalVisible} handleAdd={this.handleAdd} />
+        <AddModal modalVisible={modalVisible} data={accountList} {...parentMethods} />
         <FooterToolbar style={{width: '100%'}}>
           <Button type="primary" size="large" onClick={this.submit} loading={submitting}>
             提交

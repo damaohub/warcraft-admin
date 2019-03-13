@@ -1,4 +1,4 @@
-import { queryTeam, addTeam, queryTeamInfo,queryGroup, queryAccount, queryStaff, bindStaff, unbindStaff, toCheck} from '@/services/team';
+import { queryTeam, addTeam,removeTeam, queryTeamInfo,queryGroup, queryAccount, queryStaff, bindStaff, unbindStaff, toCheck, queryAccount1, queryAccount2} from '@/services/team';
 
 export default {
   namespace: 'team',
@@ -31,6 +31,14 @@ export default {
       });
       if (callback) callback();
     },
+    *remove({ payload, callback }, { call, put }) {
+      const response = yield call(removeTeam, payload);
+      yield put({
+        type: 'item',
+        payload: response,
+      });
+      if (callback) callback();
+    },
 
     *info({ payload }, { call, put }) {
         const response = yield call(queryTeamInfo, payload);
@@ -52,6 +60,20 @@ export default {
       },
       *account({ payload }, { call, put }) {
         const response = yield call(queryAccount, payload);
+        yield put({
+          type: 'getAccount',
+          payload: response,
+        });
+      },
+      *account1({ payload }, { call, put }) {
+        const response = yield call(queryAccount1, payload);
+        yield put({
+          type: 'getAccount',
+          payload: response,
+        });
+      },
+      *account2({ payload }, { call, put }) {
+        const response = yield call(queryAccount2, payload);
         yield put({
           type: 'getAccount',
           payload: response,

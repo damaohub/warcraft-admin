@@ -14,6 +14,13 @@ export async function addTeam(params) {
       body: params
     });
   }
+
+  export async function removeTeam(params) {
+    return request('/api/team/del', {
+      method: 'POST',
+      body: params
+    });
+  }
   
   export async function queryTeamInfo(params) {
       return request('/api/team/info', {
@@ -36,6 +43,21 @@ export async function queryAccount(params) {
     body: params
   });
 }
+
+export async function queryAccount1(params) {
+  return request('/api/team/getcanuseaccountlist1', {
+    method: 'POST',
+    body: params
+  });
+}
+
+export async function queryAccount2(params) {
+  return request('/api/team/getcanuseaccountlist2', {
+    method: 'POST',
+    body: params
+  });
+}
+
 
 export async function queryStaff(params) {
   return request('/api/team/cangiveuser', {
