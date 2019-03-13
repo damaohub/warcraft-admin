@@ -72,7 +72,7 @@ service.interceptors.response.use(
     const res = response.data
     return new Promise((resolve, reject) => {
     if(res.ret !==0 ) {
-      message.error(`错误：${res.msg}`) // 需要修改很多
+      message.error(res.msg) // 需要修改很多
       if(res.ret === 2006) {
         router.push('/exception/403');
        }
