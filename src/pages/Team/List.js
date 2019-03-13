@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Card } from 'antd';
+import { Card, Popconfirm, message, Divider } from 'antd';
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -69,7 +69,7 @@ const getValue = obj =>
         align: 'center',
         width: 60,
         render: item=> (
-            item==="1"? '联盟': '部落'
+            item==="0"? '联盟': '部落'
         )
       },
       {
@@ -106,10 +106,14 @@ const getValue = obj =>
         render: (text, record) => (
           <Fragment>
             <a href={`#/team/list/detail?id=${record.id}`}>排团详情</a>
+            <Divider type="vertical" />
+            <Popconfirm title="是否要删除此行？" onConfirm={(e) => this.remove(e, record)}>
+              <a>删除</a>
+            </Popconfirm>
           </Fragment>
         ),
         align: 'center',
-        width: 100
+        width: 120
       },
     
     ];
@@ -150,7 +154,27 @@ const getValue = obj =>
       });
     };
   
+    handleCall = (okText) => {
+      const {dispatch, team: {res} } = this.props;
+      if(res && res.ret === 0) {
+        message.success(okText || res.msg);
+        dispatch({
+          type: 'team/fetch',
+        });
+      } 
+      
+    }
 
+    remove = (e,record) => {
+      e.preventDefault()
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'team/remove',
+        payload: {id:record.id,}
+      }).then(
+        this.handleCall('已删除！')
+      );
+    } 
   
     render() {
       const {
