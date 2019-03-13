@@ -185,11 +185,6 @@ export default [
                 name: 'confirm',
                 component: './Team/Add/Step2',
               },
-              {
-                path: '/team/add/result',
-                name: 'result',
-                component: './Team/Add/Step3',
-              },
             ]
           },
         ]
