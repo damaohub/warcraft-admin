@@ -4,6 +4,7 @@ import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm } from '
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { getCurrentPage } from '@/utils/utils';
 
 import styles from './game.less';
 
@@ -187,28 +188,15 @@ class RacesPage extends Component {
    
   }
 
-/**
+ /**
  * @param okText str 请求成功后提示信息，如果是默认undifined, 会提示接口返回信息
- * @param around number 数据增减到分页临界情况时，1:自动跳转到下一页，－1:自动跳转到上一页, 0:还在当前页, 默认0。
- * @param localLast boolean 是否定位到最后一页, 默认false
+ * @param type 操作类型, 1:增加，-1:删除，0：修改(默认)
  */
 
-  handleCall = (okText = undefined, around = 0, localLast = false) => {
+  handleCall = (okText = undefined, type ) => {
     const { dispatch, races: {res} } = this.props;
     const { pagination } = this.state;
-
-    const temPage = Math.ceil(pagination.total / pagination.pageSize)
-    let lastPage = temPage
-    let currentPage
-    if(temPage === pagination.current) { // 在最后一页的操作
-      const remainder = pagination.total % pagination.pageSize
-      if(remainder === 0 || remainder === 1) { // 临界情况
-        lastPage = temPage + around; 
-      }
-      currentPage = lastPage
-    } else {
-      currentPage = localLast ? lastPage : pagination.current;
-    }
+    const currentPage = getCurrentPage(pagination, type);
 
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
@@ -281,7 +269,7 @@ class RacesPage extends Component {
     }).then(
       () => {
         this.handleModalVisible()
-        this.handleCall('添加成功！', 1, true)
+        this.handleCall('添加成功！', 1)
       }
     )
   };
