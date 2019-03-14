@@ -63,11 +63,7 @@ class UpdateForm extends PureComponent {
     super(props);
 
     this.state = {
-      formVals: {
-        name: props.values.talent_name,
-        id: props.values.id,
-        profession_name: props.values.profession_name
-      },
+    
     };
 
     this.formLayout = {
@@ -86,10 +82,10 @@ class UpdateForm extends PureComponent {
           initialValue: formVals.talent_name,
         })(<Input placeholder="请输入" />)}
       </FormItem>,
-      <FormItem key="profession_name" {...this.formLayout} label="所属职业">
+      <FormItem key="profession_id" {...this.formLayout} label="所属职业">
         {form.getFieldDecorator('profession_id', {
           rules: [{ required: true, message: '请选择职业！'}],
-          initialValue: formVals.profession_name,
+          initialValue: `${formVals.profession_id}`,
         })(
           <Select placeholder="请选择职业" style={{ width: '100%' }}>
             {professionList.map( (item) => 
@@ -119,20 +115,13 @@ class UpdateForm extends PureComponent {
      
       if (err) return;
       const formVals = { ...values, ...fieldsValue };
-      this.setState(
-        {
-          formVals,
-        },
-        () => {
-          handleUpdate(formVals);
-        }
-      );
+        handleUpdate(formVals);
     });
   };
 
   render() {
     const { updateModalVisible, handleUpdateModalVisible, values } = this.props;
-    const { formVals } = this.state;
+   
 
     return (
       <Modal
@@ -145,7 +134,7 @@ class UpdateForm extends PureComponent {
         onCancel={() => handleUpdateModalVisible(false, values)}
         afterClose={() => handleUpdateModalVisible()}
       >
-        {this.renderContent(formVals)}
+        {this.renderContent(values)}
       </Modal>
     );
   }
