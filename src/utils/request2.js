@@ -14,22 +14,20 @@ const createSign = (obj) => {
   // eslint-disable-next-line
   for (let elem of sortedKeys.values()) {
     tmp = obj[elem]
- 
-   if( typeof  obj[elem] !== "string") {
+   if(typeof  obj[elem] !== "string") {
       // eslint-disable-next-line
      tmp =JSON.stringify(obj[elem])
    }
-   
+
   //  console.log(elem)
   //  console.log(obj[elem])
   //  console.log(typeof obj[elem])
   //  console.log('----')
 
-   if(obj[elem]) {
+  if(obj[elem]) {
     str += (elem.toString() + tmp)
    }
-    
-    //  console.log(str)
+    // console.log(str)
   }
 
   return saltMD5.md5(str)
@@ -72,22 +70,23 @@ service.interceptors.response.use(
   response => {
  
     const res = response.data
-    return new Promise((resolve) => {
-     if(res.ret === 2006) {
-      message.error(res.msg)
-      router.push('/exception/403');
-     }
-     if(res.ret ===1000) {
-      message.error(res.msg)
-      localStorage.removeItem('token')
-      router.push('/login');
-     }
-     if(res.ret ===1003) {
-      message.error(res.msg)
-      localStorage.removeItem('token')
-      router.push('/login');
-     }
-     resolve(res)
+    return new Promise((resolve, reject) => {
+    if(res.ret !==0 ) {
+      message.error(res.msg) // 需要修改很多
+      if(res.ret === 2006) {
+        router.push('/exception/403');
+       }
+       if(res.ret === 1001) {
+        router.push('/exception/404');
+       }
+       if(res.ret ===1003 || res.ret ===1000) {
+        localStorage.removeItem('token')
+        router.push('/login');
+        reject();
+       }
+    } 
+    resolve(res)
+       
     })
   },
 
@@ -96,6 +95,7 @@ service.interceptors.response.use(
       message: `请求错误 ${error.response.status}: ${error.response.request.responseURL}`,
       description: error.response.statusText,
     });
+    router.push('/exception/500');
     // const err = new Error(error.response.statusText);
     // err.name = error.response.status;
     // err.response = error.response;
