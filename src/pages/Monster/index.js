@@ -167,6 +167,12 @@ class UpdateForm extends Component {
           </Select>
         )}
       </FormItem>,
+      <FormItem key="sort" {...this.formLayout} label="编号">
+        {form.getFieldDecorator('sort', {
+          rules: [{ required: true, message: '请输入所在副本中的排序！' }],
+          initialValue: formVals.sort,
+        })(<Input placeholder="请输入" />)}
+      </FormItem>,
     ];
   };
 

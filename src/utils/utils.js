@@ -181,3 +181,23 @@ export function formatWan(val) {
 export function isAntdPro() {
   return window.location.hostname === 'preview.pro.ant.design';
 }
+
+/**
+ * 根据分页参数，页面变化时获取当前页，
+ * @param {object} pagination 分页数据
+ * @param {number} around 数据增删改类型，1:增加，－1:删除, 0:修改数据, 默认0。
+ */
+export function getCurrentPage(pagination, around = 0) {
+  let currentPage = pagination.current
+  const temPage = Math.ceil(pagination.total / pagination.pageSize)
+    const remainder = pagination.total % pagination.pageSize
+    if( around === 1 ) { 
+      currentPage = remainder === 0 ? temPage + 1 : temPage
+    }
+    if(remainder === 1 && around === -1) { 
+      currentPage = temPage - 1
+    }
+  return currentPage
+  
+}
+
