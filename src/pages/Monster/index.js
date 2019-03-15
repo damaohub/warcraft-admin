@@ -62,8 +62,8 @@ class CreateForm extends Component {
           </Select>
         )}
       </FormItem>,
-      (
-        IM === 1 && 
+      
+      IM === 1 ? (
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属副本">
           {form.getFieldDecorator('instance_id', {
             rules: [{ required: true, message: '请选择副本！'}],
@@ -74,6 +74,14 @@ class CreateForm extends Component {
               )}
             </Select>
           )}
+        </FormItem>
+      ) :
+      (
+        IM !== 1 &&
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="请输入编号">
+          {form.getFieldDecorator('sort', {
+            rules: [{ required: true, message: "请输入编号"}],
+          })(<Input placeholder="请输入" />)}
         </FormItem>
       )
     ];
@@ -107,6 +115,7 @@ class CreateForm extends Component {
         width={640}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
+        maskClosable={false}
         title={IM === 0 ? "新建副本" : "添加怪兽"}
         visible={modalVisible}
         footer={this.renderFooter()}
@@ -214,6 +223,7 @@ class UpdateForm extends Component {
         width={640}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
+        maskClosable={false}
         title="更新"
         visible={updateModalVisible}
         footer={this.renderFooter()}

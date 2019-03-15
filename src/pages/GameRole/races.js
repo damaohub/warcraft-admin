@@ -26,6 +26,7 @@ const CreateForm = Form.create()(props => {
   return (
     <Modal
       destroyOnClose
+      maskClosable={false}
       title="新建种族"
       visible={modalVisible}
       onOk={okHandle}
@@ -119,6 +120,7 @@ class UpdateForm extends PureComponent {
         width={640}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
+        maskClosable={false}
         title="更新"
         visible={updateModalVisible}
         footer={this.renderFooter()}
