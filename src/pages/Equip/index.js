@@ -587,7 +587,7 @@ class EquipPage extends Component {
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                添加怪兽
+                添加
               </Button>
              
             </div>
