@@ -4,6 +4,7 @@ import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm } from '
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { getCurrentPage } from '@/utils/utils';
 
 import styles from './game.less';
 
@@ -171,24 +172,47 @@ class ProfessionPage extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    this.handleFetch(dispatch);
-  }
-
-  handleFetch = dispatch => {
     dispatch({
       type: 'profession/fetch',
-    });
-  };
+    }).then(
+      () => {
+        const {profession: { data }} = this.props
+        this.setState({
+          pagination: data.pagination
+        })
+      }
+      
+    );
+  }
 
-  handleCall = (okText) => {
-    const {dispatch, profession: {res} } = this.props;
+
+ /**
+ * @param okText str 请求成功后提示信息，如果是默认undifined, 会提示接口返回信息
+ * @param type 操作类型, 1:增加，-1:删除，0：修改(默认)
+ */
+
+  handleCall = (okText = undefined, type) => {
+    const { dispatch, profession: {res} } = this.props;
+    const { pagination } = this.state;
+    const currentPage = getCurrentPage(pagination, type);
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
       dispatch({
         type: 'profession/fetch',
-      });
+        payload: { currentPage, pageSize: pagination.pageSize},
+      }).then(
+        ()=> {
+          const {profession: { data }} = this.props;
+          const paginationProps = data.pagination
+          pagination.pageSize = paginationProps.pageSize;
+          pagination.total = paginationProps.total
+          pagination.current = currentPage
+          this.setState({
+            pagination
+          })
+        }
+      )
     }
-   
   }
 
 
@@ -216,6 +240,9 @@ class ProfessionPage extends Component {
       type: 'profession/fetch',
       payload: params,
     });
+    this.setState({
+      pagination
+    });
   };
 
   handleModalVisible = flag => {
@@ -241,7 +268,7 @@ class ProfessionPage extends Component {
     }).then(
       () => {
         this.handleModalVisible()
-        this.handleCall('添加成功')
+        this.handleCall('添加成功！', 1)
       }  
     )
     
@@ -268,7 +295,7 @@ class ProfessionPage extends Component {
     }).then(
       () => {
         this.handleUpdateModalVisible()
-        this.handleCall('删除成功')
+        this.handleCall('已删除', -1)
       }  
     )
   };

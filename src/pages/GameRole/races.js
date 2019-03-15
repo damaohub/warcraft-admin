@@ -4,6 +4,7 @@ import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm } from '
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { getCurrentPage } from '@/utils/utils';
 
 import styles from './game.less';
 
@@ -173,30 +174,53 @@ class RacesPage extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    this.handleFetch(dispatch);
-  }
-
-  handleFetch = dispatch => {
     dispatch({
       type: 'races/fetch',
-    });
-  };
+    }).then(
+      () => {
+        const {races: { data }} = this.props
+        this.setState({
+          pagination: data.pagination
+        })
+      }
+      
+    );
+   
+  }
 
-  handleCall = (okText) => {
-    const {dispatch, races: {res} } = this.props;
+ /**
+ * @param okText str 请求成功后提示信息，如果是默认undifined, 会提示接口返回信息
+ * @param type 操作类型, 1:增加，-1:删除，0：修改(默认)
+ */
+
+  handleCall = (okText = undefined, type ) => {
+    const { dispatch, races: {res} } = this.props;
+    const { pagination } = this.state;
+    const currentPage = getCurrentPage(pagination, type);
+
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
       dispatch({
         type: 'races/fetch',
-      });
-    } 
-   
+        payload: { currentPage, pageSize: pagination.pageSize},
+      }).then(
+        ()=> {
+          const {races: { data }} = this.props;
+          const paginationProps = data.pagination
+          pagination.pageSize = paginationProps.pageSize;
+          pagination.total = paginationProps.total
+          pagination.current = currentPage
+          this.setState({
+            pagination
+          })
+        }
+      )
+    }
   }
 
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  handleStandardTableChange = (pagination, filtersArg = {}, sorter) => {
     const { dispatch } = this.props;
     const { formValues } = this.state;
-
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
       newObj[key] = getValue(filtersArg[key]);
@@ -216,6 +240,9 @@ class RacesPage extends Component {
     dispatch({
       type: 'races/fetch',
       payload: params,
+    });
+    this.setState({
+      pagination
     });
   };
 
@@ -242,20 +269,21 @@ class RacesPage extends Component {
     }).then(
       () => {
         this.handleModalVisible()
-        this.handleCall()
+        this.handleCall('添加成功！', 1)
       }
     )
   };
 
   handleUpdate = fields => {
     const { dispatch } = this.props;
+    const { pagination } = this.state;
     dispatch({
       type: 'races/update',
-      payload: fields
+      payload: {...fields, ... pagination }
     }).then(
       () => {
         this.handleUpdateModalVisible()
-        this.handleCall('更新成功')
+        this.handleCall('更新成功！')
       }  
     )
     
@@ -268,7 +296,7 @@ class RacesPage extends Component {
       payload: { id: record.id },
     }).then(
       () => {
-        this.handleCall('已删除')
+        this.handleCall('已删除', -1)
       }  
     )
   };

@@ -4,6 +4,7 @@ import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm, Select 
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { getCurrentPage } from '@/utils/utils';
 
 import styles from './game.less';
 
@@ -63,7 +64,6 @@ class UpdateForm extends PureComponent {
     super(props);
 
     this.state = {
-    
     };
 
     this.formLayout = {
@@ -115,14 +115,12 @@ class UpdateForm extends PureComponent {
      
       if (err) return;
       const formVals = { ...values, ...fieldsValue };
-        handleUpdate(formVals);
+      handleUpdate(formVals);
     });
   };
 
   render() {
     const { updateModalVisible, handleUpdateModalVisible, values } = this.props;
-   
-
     return (
       <Modal
         width={640}
@@ -190,29 +188,52 @@ class TalentPage extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    this.handleFetch(dispatch);
+    dispatch({
+      type: 'talent/fetch',
+    }).then(
+      () => {
+        const {talent: { data }} = this.props
+        this.setState({
+          pagination: data.pagination
+        })
+      }
+      
+    );
     dispatch({
       type: 'profession/fetch',
       payload: {pageSize: 10000}
     })
   }
 
-  handleFetch = dispatch => {
+  
+/**
+ * @param okText str 请求成功后提示信息，如果是默认undifined, 会提示接口返回信息
+ * @param type 操作类型, 1:增加，-1:删除，0：修改(默认)
+ */
+
+handleCall = (okText = undefined, type ) => {
+  const { dispatch, talent: {res} } = this.props;
+  const { pagination } = this.state;
+  const currentPage = getCurrentPage(pagination, type);
+  if(res && res.ret === 0) {
+    message.success(okText || res.msg);
     dispatch({
       type: 'talent/fetch',
-    });
-  };
-
-  handleCall = (okText) => {
-    const {dispatch, talent: {res} } = this.props;
-    if(res && res.ret === 0) {
-      message.success(okText || res.msg);
-      dispatch({
-        type: 'talent/fetch',
-      });
-    }
-   
+      payload: { currentPage, pageSize: pagination.pageSize},
+    }).then(
+      ()=> {
+        const {talent: { data }} = this.props;
+        const paginationProps = data.pagination
+        pagination.pageSize = paginationProps.pageSize;
+        pagination.total = paginationProps.total
+        pagination.current = currentPage
+        this.setState({
+          pagination
+        })
+      }
+    )
   }
+}
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
@@ -238,6 +259,9 @@ class TalentPage extends Component {
       type: 'talent/fetch',
       payload: params,
     });
+    this.setState({
+      pagination
+    });
   };
 
   handleModalVisible = flag => {
@@ -261,7 +285,7 @@ class TalentPage extends Component {
     }).then(
       () => {
         this.handleModalVisible()
-        this.handleCall('添加成功')
+        this.handleCall('添加成功！', 1)
       }
     )
   };
@@ -287,7 +311,7 @@ class TalentPage extends Component {
       payload: { id: record.id },
     }).then(
       () => {
-        this.handleCall('已删除')
+        this.handleCall('已删除', -1)
       }  
     )
   };
