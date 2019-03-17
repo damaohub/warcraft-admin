@@ -4,15 +4,18 @@ import { Card, Button, Modal, Form, Input, message, Divider, Popconfirm, Select 
 
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-
+import { getCurrentPage } from '@/utils/utils';
 import styles from '../GameRole/game.less';
 
 const FormItem = Form.Item;
-const { Option } = Select;
+const { Option, OptGroup } = Select;
 const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
+
+const filterArr = (arr, key, value) => 
+  arr.filter(item => item[key] === value)
 
 @Form.create()
 class CreateForm extends Component {
@@ -24,6 +27,7 @@ class CreateForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      instances: []
     };
 
     this.formLayout = {
@@ -34,55 +38,58 @@ class CreateForm extends Component {
 
 
 
-  onSelectHandel = (value) => {
-    const { form } = this.props
-    form.setFieldsValue({
-      monster_id: value
+  selectType = (value) => {
+    const { instanceList } = this.props;
+    const list = filterArr(instanceList, 'instance_type', parseInt(value, 10))
+    this.setState({
+      instances: list || []
     })
   }
 
 
   renderContent = (IM) => {
-    const { form, instanceList} = this.props;
+    const { form} = this.props;
+    const { instances }  = this.state;
   
     return [
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label={IM === 0 ? "请输入副本" : "请输入怪兽"}>
+      <FormItem key="name" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label={IM === 0 ? "请输入副本" : "请输入怪兽"}>
         {form.getFieldDecorator('name', {
           rules: [{ required: true, message: IM === 0 ? "请输入副本" : "请输入怪兽"}],
         })(<Input placeholder="请输入" />)}
       </FormItem>,
       
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="副本类型">
+      <FormItem key="instance_type" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="副本类型">
         {form.getFieldDecorator('instance_type', {
           rules: [{ required: true, message: '请选择副本类型！'}],
         })(
-          <Select placeholder="请选择副本类型" style={{ width: '100%' }}>
+          <Select placeholder="请选择副本类型" style={{ width: '100%' }} onSelect={this.selectType}>
             <Option key='1'>地下城</Option>
             <Option key='2'>团队副本</Option>
           </Select>
         )}
       </FormItem>,
       
-      IM === 1 ? (
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属副本">
-          {form.getFieldDecorator('instance_id', {
-            rules: [{ required: true, message: '请选择副本！'}],
-          })(
-            <Select placeholder="请选择副本" style={{ width: '100%' }}>
-              {instanceList.map( (item) => 
-                (<Option key={item.id}>{item.name}</Option>)
-              )}
-            </Select>
-          )}
-        </FormItem>
-      ) :
-      (
-        IM !== 1 &&
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="请输入编号">
+      (IM === 1  &&
+      <Fragment>
+        {instances.length !== 0 &&
+          <FormItem key="instance_id" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属副本">
+            {form.getFieldDecorator('instance_id', {
+              rules: [{ required: true, message: '请选择副本！'}],
+            })(
+              <Select placeholder="请选择副本" style={{ width: '100%' }}>
+                {instances.map( (item) => 
+                  (<Option key={item.id}>{item.name}</Option>)
+                )}
+              </Select>
+            )}
+          </FormItem>
+        }
+        <FormItem key="sort" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="请输入编号">
           {form.getFieldDecorator('sort', {
             rules: [{ required: true, message: "请输入编号"}],
           })(<Input placeholder="请输入" />)}
         </FormItem>
+      </Fragment>
       )
     ];
   };
@@ -141,11 +148,6 @@ class UpdateForm extends Component {
     super(props);
 
     this.state = {
-      formVals: {
-        name: props.values.name,
-        id: props.values.id,
-        instance_name: props.values.instance_name
-      },
     };
 
     this.formLayout = {
@@ -167,12 +169,20 @@ class UpdateForm extends Component {
       <FormItem key="instance_id" {...this.formLayout} label="所属副本">
         {form.getFieldDecorator('instance_id', {
           rules: [{ required: true, message: '请选择职业！'}],
-          initialValue: formVals.instance_name,
+          initialValue: `${formVals.instance_id}`,
         })(
           <Select placeholder="请选择副本" style={{ width: '100%' }}>
-            {instanceList.map( (item) => 
-              (<Option key={item.id}>{item.name}</Option>)
-            )}
+            <OptGroup label="团队副本">
+              {filterArr(instanceList, 'instance_type', 2) .map( (item) => 
+                (<Option key={item.id}>{item.name}</Option>)
+              )}
+            </OptGroup>
+            
+            <OptGroup label="地下城">
+              {filterArr(instanceList, 'instance_type', 1) .map( (item) => 
+                (<Option key={item.id}>{item.name}</Option>)
+              )}
+            </OptGroup>
           </Select>
         )}
       </FormItem>,
@@ -203,20 +213,12 @@ class UpdateForm extends Component {
      
       if (err) return;
       const formVals = { ...values, ...fieldsValue };
-      this.setState(
-        {
-          formVals,
-        },
-        () => {
-          handleUpdate(formVals);
-        }
-      );
+      handleUpdate(formVals);
     });
   };
 
   render() {
     const { updateModalVisible, handleUpdateModalVisible, values } = this.props;
-    const { formVals } = this.state;
 
     return (
       <Modal
@@ -230,7 +232,7 @@ class UpdateForm extends Component {
         onCancel={() => handleUpdateModalVisible(false, values)}
         afterClose={() => handleUpdateModalVisible()}
       >
-        {this.renderContent(formVals)}
+        {this.renderContent(values)}
       </Modal>
     );
   }
@@ -279,7 +281,7 @@ class MonsterPage extends Component {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true, record)}>更新</a>
+          <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
           <Divider type="vertical" />
           <Popconfirm title="是否要删除此行？" okText="确定" cancelText="取消" onConfirm={() => this.handleDelete(record)}>
             <a>删除</a>
@@ -293,26 +295,47 @@ class MonsterPage extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    this.handleFetch(dispatch);
-   
-  }
-
-  handleFetch = dispatch => {
     dispatch({
       type: 'monster/fetch',
-    });
-  };
-
-  handleCall = (okText) => {
-    const {dispatch, monster: {res} } = this.props;
-    if(res && res.ret === 0) {
-      message.success(okText || res.msg);
-      dispatch({
-        type: 'monster/fetch',
-      });
-    } 
-    
+    }).then(
+      () => {
+        const {monster: { data }} = this.props
+        this.setState({
+          pagination: data.pagination
+        })
+      }  
+    );
   }
+
+  /**
+ * @param okText str 请求成功后提示信息，如果是默认undifined, 会提示接口返回信息
+ * @param type 操作类型, 1:增加，-1:删除，0：修改(默认)
+ */
+
+handleCall = (okText = undefined, type ) => {
+  const { dispatch, monster: {res} } = this.props;
+  const { pagination } = this.state;
+  const currentPage = getCurrentPage(pagination, type);
+
+  if(res && res.ret === 0) {
+    message.success(okText || res.msg);
+    dispatch({
+      type: 'monster/fetch',
+      payload: { currentPage, pageSize: pagination.pageSize},
+    }).then(
+      ()=> {
+        const {monster: { data }} = this.props;
+        const paginationProps = data.pagination
+        pagination.pageSize = paginationProps.pageSize;
+        pagination.total = paginationProps.total
+        pagination.current = currentPage
+        this.setState({
+          pagination
+        })
+      }
+    )
+  }
+}
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
@@ -337,7 +360,14 @@ class MonsterPage extends Component {
     dispatch({
       type: 'monster/fetch',
       payload: params,
-    });
+    }).then(
+      () => {
+        this.setState({
+          pagination
+        });
+      }
+    )
+  
   };
 
   handleModalVisible = (flag, is) => {
@@ -377,7 +407,7 @@ class MonsterPage extends Component {
     }).then(
       () => {
         this.handleModalVisible()
-        this.handleCall('添加成功')
+        this.handleCall('添加成功', 1)
       }
     )
   };
@@ -403,7 +433,7 @@ class MonsterPage extends Component {
       payload: { id: record.id },
     }).then(
       () => {
-        this.handleCall('已删除')
+        this.handleCall('已删除', -1)
       }  
     )
   };
