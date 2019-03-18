@@ -15,7 +15,8 @@ const getValue = obj =>
     .join(',');
 
 const filterArr = (arr, key, value) => 
-  arr.filter(item => item[key] === value)
+  // eslint-disable-next-line eqeqeq
+  arr.filter(item => item[key] == value)
 
 @Form.create()
 class CreateForm extends Component {
@@ -40,7 +41,7 @@ class CreateForm extends Component {
 
   selectType = (value) => {
     const { instanceList } = this.props;
-    const list = filterArr(instanceList, 'instance_type', parseInt(value, 10))
+    const list = filterArr(instanceList, 'instance_type', value)
     this.setState({
       instances: list || []
     })
