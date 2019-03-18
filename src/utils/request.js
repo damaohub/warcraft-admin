@@ -148,15 +148,19 @@ export default function request(url, option) {
         return response.json().then (
           // 对自定义业务错误码的处理
           (res) => (
-            new Promise((resolve) => {
+            new Promise((resolve, reject) => {
               if(res.ret !== 0) {
                 message.error(res.msg) // 这里可能会和页面写的错误提示 重复弹出
                 if(res.ret === 2006) {   
                   router.push('/exception/403');
                  }
+                 if(res.ret === 1001) {
+                  router.push('/exception/404');
+                 }
                 if(res.ret === 1000 || res.ret === 1003 || res.ret === 1004) {
                   localStorage.removeItem('token')
                   router.push('/login');
+                  reject();
                 }
               }
               resolve(res)
