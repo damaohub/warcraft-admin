@@ -1,3 +1,4 @@
+import "@babel/polyfill";
 import React from 'react';
 import { notification, Button, message } from 'antd';
 import { formatMessage } from 'umi/locale';

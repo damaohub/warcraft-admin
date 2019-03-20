@@ -21,7 +21,7 @@ const formItemLayout = {
 
 function disabledDate(current) {
   // Can not select days before today and today
-  return current && current < moment().endOf('day');
+  return current && current < moment(new Date()).add(-1, 'days');
   // return current.getTime() < Date.now() - 8.64e7
 }
 

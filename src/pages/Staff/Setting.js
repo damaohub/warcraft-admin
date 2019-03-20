@@ -6,6 +6,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import saltMD5 from '@/utils/saltMD5'
 
 import styles from '../GameRole/game.less';
 
@@ -13,6 +14,25 @@ const FormItem = Form.Item;
 const {Dragger} = Upload;
 moment.locale('zh-cn');
 
+const createSign = (obj) => {
+  let str = ''
+  const sortedKeys = Object.keys(obj).sort()
+  let tmp
+  // eslint-disable-next-line
+  for (let elem of sortedKeys.values()) {
+    tmp = obj[elem]
+   if(typeof  obj[elem] !== "string") {
+      // eslint-disable-next-line
+     tmp =JSON.stringify(obj[elem])
+   }
+
+  if(obj[elem]) {
+    str += (elem.toString() + tmp)
+   }
+  }
+
+  return saltMD5.md5(str)
+}
 
 @Form.create()
 @connect(({ staff, loading }) => ({
@@ -121,13 +141,16 @@ class SettingPage extends Component {
       staff: {current}
     } = this.props;
     const { cardFront, cardBehind } = this.state;
+    const time = Date.parse(new Date()) / 1000;
+    const token = localStorage.getItem('token')? JSON.parse(localStorage.getItem('token')) : null;
     const uploadProps = {
-      action: "http://192.168.0.128/user/upload-cardimg",
+      action: "http://47.100.225.112/user/upload-cardimg",
       showUploadList: false,
       onChange: this.handleChange,
       data: {
-        time: Date.parse(new Date()) / 1000,
-        token: localStorage.getItem('token')? JSON.parse(localStorage.getItem('token')) : null,
+        time,
+        token,
+        sign: createSign({token, time})
       }
     }
 

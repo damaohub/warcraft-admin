@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
 import Zmage from 'react-zmage';
@@ -17,10 +18,14 @@ import {
   Popconfirm,
   Tooltip,
   Avatar,
+  Input,
+  Form,
+  Icon
 } from 'antd';
 
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import AddModal from './Add/Addmodal';
 
 import styles from './AdvancedProfile.less';
 
@@ -40,19 +45,23 @@ const getImageSet = (arr) => {
   return tmpArr
 }
 
+
+@Form.create()
 @connect(({ team, loading }) => ({
     team,
     loading: loading.effects['team/info'],
-    staffLaoding: loading.effects['team/staff']
+    staffLaoding: loading.effects['team/staff'],
+    downLoadPathLoading: loading.effects['team/download']
 }))
 class TeamDetailPage extends Component {
   state = {
     visible: false,
     loaded: false,
+    delModal: false,
     statusMap: {"1": "未完成","2": "待审核", "3": "已完成"}
   };
 
-  colums = [
+  colums1 = [
     
     {
       title: <div style={{textAlign: 'center',margin: '0 auto'}}>账号</div>,
@@ -138,16 +147,120 @@ class TeamDetailPage extends Component {
             <Button type="primary" disabled={record.status!=="0"} size="small" ghost onClick={e=>{this.unbind(e,record)}}>解绑团员</Button>:
             <Button type="primary" size="small" ghost onClick={e=>{this.showModal(e,record)}}>团员绑定</Button>
           }
-          {/* <Divider type="vertical" style={{margin: '0 2px'}} />
-          <a href={`#/account/detail?id=${record.id}`}>详情</a> */}
+          <Divider type="vertical" style={{margin: '0 4px'}} />
+          <a onClick={e=> {this.showDel(e,record)}}>删除</a>
         </Fragment>
       ),
       align: 'center',
     },
   ]
-  
+
+
+  colums2 = [
+    {
+      title: <div style={{textAlign: 'center',margin: '0 auto'}}>账号</div>,
+      dataIndex: 'account_name',
+      key: 'account_name',
+      align: 'justify',
+      width: 300,
+      render: (item,record) => (
+        <Fragment>
+          <Tooltip title={record.profession_name}>
+            <Avatar src={record.profession_img} />
+          </Tooltip>
+          <Tooltip 
+            placement="right" 
+            title={
+              <div style={{display:"flex",flexDirection:"column"}}>
+                <div>密码：{record.account_pwd}</div>
+                <div>账号类型：{typeMap[record.type]}</div>
+                <div>子账号：{record.child_name}</div>
+                <div>服务器：{record.region_id}</div>
+                <div>角色名：{record.game_role_name}</div>
+                <div>角色等级：{record.level}</div>
+                <div>阵营：{record.organization==='0'?'联盟':'部落'}</div>
+                <div>职业：{record.profession_name}</div>
+                <div>可用天赋：{record.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
+                <div>装备等级：{record.equip_level}</div>
+                <div>联系方式：{record.account_phone}</div>
+                {record.account_remark? <div>备注：{record.account_remark}</div>: null}
+                
+              </div>     
+              }
+          >
+            <div style={{display: "inline-block"}}>{item}</div>
+          </Tooltip>
+        </Fragment>
+      )
+    },
+   
+    {
+      title: '位置',
+      dataIndex: 'battle_site',
+      key: 'battle_site',
+      align: 'center',
+      render: item => (positionMap[item])
+    },
+    {
+      title: '截图',
+      dataIndex: 'screenshots_arr',
+      key: 'screenshots_arr',
+      align: 'center',
+      render: (item) => (
+      item.length === 0? '暂无截图':
+      <Zmage
+        style={{width: '100px',height: '50px'}}
+        src={item[0]}
+        alt={`点击查看共${item.length}张截图`}
+        set={
+          getImageSet(item)
+        }
+      />
+      )
+      
+    },
+    {
+      title: '操号团员',
+      key: 'play_name',
+      dataIndex: 'play_name',
+      align: 'center',
+      render: (item) => (item===null?<span style={{color:"red"}}>无</span>:<span style={{color:"green"}}>{item}</span>)
+    },
+    {
+      title: '提交状态',
+      dataIndex: 'status',
+      key: 'status',
+      align: 'center',
+      render: item => (item==="0"?<span style={{color: "orange"}}>未提交</span>:<span style={{color: "green"}}>已提交</span>)
+    },
+    {
+      title: '删除原因',
+      dataIndex: 'del_msg',
+      key: 'del_msg',
+      align: 'center'
+    },
+  ]
+
   componentWillMount() {
     const { dispatch, location: {query: {id} }} = this.props
+    dispatch({
+      type: 'team/download',
+      payload: {'tid': id}
+    }).then(
+      ()=>{
+        const {team: {downLoadLink}} = this.props;
+        if(downLoadLink && downLoadLink.ret === 0) {
+          const {data} = downLoadLink
+          this.setState({
+            downLoadPath :data.download_path,
+          })
+        }
+      }
+    );
+    dispatch({
+      type: 'team/staff',
+      payload: {'tid': id}
+    });
     dispatch({
       type: 'team/info',
       payload: {id}
@@ -155,17 +268,14 @@ class TeamDetailPage extends Component {
       const { team: {info}} = this.props
       this.setState({
         accountList:info.account_list,
+        delList: info.account_del_list,
+        tid: id,
         loaded: true
       })
     });
 
-    dispatch({
-      type: 'team/staff',
-      payload: {'tid': id}
-    })
-    this.setState({
-      tid: id
-    })
+  
+  
     window.addEventListener('resize', this.setStepDirection, { passive: true });
    
   }
@@ -176,6 +286,7 @@ class TeamDetailPage extends Component {
   
   }
 
+ 
 
   handleCheck = () => {
     const {dispatch} =this.props
@@ -214,6 +325,142 @@ class TeamDetailPage extends Component {
     });
   };
 
+  showDel = (e, record) => {
+    e.preventDefault()
+    this.setState({
+      delModal: true,
+      delCurrent: record
+    })
+  }
+
+  handleDelCancel = () => {
+    this.setState({
+      delModal: false
+    })
+  }
+
+  showAddModal = (e) => {
+    e.preventDefault()
+    this.handleSearch(0, true)
+  }
+
+  handleModalVisible =() => {
+    this.setState({
+      modalVisible: false
+    })
+  }
+
+  handleSearch = (values, isShow = false) => {
+    const{dispatch} = this.props
+    const { tid } = this.state
+    const types = ['team/account3', 'team/account4'];
+    const type = parseInt(values.type, 10)
+    const payLoad = {tid}
+    if(values.f_battle_site) { 
+      Object.assign(payLoad, {battle_site: values.f_battle_site})
+    } else {
+      Object.assign(payLoad, {battle_site: 't'})
+    }
+    if(values.f_account_name) Object.assign(payLoad, {account_name: values.f_account_name})
+    if(values.f_game_role_name) Object.assign(payLoad, {game_role_name: values.f_game_role_name})
+    dispatch({
+      type: types[type] || types[0],
+      payload: payLoad
+    }).then(
+      () => {
+        const{team:{account:{data}}} =this.props
+        if(data){ 
+          this.setState({
+            accountAddList: {list: data.list, pagination: Object.assign(data.pagination, {showQuickJumper: false}) },
+          })
+          if(isShow) {
+            this.setState({
+              modalVisible: true
+            })
+          }
+          
+        } else{
+          message.error('未获取待选列表！')
+        }
+        
+      }
+    ).catch(err=>message.error(err))
+  }
+
+  handleAdd = (selectedItemKeys, selectItems) => {
+    if(!selectItems || selectItems.length === 0 ) {
+      this.handleModalVisible()
+      message.warning('未选择任何账号')
+      return
+    }
+
+    const { dispatch } = this.props
+    const {tid} = this.state
+    const items = selectItems.map(item => (
+      {aid: item.aid, oid: item.oid, oiid: item.oiid, battle_site: item.battle_site}
+    ))
+    dispatch({
+      type:'team/addaccount',
+      payload: {tid, account_arr: items}
+    }).then(
+      () => {
+        const{team: {res}} = this.props
+        if(res.ret === 0) {
+          this.setState({modalVisible: false})
+          dispatch({
+            type: 'team/info',
+            payload: {id: tid}
+          }).then(
+            () => {
+              const { team: {info}} = this.props
+              this.setState({
+                accountList:info.account_list,
+              })
+            }
+          )
+          message.success('添加成功！')
+        }
+      }
+    )
+  }
+
+  handleDelete = record => {
+    const { dispatch, form} = this.props
+    const {tid} =this.state
+    form.validateFields((err, values) => {
+      if (!err) {
+        // eslint-disable-next-line camelcase
+        const { del_msg } =values
+        dispatch({
+          type: 'team/delaccount',
+          payload: { tid, aid: record.aid, del_msg}
+        }).then(
+          () =>{
+            const{team: {res}} = this.props
+            if(res.ret === 0) {
+              dispatch({
+                type: 'team/info',
+                payload: {id: tid}
+              }).then(
+                () => {
+                  const { team: {info}} = this.props
+                  this.setState({
+                    accountList:info.account_list,
+                  })
+                }
+              )
+              message.success('已删除')
+            }
+            this.setState({
+              delModal: false
+            })
+          }
+        )
+      }
+    })
+   
+  }
+
   handleCancel = () => {
     this.setState({
       visible: false,
@@ -230,7 +477,7 @@ class TeamDetailPage extends Component {
   handleSubmit = e => {
     e.preventDefault();
     const { dispatch} = this.props
-    const { selectItem, currentRow, accountList, tid } = this.state;
+    const { selectItem, currentRow, accountList, tid} = this.state;
    
     this.handleCancel()
     dispatch({
@@ -303,12 +550,15 @@ class TeamDetailPage extends Component {
   }
 
 
-
   render() {
     const {team: {info}, loading, team:{staff} } = this.props;
-    const {loaded, statusMap, visible, accountList} =this.state
+    const {loaded, statusMap, visible, accountList, accountAddList, delList, modalVisible, delModal, delCurrent, downLoadPath } =this.state
     const teamInfo= info.team_info
-
+    const parentMethods = {
+      handleAdd: this.handleAdd,
+      handleModalVisible: this.handleModalVisible,
+      handleSearch: this.handleSearch
+    };
     const modalFooter = { okText: '保存', onOk: this.handleSubmit, cancelText:'取消', onCancel: this.handleCancel };
     
     const getModalContent = (data) => (
@@ -356,6 +606,7 @@ class TeamDetailPage extends Component {
         extraContent={
           <Row>
             <Col xs={24} sm={12}>
+              <div> {<a href={downLoadPath}><Icon type="download" style={{color: '#1890FF'}} />下载打包截图</a>}</div>
               <div className={styles.textSecondary}>订单状态：{teamInfo.status==="2"?statusMap[teamInfo.status]: ''}</div>
               <div className={styles.heading}>
                 {
@@ -375,13 +626,25 @@ class TeamDetailPage extends Component {
         }
       >
         
-        <Card title="团队账号" style={{ marginBottom: 24 }} bordered={false}>
+        <Card title="团队账号" style={{ marginBottom: 24 }} bordered={false} extra={<Button type="primary" onClick={e => this.showAddModal(e)}>添加账号</Button>}>
+
           <Table
             style={{ marginBottom: 24 }}
             pagination={false}
             loading={loading}
             dataSource={accountList}
-            columns={this.colums}
+            columns={this.colums1}
+            rowKey="id"
+          />
+        </Card>
+        <Card title="问题单" style={{ marginBottom: 24 }} bordered={false}>
+
+          <Table
+            style={{ marginBottom: 24 }}
+            pagination={false}
+            loading={loading}
+            dataSource={delList}
+            columns={this.colums2}
             rowKey="id"
           />
         </Card>
@@ -396,6 +659,26 @@ class TeamDetailPage extends Component {
           maskClosable={false}
         >
           {getModalContent(staff)}
+        </Modal>
+
+        <AddModal modalVisible={modalVisible} data={accountAddList} battleSite {...parentMethods} />
+        <Modal
+          title="确认删除"
+          visible={delModal}
+          onOk={() => this.handleDelete(delCurrent)}
+          destroyOnClose
+          onCancel={this.handleDelCancel}
+        >
+          <Form>
+            <Form.Item>
+              {this.props.form.getFieldDecorator('del_msg', {
+                rules: [{ required: true, message: '输入删除的原因' }],
+              })(
+                <Input placeholder="输入原因" /> 
+              )}
+              
+            </Form.Item>
+          </Form> 
         </Modal>
       </PageHeaderWrapper>: <Spin size="large" />
     );

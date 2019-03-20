@@ -1,4 +1,22 @@
-import { queryTeam, addTeam,removeTeam, queryTeamInfo,queryGroup, queryAccount, queryStaff, bindStaff, unbindStaff, toCheck, queryAccount1, queryAccount2} from '@/services/team';
+import { 
+  queryTeam, 
+  addTeam,
+  removeTeam, 
+  queryTeamInfo,
+  queryGroup, 
+  queryAccount, 
+  queryStaff, 
+  bindStaff, 
+  unbindStaff, 
+  toCheck, 
+  queryAccount1, 
+  queryAccount2, 
+  queryAccount3, 
+  queryAccount4, 
+  delAccount,
+  addAccount,
+  downLoad
+} from '@/services/team';
 
 export default {
   namespace: 'team',
@@ -12,7 +30,8 @@ export default {
     info: {},
     group: {},
     account: {},
-    staff:[]
+    staff:[],
+    downLoadLink: undefined
   },
 
   effects: {
@@ -79,6 +98,35 @@ export default {
           payload: response,
         });
       },
+      *account3({ payload }, { call, put }) {
+        const response = yield call(queryAccount3, payload);
+        yield put({
+          type: 'getAccount',
+          payload: response,
+        });
+      },
+      *account4({ payload }, { call, put }) {
+        const response = yield call(queryAccount4, payload);
+        yield put({
+          type: 'getAccount',
+          payload: response,
+        });
+      },
+
+      *delaccount({ payload }, { call, put }) {
+        const response = yield call(delAccount, payload);
+        yield put({
+          type: 'item',
+          payload: response,
+        });
+      },
+      *addaccount({ payload }, { call, put }) {
+        const response = yield call(addAccount, payload);
+        yield put({
+          type: 'item',
+          payload: response,
+        });
+      },
       *staff({ payload }, { call, put }) {
         const response = yield call(queryStaff, payload);
         yield put({
@@ -104,6 +152,13 @@ export default {
         const response = yield call(toCheck, payload);
         yield put({
           type: 'item',
+          payload: response,
+        });
+      },
+      *download({ payload }, { call, put }) {
+        const response = yield call(downLoad, payload);
+        yield put({
+          type: 'saveDownLoad',
           payload: response,
         });
       },
@@ -147,6 +202,12 @@ export default {
       return {
         ...state,
         staff: action.payload
+      }
+    },
+    saveDownLoad(state, action) {
+      return {
+        ...state,
+        downLoadLink: action.payload
       }
     }
   }

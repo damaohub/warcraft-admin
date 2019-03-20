@@ -188,6 +188,7 @@ const getValue = obj =>
       const { dispatch } = this.props;
       dispatch({
         type: 'order/fetch',
+        payload: null
       });
      
     }

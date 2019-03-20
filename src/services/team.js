@@ -58,6 +58,34 @@ export async function queryAccount2(params) {
   });
 }
 
+export async function queryAccount3(params) {
+  return request('/api/team/getcanuseaccountlist3', {
+    method: 'POST',
+    body: params
+  });
+}
+
+export async function queryAccount4(params) {
+  return request('/api/team/getcanuseaccountlist4', {
+    method: 'POST',
+    body: params
+  });
+}
+
+export async function delAccount(params) {
+  return request('/api/team/delaccount', {
+    method: 'POST',
+    body: params
+  });
+}
+
+export async function addAccount(params) {
+  return request('/api/team/addaccount', {
+    method: 'POST',
+    body: params
+  });
+}
+
 
 export async function queryStaff(params) {
   return request('/api/team/cangiveuser', {
@@ -86,3 +114,11 @@ export async function toCheck(params) {
     body: params
   });
 }
+
+export async function downLoad(params) {
+  return request('/api/team/downloadimg', {
+    method: 'POST',
+    body: params
+  });
+}
+

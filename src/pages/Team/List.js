@@ -99,10 +99,11 @@ const getValue = obj =>
         dataIndex: 'finish_time',
         key: 'finish_time',
         align: 'center',
-        width: 160
+        width: 160,
       },
       {
         title: '操作',
+        fixed: 'right',
         render: (text, record) => (
           <Fragment>
             <a href={`#/team/list/detail?id=${record.id}`}>排团详情</a>
@@ -113,7 +114,7 @@ const getValue = obj =>
           </Fragment>
         ),
         align: 'center',
-        width: 120
+        width: 150
       },
     
     ];

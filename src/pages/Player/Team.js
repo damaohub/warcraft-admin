@@ -18,10 +18,31 @@ import {
 
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import saltMD5 from '@/utils/saltMD5'
 
 import styles from '../Team/AdvancedProfile.less';
 
 const { Description } = DescriptionList;
+
+const createSign = (obj) => {
+  let str = ''
+  const sortedKeys = Object.keys(obj).sort()
+  let tmp
+  // eslint-disable-next-line
+  for (let elem of sortedKeys.values()) {
+    tmp = obj[elem]
+   if(typeof  obj[elem] !== "string") {
+      // eslint-disable-next-line
+     tmp =JSON.stringify(obj[elem])
+   }
+
+  if(obj[elem]) {
+    str += (elem.toString() + tmp)
+   }
+  }
+
+  return saltMD5.md5(str)
+}
 
 const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
 @connect(({ player, loading }) => ({
@@ -172,7 +193,8 @@ class TeamDetailPage extends Component {
     const {loaded, statusMap, previewImage, previewVisible, screenList, uploading, fileList } =this.state
     const teamInfo= team.team_info
     const account = team.account_list
- 
+    const time = Date.parse(new Date()) / 1000;
+    const token = localStorage.getItem('token')? JSON.parse(localStorage.getItem('token')) : null;
     const uploadProps = {
       onRemove: (file) => {
         this.setState((state) => {
@@ -219,10 +241,11 @@ class TeamDetailPage extends Component {
       },
       multiple: true,
       listType: 'picture',
-      action: "http://192.168.0.128/gamer/upload-screen",
+      action: "http://47.100.225.112/gamer/upload-screen",
       data: {
-        time: Date.parse(new Date()) / 1000,
-        token: localStorage.getItem('token')? JSON.parse(localStorage.getItem('token')) : null,
+        time,
+        token,
+        sign: createSign({time, token})
       }
     };
 

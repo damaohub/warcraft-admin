@@ -315,7 +315,7 @@ class Step2 extends React.Component {
                                       <div>职业：{item.profession_name}</div>
                                       <div>可用天赋：{item.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
                                       <div>装备等级：{item.equip_level}</div>
-                                      
+                                      <div>购买项目：{item.instance_name}<span style={{margin: '0 2px'}} />{item.difficult}<span style={{margin: '0 2px'}} /> {item.monsters}</div>
                                     </div>     
                                     }
                                 >
@@ -386,7 +386,7 @@ class Step2 extends React.Component {
                                       <div>职业：{item.profession_name}</div>
                                       <div>可用天赋：{item.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
                                       <div>装备等级：{item.equip_level}</div>
-                                      
+                                      <div>购买项目：{item.instance_name}<span style={{margin: '0 2px'}} />{item.difficult}<span style={{margin: '0 2px'}} /> {item.monsters}</div>
                                     </div>     
                                     }
                                 >
@@ -458,7 +458,7 @@ class Step2 extends React.Component {
                                       <div>职业：{item.profession_name}</div>
                                       <div>可用天赋：{item.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
                                       <div>装备等级：{item.equip_level}</div>
-                                      
+                                      <div>购买项目：{item.instance_name}<span style={{margin: '0 2px'}} />{item.difficult}<span style={{margin: '0 2px'}} /> {item.monsters}</div>
                                     </div>     
                                     }
                                 >
@@ -486,6 +486,7 @@ class Step2 extends React.Component {
         }
         <AddModal modalVisible={modalVisible} data={accountList} {...parentMethods} />
         <FooterToolbar style={{width: '100%'}}>
+          <span>{tAccount.length}T-{nAccount.length}N-{dAccount.length}D，共计{tAccount.length + nAccount.length + dAccount.length}个</span>
           <Button type="primary" size="large" onClick={this.submit} loading={submitting}>
             提交
           </Button>

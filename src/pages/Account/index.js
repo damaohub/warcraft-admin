@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { PureComponent ,Fragment } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { connect } from 'dva';
@@ -20,6 +21,8 @@ const getValue = obj =>
 const typeMaps = {"0":'工作室账号',"1":"客户账号", "2": "借用账号"}
 const typeTag = {"0":'工',"1":"客", "2": "借"}
 const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
+
+
 @connect(({ loading, account, profession, talent }) => ({
     account,
     profession,
@@ -165,7 +168,6 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
       },
       {
         title: '操作',
-       
         render: (text, record) => (
           <Fragment>
             <CopyToClipboard
@@ -246,8 +248,12 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
     };
   
     showEditModal = (e,item) => {
-     this.selectHandel(item.profession_id)
       e.preventDefault()
+      const {dispatch } = this.props;
+      dispatch({
+        type: 'talent/fetch',
+        payload: { profession_id: item.profession_id ,pageSize: 10000}
+      });
       this.setState({
         visible: true,
         current: item,
@@ -338,14 +344,15 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
 
     selectHandel = value => {
       const {dispatch, form } = this.props;
-      dispatch({
-        type: 'talent/fetch',
-        payload: { profession_id: value,pageSize: 10000}
-      });
       form.setFieldsValue({
         'talent_id': undefined,
         'need_talent_id': undefined
       });
+      dispatch({
+        type: 'talent/fetch',
+        payload: { profession_id: value,pageSize: 10000}
+      });
+      
     }
 
     handleSearch = e => {
@@ -479,6 +486,16 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
     const modalFooter = { okText: '保存', onOk: this.handleSubmit, onCancel: this.handleCancel };
     // const labelName = !current.pid || current.pid === "0"? '分组名称' : '接口名称'
 
+    const getTalents = talents => {
+      if (talents === undefined) return;
+      const arr = [];
+      talents.map(item => (
+        arr.push (item.id)
+      ))
+      // eslint-disable-next-line consistent-return
+      return arr
+    }
+
     const getModalContent = () => 
       (
         <Form onSubmit={this.handleSubmit}>
@@ -552,7 +569,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           <FormItem label="角色职业" {...this.formLayout}>
             {getFieldDecorator('profession_id', {
               rules: [{ required: true, message: '请选择职业' }],
-              initialValue: current.profession_id,
+              initialValue: `${current.profession_id}`,
             })(
               <Select placeholder="请选择职业" style={{ width: '100%' }} onSelect={(value) => {this.selectHandel(value)}}>
                 {professionList.map( (item) => 
@@ -564,7 +581,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           <FormItem label="可用天赋" {...this.formLayout}>
             {getFieldDecorator('talent_id', {
               rules: [{ required: true, message: '请选择可用天赋' }],
-             
+              initialValue: getTalents(current.talents),
             })(
               <Select mode="multiple" autoClearSearchValue placeholder="请选择可用天赋" style={{ width: '100%' }}>
                 {talentList.map( (item) => 
@@ -576,7 +593,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           <FormItem label="拾取天赋" {...this.formLayout}>
             {getFieldDecorator('need_talent_id', {
               rules: [{ required: true, message: '请选择拾取天赋' }],
-             
+              initialValue: `${current.need_talent_id}`,
             })(
               <Select placeholder="请选择拾取天赋" style={{ width: '100%' }}>
                 {talentList.map( (item) => 

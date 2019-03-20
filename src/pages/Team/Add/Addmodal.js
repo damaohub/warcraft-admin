@@ -239,20 +239,31 @@ class Addmodal extends Component {
   handleFormReset = () => {
     const { form ,handleSearch} = this.props;
     form.resetFields();
-    handleSearch({type:"0"})
+    handleSearch({type:"0", battle_site: 't'})
   };
 
   changeType = value => {
-    const { handleSearch } = this.props;
+    const { handleSearch, form } = this.props;
     this.setState({
       selectedRowKeys: [],
     })
-    handleSearch({type: value})
+    const battle =  form.getFieldValue('f_battle_site')
+    handleSearch({type: value, f_battle_site: battle})
+  }
+
+  changeBattle = value => {
+    const { handleSearch, form } = this.props;
+    this.setState({
+      selectedRowKeys: [],
+    })
+    const type =  form.getFieldValue('type')
+    handleSearch({f_battle_site: value, type})
   }
 
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
+      battleSite,
     } = this.props;
     return (
       
@@ -260,7 +271,7 @@ class Addmodal extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="账户类型">
-              {getFieldDecorator('type', { initialValue:"0" })(
+              {getFieldDecorator('type', { initialValue:"0", rules: [ {required: true, message: '必选类型'}], })(
                 <Select placeholder="请选择" style={{ width: '100%' }} onSelect={this.changeType}>
                   <Option value="0">客户账号</Option>
                   <Option value="1">非客户账号</Option>
@@ -280,6 +291,22 @@ class Addmodal extends Component {
         
           </Col>
         </Row>
+        { battleSite &&
+          <Row>
+            <Col md={8} sm={24}>
+              <FormItem label="位置">
+                {getFieldDecorator('f_battle_site',{ initialValue: 't', rules: [ {required: true, message: '必选类型'}]})(
+                  <Select placeholder="请选择" style={{ width: '100%' }} onSelect={this.changeBattle}>
+                    <Option value="t">坦克</Option>
+                    <Option value="n">治疗</Option>
+                    <Option value="d">输出</Option>
+                  </Select>
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+        }
+        
         <div style={{ overflow: 'hidden' }}>
           <div style={{ marginBottom: 24 }}>
             <Button type="primary" onClick={this.goSearch} htmlType="submit">
