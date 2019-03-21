@@ -42,6 +42,7 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(
   config => {
+    console.log(config)
     let data = {}
     // IE localStorage 兼容问题
     localStorage.setItem('dummy', 'dummyvalue');
@@ -58,7 +59,9 @@ service.interceptors.request.use(
       data ={...Nobj,sign} 
     }
     // eslint-disable-next-line
-    config.data = data
+    config.data = data;
+     // eslint-disable-next-line
+    config.headers = { ...config.headers, ...{'Authorization':  `Bearer ${JSON.parse(localStorage.getItem('token'))}`},}
     return config
   },
   error => {
