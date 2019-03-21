@@ -61,7 +61,7 @@ service.interceptors.request.use(
     // eslint-disable-next-line
     config.data = data;
      // eslint-disable-next-line
-    config.headers = { ...config.headers, ...{'Authorization':  `Bearer ${JSON.parse(localStorage.getItem('token'))}`},}
+    config.headers = { ...config.headers, ...{'Authorization':  `Bearer ${JSON.parse(localStorage.getItem('token'))}`}}
     return config
   },
   error => {
