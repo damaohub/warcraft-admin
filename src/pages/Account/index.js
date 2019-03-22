@@ -367,6 +367,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           organization: fieldsValue.f_organization,
           game_role_name: fieldsValue.f_game_role_name,
           profession_id: fieldsValue.f_profession_id,
+          region_id: fieldsValue.f_region_id,
           type: fieldsValue.f_type
         };
   
@@ -443,6 +444,11 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
                   </Select>
                  )
                 }
+              </FormItem>
+            </Col>
+            <Col lg={6} md={6} sm={24}>
+              <FormItem label="服务器">
+                {getFieldDecorator('f_region_id')(<Input placeholder="请输入" />)}
               </FormItem>
             </Col>
             <Col lg={6} md={6} sm={24}>
