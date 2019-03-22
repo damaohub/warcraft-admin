@@ -86,7 +86,7 @@ service.interceptors.response.use(
        if(res.ret === 1001) {
         router.push('/exception/404');
        }
-       if(res.ret ===1003 || res.ret ===1000) {
+       if(res.ret ===1003 || res.ret ===1000 || res.ret === 1004) {
         localStorage.removeItem('token')
         router.push('/login');
         reject();
