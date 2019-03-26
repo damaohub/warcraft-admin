@@ -112,10 +112,10 @@
     }
   }
   .cardTitle {
-    font-size: 0;
+    // font-size: 0;
     a {
       color: @heading-color;
-      margin-left: 12px;
+      margin-left: 0px;
       line-height: 24px;
       height: 24px;
       display: inline-block;
@@ -127,7 +127,19 @@
     }
   }
   .projectGrid {
-    width: 33.33%;
+    :global{
+      width: 33.33%;
+      padding: 5px 10px;
+      .ant-card{
+        .ant-card-head{
+          padding: 0;
+        }
+        .ant-card-body{
+          padding: 20px 0 0;
+        }
+      }
+    }
+    
   }
   .projectItemContent {
     display: flex;

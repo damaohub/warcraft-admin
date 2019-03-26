@@ -1,9 +1,9 @@
 import React ,{ Fragment }from 'react';
 import { connect } from 'dva';
-import { Row, Col, List, Icon, Card, Button, Avatar, Divider, Spin, Popconfirm, message, Tooltip  } from 'antd';
+import { Row, Col, List, Icon, Card, Button, Avatar, Divider, Spin, Popconfirm, message, Tooltip, Tag } from 'antd';
 import router from 'umi/router';
 // import { digitUppercase } from '@/utils/utils';
-import Ellipsis from '@/components/Ellipsis';
+// import Ellipsis from '@/components/Ellipsis';
 import FooterToolbar from '@/components/FooterToolbar';
 import styles from './style.less';
 import AddModal from './Addmodal';
@@ -56,7 +56,8 @@ const includesArr = (tarArr,SrcArr) => (
   router.push('/team/add/info');
 };
 const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
-
+const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
+const typeTag = {"0":'工',"1":"客", "2": "借"}
 @connect(({ team, loading }) => ({
   submitting: loading.effects['team/add'],
   addAccountLoading: loading.effects['team/account'],
@@ -291,15 +292,17 @@ class Step2 extends React.Component {
                       >
                         <Card.Meta
                           avatar={<Avatar size="large" src={item.profession_img} style={{margin: "68% 0"}} />}
-                          title={item.game_role_name}
+                          title={<div>{item.game_role_name } <Tag style={{display: "inline", float:'right', fontSize: "18px" }} color={typeTagColor[item.type]}>{typeTag[item.type]}</Tag></div>}
                           description={
-                            <Ellipsis className={styles.item} lines={9}>
-                              {item.talent.map(((v, i)=>(
-                                <Fragment>
-                                  <span color="blue" key={`${i+1}`}>{v}</span> { i !== item.talent.length-1 && <Divider type="vertical" style={{margin: '0 3px'}} />}
-                                </Fragment>
-                              )))}
-                             
+                            <div>
+                              <div>
+                                {item.talent.map(((v, i)=>(
+                                  <Fragment>
+                                    <span color="blue" key={`${i+1}`}>{v}</span> { i !== item.talent.length-1 && <Divider type="vertical" style={{margin: '0 3px'}} />}
+                                  </Fragment>
+                                )))}
+                              </div>
+      
                               <div>
                                 <Tooltip
                                   placement="right" 
@@ -323,7 +326,8 @@ class Step2 extends React.Component {
                                 </Tooltip> 
                                 
                               </div>
-                            </Ellipsis>
+                              <div>{item.instance_name}<span style={{margin: '0 2px'}} />{item.difficult}<span style={{margin: '0 2px'}} /> {item.monsters}</div>
+                            </div>  
                           }
                         />
                       </Card>
@@ -362,15 +366,17 @@ class Step2 extends React.Component {
                       >
                         <Card.Meta
                           avatar={<Avatar size="large" src={item.profession_img} style={{margin: "68% 0"}} />}
-                          title={item.game_role_name}
+                          title={<div>{item.game_role_name } <Tag style={{display: "inline", float:'right', fontSize: "18px" }} color={typeTagColor[item.type]}>{typeTag[item.type]}</Tag></div>}
                           description={
-                            <Ellipsis className={styles.item} lines={3}>
-                              <div>{item.talent.map(((v, i)=>(
-                                <Fragment>
-                                  <span color="blue" key={`${i+1}`}>{v}</span> { i !== item.talent.length-1 && <Divider type="vertical" style={{margin: '0 3px'}} />}
-                                </Fragment>
-                              )))}
+                            <div>
+                              <div>
+                                {item.talent.map(((v, i)=>(
+                                  <Fragment>
+                                    <span color="blue" key={`${i+1}`}>{v}</span> { i !== item.talent.length-1 && <Divider type="vertical" style={{margin: '0 3px'}} />}
+                                  </Fragment>
+                                )))}
                               </div>
+    
                               <div>
                                 <Tooltip
                                   placement="right" 
@@ -392,12 +398,13 @@ class Step2 extends React.Component {
                                 >
                                   {item.account_name}
                                 </Tooltip> 
-                                
-                              </div>
                               
-                            </Ellipsis>
-                          }
+                              </div>
+                              <div>{item.instance_name}<span style={{margin: '0 2px'}} />{item.difficult}<span style={{margin: '0 2px'}} /> {item.monsters}</div>
+                            </div>  
+                           }
                         />
+                        
                       </Card>
                     
                     </List.Item> 
@@ -434,15 +441,17 @@ class Step2 extends React.Component {
                       >
                         <Card.Meta
                           avatar={<Avatar size="large" src={item.profession_img} style={{margin: "68% 0"}} />}
-                          title={item.game_role_name}
+                          title={<div>{item.game_role_name } <Tag style={{display: "inline", float:'right', fontSize: "18px" }} color={typeTagColor[item.type]}>{typeTag[item.type]}</Tag></div>}
                           description={
-                            <Ellipsis className={styles.item} lines={3}>
-                              <div>{item.talent.map(((v, i)=>(
-                                <Fragment>
-                                  <span color="blue" key={`${i+1}`}>{v}</span> { i !== item.talent.length-1 && <Divider type="vertical" style={{margin: '0 3px'}} />}
-                                </Fragment>
-                              )))}
+                            <div>
+                              <div>
+                                {item.talent.map(((v, i)=>(
+                                  <Fragment>
+                                    <span color="blue" key={`${i+1}`}>{v}</span> { i !== item.talent.length-1 && <Divider type="vertical" style={{margin: '0 3px'}} />}
+                                  </Fragment>
+                                )))}
                               </div>
+      
                               <div>
                                 <Tooltip
                                   placement="right" 
@@ -466,8 +475,8 @@ class Step2 extends React.Component {
                                 </Tooltip> 
                                 
                               </div>
-                              
-                            </Ellipsis>
+                              <div>{item.instance_name}<span style={{margin: '0 2px'}} />{item.difficult}<span style={{margin: '0 2px'}} /> {item.monsters}</div>
+                            </div>  
                           }
                         />
                       </Card>
@@ -486,7 +495,7 @@ class Step2 extends React.Component {
         }
         <AddModal modalVisible={modalVisible} data={accountList} {...parentMethods} />
         <FooterToolbar style={{width: '100%'}}>
-          <span>{tAccount.length}T-{nAccount.length}N-{dAccount.length}D，共计{tAccount.length + nAccount.length + dAccount.length}个</span>
+          <span>{tAccount.length-1}T-{nAccount.length-1}N-{dAccount.length-1}D，共计{tAccount.length + nAccount.length + dAccount.length-3}个</span>
           <Button type="primary" size="large" onClick={this.submit} loading={submitting}>
             提交
           </Button>

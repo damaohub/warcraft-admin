@@ -23,6 +23,13 @@ const getValue = obj =>
 
     columns = [
       {
+        title: '团号',
+        dataIndex: 'id',
+        key: 'id',
+        align: 'center',
+        width: 60
+      },
+      {
         title: '团长',
         dataIndex: 'leader_name',
         key: 'leader_name',

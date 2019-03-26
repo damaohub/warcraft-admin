@@ -122,3 +122,10 @@ export async function downLoad(params) {
   });
 }
 
+export async function downLoadItem(params) {
+  return request('/api/team/downloadaccountimg', {
+    method: 'POST',
+    body: params
+  });
+}
+

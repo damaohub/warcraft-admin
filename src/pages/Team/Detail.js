@@ -20,7 +20,8 @@ import {
   Avatar,
   Input,
   Form,
-  Icon
+  Icon,
+  Tag
 } from 'antd';
 
 import DescriptionList from '@/components/DescriptionList';
@@ -33,6 +34,9 @@ const { Description } = DescriptionList;
 const RadioGroup = Radio.Group;
 const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
 const positionMap = {"d":'输出',"t":"坦克", "n": "治疗"}
+const typeTag = {"0":'工',"1":"客", "2": "借"}
+const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
+
 const getImageSet = (arr) => {
   const tmpArr = []
   arr.map((v,i)=>{
@@ -62,22 +66,31 @@ class TeamDetailPage extends Component {
   };
 
   colums1 = [
-    
+    {
+      title: '序号',
+      width: 60,
+      align: 'center',
+      render:(text,record,index)=>`${index+1}`,
+    },
+  
     {
       title: <div style={{textAlign: 'center',margin: '0 auto'}}>账号</div>,
-      dataIndex: 'account_name',
-      key: 'account_name',
+      dataIndex: 'game_role_name',
+      key: 'game_role_name',
       align: 'justify',
       width: 300,
       render: (item,record) => (
         <Fragment>
+          <Tag style={{display: "inline",marginRight: '10px'}} color={typeTagColor[record.type]}>{typeTag[record.type]}</Tag>
           <Tooltip title={record.profession_name}>
             <Avatar src={record.profession_img} />
           </Tooltip>
+          
           <Tooltip 
             placement="right" 
             title={
               <div style={{display:"flex",flexDirection:"column"}}>
+                <div>账号：{record.account_name}</div>
                 <div>密码：{record.account_pwd}</div>
                 <div>账号类型：{typeMap[record.type]}</div>
                 <div>子账号：{record.child_name}</div>
@@ -112,16 +125,19 @@ class TeamDetailPage extends Component {
       dataIndex: 'screenshots_arr',
       key: 'screenshots_arr',
       align: 'center',
-      render: (item) => (
-      item.length === 0? '暂无截图':
-      <Zmage
-        style={{width: '100px',height: '50px'}}
-        src={item[0]}
-        alt={`点击查看共${item.length}张截图`}
-        set={
-          getImageSet(item)
-        }
-      />
+      render: (item, record) => (
+        item.length === 0? '暂无截图':
+        <Fragment>
+          <Zmage
+            style={{width: '100px',height: '50px'}}
+            src={item[0]}
+            alt={`点击查看共${item.length}张截图`}
+            set={
+              getImageSet(item)
+            }
+          />
+          <Icon type="cloud-download" onClick={e => {this.goDownItem(e, record)}} title="下载打包截图" style={{color: "#1890FF", fontSize: '20px', cursor: 'pointer', marginLeft: '5px'}} />
+        </Fragment>
       )
       
     },
@@ -158,13 +174,21 @@ class TeamDetailPage extends Component {
 
   colums2 = [
     {
+      title: '序号',
+      width: 60,
+      align: 'center',
+      render:(text,record,index)=>`${index+1}`,
+    },
+
+    {
       title: <div style={{textAlign: 'center',margin: '0 auto'}}>账号</div>,
-      dataIndex: 'account_name',
-      key: 'account_name',
+      dataIndex: 'game_role_name',
+      key: 'game_role_name',
       align: 'justify',
       width: 300,
       render: (item,record) => (
         <Fragment>
+          <Tag style={{display: "inline",marginRight: '10px'}} color={typeTagColor[record.type]}>{typeTag[record.type]}</Tag>
           <Tooltip title={record.profession_name}>
             <Avatar src={record.profession_img} />
           </Tooltip>
@@ -172,6 +196,7 @@ class TeamDetailPage extends Component {
             placement="right" 
             title={
               <div style={{display:"flex",flexDirection:"column"}}>
+                <div>账号：{record.account_name}</div>
                 <div>密码：{record.account_pwd}</div>
                 <div>账号类型：{typeMap[record.type]}</div>
                 <div>子账号：{record.child_name}</div>
@@ -206,16 +231,19 @@ class TeamDetailPage extends Component {
       dataIndex: 'screenshots_arr',
       key: 'screenshots_arr',
       align: 'center',
-      render: (item) => (
+      render: (item,record) => (
       item.length === 0? '暂无截图':
-      <Zmage
-        style={{width: '100px',height: '50px'}}
-        src={item[0]}
-        alt={`点击查看共${item.length}张截图`}
-        set={
-          getImageSet(item)
-        }
-      />
+      <Fragment>
+        <Zmage
+          style={{width: '100px',height: '50px'}}
+          src={item[0]}
+          alt={`点击查看共${item.length}张截图`}
+          set={
+            getImageSet(item)
+          }
+        />
+        <Icon type="cloud-download" onClick={e => {this.goDownItem(e,record)}} title="下载打包截图" style={{color: "#1890FF", fontSize: '20px', cursor: 'pointer', marginLeft: '5px'}} />
+      </Fragment>
       )
       
     },
@@ -244,20 +272,6 @@ class TeamDetailPage extends Component {
   componentWillMount() {
     const { dispatch, location: {query: {id} }} = this.props
     dispatch({
-      type: 'team/download',
-      payload: {'tid': id}
-    }).then(
-      ()=>{
-        const {team: {downLoadLink}} = this.props;
-        if(downLoadLink && downLoadLink.ret === 0) {
-          const {data} = downLoadLink
-          this.setState({
-            downLoadPath :data.download_path,
-          })
-        }
-      }
-    );
-    dispatch({
       type: 'team/staff',
       payload: {'tid': id}
     });
@@ -271,6 +285,9 @@ class TeamDetailPage extends Component {
         delList: info.account_del_list,
         tid: id,
         loaded: true
+      }, () => {
+        const {accountList}=this.state;
+        this.checkImg(accountList)
       })
     });
 
@@ -286,7 +303,12 @@ class TeamDetailPage extends Component {
   
   }
 
- 
+  checkImg = (list) => {
+    const flag = list.every(item => (item.screenshots_arr && item.screenshots_arr.length === 0))
+    this.setState({
+      noDownLoad: flag
+    })
+  }
 
   handleCheck = () => {
     const {dispatch} =this.props
@@ -415,6 +437,9 @@ class TeamDetailPage extends Component {
               const { team: {info}} = this.props
               this.setState({
                 accountList:info.account_list,
+              }, ()=> {
+                const {accountList} =this.state
+                this.checkImg(accountList)
               })
             }
           )
@@ -446,6 +471,9 @@ class TeamDetailPage extends Component {
                   const { team: {info}} = this.props
                   this.setState({
                     accountList:info.account_list,
+                  },()=> {
+                    const {accountList} =this.state
+                    this.checkImg(accountList)
                   })
                 }
               )
@@ -549,10 +577,44 @@ class TeamDetailPage extends Component {
     
   }
 
+  goDown = () => {
+    const { dispatch } = this.props
+    const { tid } =this.state;
+    dispatch({
+      type: 'team/download',
+      payload: {tid}
+    }).then(
+      ()=>{
+        const {team: {downLoadLink}} = this.props;
+        if(downLoadLink && downLoadLink.ret === 0) {
+          const {data} = downLoadLink
+          window.location.href = data.download_path
+        }
+      }
+    );
+  }
+
+  goDownItem = (e, record) => {
+    e.preventDefault();
+    const { dispatch } = this.props
+    const { tid } =this.state;
+    dispatch({
+      type: 'team/downloaditem',
+      payload: {tid, aid: record.aid}
+    }).then(
+      ()=>{
+        const {team: {downLoadLink}} = this.props;
+        if(downLoadLink && downLoadLink.ret === 0) {
+          const {data} = downLoadLink
+          window.location.href = data.download_path
+        }
+      }
+    );
+  }
 
   render() {
     const {team: {info}, loading, team:{staff} } = this.props;
-    const {loaded, statusMap, visible, accountList, accountAddList, delList, modalVisible, delModal, delCurrent, downLoadPath } =this.state
+    const {loaded, statusMap, visible, accountList, accountAddList, delList, modalVisible, delModal, delCurrent, noDownLoad } =this.state
     const teamInfo= info.team_info
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -606,7 +668,7 @@ class TeamDetailPage extends Component {
         extraContent={
           <Row>
             <Col xs={24} sm={12}>
-              <div> {<a href={downLoadPath}><Icon type="download" style={{color: '#1890FF'}} />下载打包截图</a>}</div>
+              <div> <Button type='primary' disabled={noDownLoad} icon="download" onClick={this.goDown}>{noDownLoad?'暂无截图': '下载团队打包截图'}</Button></div>
               <div className={styles.textSecondary}>订单状态：{teamInfo.status==="2"?statusMap[teamInfo.status]: ''}</div>
               <div className={styles.heading}>
                 {

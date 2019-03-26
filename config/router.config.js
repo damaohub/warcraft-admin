@@ -257,7 +257,7 @@ export default [
           path: '/dashboard/player-team',
           icon: 'table',
           name: 'player-team',
-          authority: ['3'],
+          authority: ['1','2','3'],
           hideInMenu: true,
           component: "./Player/Team"
         },

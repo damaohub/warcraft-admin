@@ -7,9 +7,7 @@ import {
   message,
   Upload,
   Icon,
-  Tooltip,
   Divider,
-  Avatar,
   Modal,
   Popconfirm,
   Empty,
@@ -44,7 +42,7 @@ const createSign = (obj) => {
   return saltMD5.md5(str)
 }
 
-const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
+const typeMap = {"0":'工作室账号',"1":"客户账号", "2": "借用账号"}
 @connect(({ player, loading }) => ({
     player,
     loading: loading.effects['player/team'],
@@ -291,31 +289,27 @@ class TeamDetailPage extends Component {
       >
         
         <Card 
-          title={
-            <Tooltip 
-              placement="rightTop" 
-              title={
-                <div style={{display:"flex",flexDirection:"column"}}>
-                  <div>密码：{account.account_pwd}</div>
-                  <div>账号类型：{typeMap[account.type]}</div>
-                  <div>子账号：{account.child_name}</div>
-                  <div>服务器：{account.region_id}</div>
-                  <div>角色名：{account.game_role_name}</div>
-                  <div>角色等级：{account.level}</div>
-                  <div>阵营：{account.organization==="0"?"联盟":"部落"}</div>
-                  <div>职业：{account.profession_name}</div>
-                  <div>可用天赋：{account.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
-                  <div>装备等级：{account.equip_level}</div>
-                  
-                </div>     
-                }
-            >
-              {<Avatar style={{marginRight:'5px'}} size="small" src={account.profession_img} />  }{account.account_name}
-            </Tooltip>
-          }
           bordered={false}
         >
           <div className={styles.tableList}>
+
+            <DescriptionList className={styles.headerList} size="small" col="2">
+              <Description term="账号"> {account.account_name}</Description>
+              <Description term="密码">{account.account_pwd}</Description>
+              <Description term="账号类型">{typeMap[account.type]}</Description>
+              <Description term="子账号">{account.child_name}</Description>
+              <Description term="服务器">{account.region_id}</Description>
+              <Description term="角色名">{account.game_role_name}</Description>
+              <Description term="角色等级">{account.level}</Description>
+              <Description term="阵营">{account.organization==="0"?"联盟":"部落"}</Description>
+              <Description term="职业">{account.profession_name}</Description>
+              <Description term="可用天赋">{account.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</Description>
+              <Description term="装备等级">{account.equip_level}</Description>
+              <Description term="联系电话">{account.account_phone}</Description>
+              <Description term="备注">{account.account_remark}</Description>
+              
+            </DescriptionList>
+            <Divider />
             <div className={styles.tableListOperator}>
               {screenList.length !== 0 ?
                 <div>
@@ -348,7 +342,7 @@ class TeamDetailPage extends Component {
               <Divider orientation="left" dashed style={{paddingTop:"20px"}}>上传截图</Divider>
              
               <Upload fileList={fileList} {...uploadProps}>
-                <Button>
+                <Button type="primary">
                   <Icon type="upload" />选择文件
                 </Button>
               </Upload>

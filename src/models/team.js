@@ -15,7 +15,8 @@ import {
   queryAccount4, 
   delAccount,
   addAccount,
-  downLoad
+  downLoad,
+  downLoadItem
 } from '@/services/team';
 
 export default {
@@ -162,7 +163,14 @@ export default {
           payload: response,
         });
       },
-    
+      *downloaditem({ payload }, { call, put }) {
+        const response = yield call(downLoadItem, payload);
+        yield put({
+          type: 'saveDownLoad',
+          payload: response,
+        });
+      },
+      
    
   },
 

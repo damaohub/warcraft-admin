@@ -30,4 +30,5 @@ export default config => {
       },
     ]);
   }
+  productionSourceMap: false
 };

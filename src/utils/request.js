@@ -24,9 +24,15 @@ const createSign = (obj) => {
   //  console.log(typeof obj[elem])
   //  console.log('----')
 
-  if(obj[elem]) {
+  if(tmp === 'null' ){
+    // eslint-disable-next-line no-param-reassign
+    tmp='';
+    // console.log(obj)
+  }
+  if(typeof (tmp) !== 'undefined'){
     str += (elem.toString() + tmp)
-   }
+  }
+  
     // console.log(str)
   }
 
@@ -42,7 +48,6 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(
   config => {
-    console.log(config)
     let data = {}
     // IE localStorage 兼容问题
     localStorage.setItem('dummy', 'dummyvalue');
@@ -53,10 +58,7 @@ service.interceptors.request.use(
       const sign = createSign(Nobj)
       data ={...Nobj,sign}
     } else {
-      // router.push('/login');
-      const Nobj = {...config.body, ...{ time: `${Date.parse(new Date()) / 1000}`} }
-      const sign = createSign(Nobj)
-      data ={...Nobj,sign} 
+      router.push('/login');
     }
     // eslint-disable-next-line
     config.data = data;

@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import moment from 'moment';
 import { connect } from 'dva';
 // import Link from 'umi/link';
-import { Row, Col, Card, List, Avatar, Spin, Empty  } from 'antd';
+import { Row, Col, Card, List, Avatar, Empty  } from 'antd';
 
 import { Radar } from '@/components/Charts';
 // import EditableLinkGroup from '@/components/EditableLinkGroup';
@@ -167,22 +167,14 @@ class Workplace extends PureComponent {
               loading={taskLoading}
               bodyStyle={{ padding: 0 }}
             >
-              {task.my_team ? task.my_team.map(item => (
+              {task.my_team && task.my_team.length !== 0 ? task.my_team.map(item => (
                 item? 
                   <Card.Grid className={styles.projectGrid} key={item.id}>
-                    <Card bodyStyle={{ padding: 0 }} bordered={false}>
-                      <Card.Meta
-                        title={
-                          <div className={styles.cardTitle}>
-                            <a href={`#/dashboard/player-team?id=${item.tid}`}>团号：{item.tid}</a>
-                          </div>
-                        }
-                        description={item.remark}
-                      />
-                      <div>开团时间： {item.reserve_time}</div>
-                      {/* <div>团长： {item.leader_id}</div> */}
-                      <div>人数： {item.mem_num}</div>
+                    <Card bordered={false} title={`团号：${item.tid}`} extra={<a href={`#/dashboard/player-team?id=${item.tid}`}>操作</a>}>
+                      <Card.Meta />
+                      <div>人数：{item.mem_num}</div>
                       <div>副本： {item.instance_name}</div>
+                      <div>开团时间： {item.reserve_time}</div>         
                       <div className={styles.projectItemContent}>
                         {/* <a title={`创建人:${item.create_id}`}>{item.create_id}</a> */}
                         {item.reserve_time && (
@@ -193,7 +185,7 @@ class Workplace extends PureComponent {
                       </div>
                     </Card>
                   </Card.Grid>: <Empty />
-              )): <Spin size="large" />
+              )):  <Empty />
             }
             </Card>
             <Card

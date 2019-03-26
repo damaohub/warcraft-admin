@@ -111,9 +111,9 @@ const getValue = obj =>
         align: 'center',
       },
       {
-        title: '账号',
-        dataIndex: 'account_name',
-        key: 'account_name',
+        title: '角色名',
+        dataIndex: 'game_role_name',
+        key: 'game_role_name',
         align: 'center',
         width: 200,
         render: (item,record) => (
@@ -121,6 +121,7 @@ const getValue = obj =>
             placement="right" 
             title={
               <div style={{display:"flex",flexDirection:"column"}}>
+                <div>账号: {record.account_name}</div>
                 <div>密码：{record.account_pwd}</div>
                 <div>账号类型：{typeMap[record.type]}</div>
                 <div>子账号：{record.child_name}</div>
