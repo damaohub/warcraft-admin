@@ -7,6 +7,7 @@ import 'moment/locale/zh-cn';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import saltMD5 from '@/utils/saltMD5'
+import router from 'umi/router';
 
 import styles from '../GameRole/game.less';
 
@@ -124,7 +125,7 @@ class SettingPage extends Component {
             const { staff: {res} } = this.props;
             if(res && res.ret === 0) {
               message.success("提交成功！");
-            
+              router.push(`/staff`);
             } else {
               message.error(res.msg);
             }
@@ -163,7 +164,7 @@ class SettingPage extends Component {
       return <Icon type="idcard" style={{fontSize: '200px'}} theme="twoTone" twoToneColor="#dddddd" />
     }
     const config = {
-      rules: [{ type: 'object', required: true, message: '请选择日期' }],
+      rules: [{  type: 'object',required: true, message: '请选择日期' }],
       
     };
     const formItemLayout = {
@@ -257,7 +258,7 @@ class SettingPage extends Component {
                 })(<Input placeholder="请输入QQ号" />)}
                 </FormItem>
                 <FormItem {...formItemLayout} label="入职时间">
-                  {getFieldDecorator('entry_time', {...config, initialValue: moment(current.entry_time, 'YYYY-MM-DD')})(<DatePicker placeholder="请选择入职日期" />)}
+                  {getFieldDecorator('entry_time', {...config, initialValue: current.entry_time? moment(current.entry_time, 'YYYY-MM-DD'): moment() })(<DatePicker placeholder="请选择入职日期" />)}
                 </FormItem>
                 <FormItem {...formItemLayout} label="身份证号">
                   {getFieldDecorator('id_card', {
