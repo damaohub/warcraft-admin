@@ -496,7 +496,7 @@ class TeamDetailPage extends Component {
   handleDelete = record => {
     const { dispatch, form} = this.props
     const {tid} =this.state
-    form.validateFields('del_msg', (err, values) => {
+    form.validateFields(['del_msg'], (err, values) => {
       if (!err) {
         // eslint-disable-next-line camelcase
         const { del_msg } =values
