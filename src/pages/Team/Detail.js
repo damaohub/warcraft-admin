@@ -765,7 +765,7 @@ class TeamDetailPage extends Component {
   };
 
   render() {
-    const {team: {info}, loading, team:{staff} } = this.props;
+    const {team: {info}, loading, team:{staff}, downLoadPathLoading } = this.props;
     const {loaded, statusMap, visible, accountList, accountAddList, delList, modalVisible, delModal, delCurrent, noDownLoad, mjVisible, curMj } =this.state
     const teamInfo= info.team_info
     const parentMethods = {
@@ -820,7 +820,7 @@ class TeamDetailPage extends Component {
         extraContent={
           <Row>
             <Col xs={24} sm={12}>
-              <div> <Button type='primary' disabled={noDownLoad} icon="download" onClick={this.goDown}>{noDownLoad?'暂无截图': '下载团队打包截图'}</Button></div>
+              <div> <Button type='primary' loading={downLoadPathLoading} disabled={noDownLoad} icon="download" onClick={this.goDown}>{noDownLoad?'暂无截图': '下载团队打包截图'}</Button></div>
               <div className={styles.textSecondary}>订单状态：{teamInfo.status==="2"?statusMap[teamInfo.status]: ''}</div>
               <div className={styles.heading}>
                 {
