@@ -2,6 +2,7 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
 import Zmage from 'react-zmage';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import {
   Card,
   Table,
@@ -21,7 +22,8 @@ import {
   Input,
   Form,
   Icon,
-  Tag
+  Tag,
+  Popover
 } from 'antd';
 
 import DescriptionList from '@/components/DescriptionList';
@@ -159,15 +161,49 @@ class TeamDetailPage extends Component {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          {record.uid !=="0"?
-            <Button type="primary" disabled={record.status!=="0"} size="small" ghost onClick={e=>{this.unbind(e,record)}}>解绑团员</Button>:
-            <Button type="primary" size="small" ghost onClick={e=>{this.showModal(e,record)}}>团员绑定</Button>
+          {record.uid !== "0" && <Button type="primary" disabled={record.status!=="0"} size="small" ghost onClick={e=>{this.unbind(e,record)}}>解绑</Button> }
+          { record.uid === '-1' && 
+            <Fragment> 
+              <Divider type="vertical" style={{margin: '0 4px'}} />
+              <Popover 
+                title={this.state.linkCode? 
+                  <div> 
+                    <span style={{marginRight: '5px'}}>
+                      {`http://${ window.location.host}/#/login1?code=${this.state.linkCode}`}
+                    </span>
+                    <CopyToClipboard
+                      onCopy={this.copy}
+                      text={`http://${ window.location.host}/#/login1?code=${this.state.linkCode}`}
+                    >
+                      <Button type="primary" ghost size="small">复制</Button>
+                    </CopyToClipboard>
+                    
+                  </div>:
+                  <Spin size="small" />
+                }
+                content={this.state.password? `密码: ${this.state.password}`: <Spin size="small" />}
+                trigger="click"
+              >
+                <Button type="primary" size="small" ghost onClick={e => {this.seeMjLink(e, record)}}>链接</Button>
+              </Popover>
+              
+            </Fragment>
           }
+          {
+            record.uid ==="0" &&
+            <Fragment>
+              <Button type="primary" size="small" ghost onClick={e=>{this.showModal(e,record)}}>团员</Button>
+              <Divider type="vertical" style={{margin: '0 4px'}} />
+              <Button type="primary" size="small" onClick={e=> {this.showMjModal(e, record)}} ghost>马甲</Button>
+            </Fragment>
+          }
+
           <Divider type="vertical" style={{margin: '0 4px'}} />
           <a onClick={e=> {this.showDel(e,record)}}>删除</a>
         </Fragment>
       ),
       align: 'center',
+      width: 200
     },
   ]
 
@@ -267,6 +303,14 @@ class TeamDetailPage extends Component {
       key: 'del_msg',
       align: 'center'
     },
+    {
+      title: '操作',
+      render: (text, record) => (
+        <Popconfirm title="是否要移除该账号？" okText="确定" cancelText="取消" onConfirm={() => this.handleRemove(record)}>
+          <a>删除</a>
+        </Popconfirm>
+      )
+    }
   ]
 
   componentWillMount() {
@@ -452,7 +496,7 @@ class TeamDetailPage extends Component {
   handleDelete = record => {
     const { dispatch, form} = this.props
     const {tid} =this.state
-    form.validateFields((err, values) => {
+    form.validateFields('del_msg', (err, values) => {
       if (!err) {
         // eslint-disable-next-line camelcase
         const { del_msg } =values
@@ -500,6 +544,36 @@ class TeamDetailPage extends Component {
     this.setState({
       selectItem: e.target.value
     })
+  }
+
+  handleRemove = record => {
+    const {dispatch} =this.props;
+    const {tid} =this.state
+    dispatch({
+      type:'team/removeproblem',
+      payload: { tid, aid: record.aid, oiid: record.oiid}
+    }).then(
+      () => {
+        
+        const{team: {res}} = this.props
+        if(res.ret === 0) {
+          dispatch({
+            type: 'team/info',
+            payload: {id: tid}
+          }).then(
+            () => {
+              const { team: {info}} = this.props
+              this.setState({
+                delList: info.account_del_list
+              })
+             
+            }
+          )
+          message.success('已移除！')
+        }
+
+      }
+    )
   }
 
   handleSubmit = e => {
@@ -612,9 +686,87 @@ class TeamDetailPage extends Component {
     );
   }
 
+  showMjModal = (e, record) => {
+    e.preventDefault();
+    this.setState({
+      mjVisible: true,
+      curMj: record
+    })
+  }
+
+  handleMjCancel = () => {
+    this.setState({
+      mjVisible: false
+    })
+  }
+
+  getMjLink = record => {
+    const { dispatch, form } = this.props
+    const { tid } =this.state;
+    form.validateFields(['password'], (err, values) => {
+     if(!err) {
+      dispatch({
+        type: 'team/getmjlink',
+        payload: {tid, aid: record.aid, password: values.password}
+      }).then(
+        () => {
+          const{team: {res}} = this.props
+          if(res.ret === 0) {
+            dispatch({
+              type: 'team/info',
+              payload: {id: tid}
+            }).then(
+              () => {
+                const { team: {info}} = this.props
+                this.setState({
+                  accountList:info.account_list,
+                },()=> {
+                  const {accountList} =this.state
+                  this.checkImg(accountList)
+                })
+              }
+            )
+            message.success('链接已生成！');
+          }
+          this.handleMjCancel();
+        }
+      )
+     }  
+    })
+  }
+
+  seeMjLink = (e, record) => {
+    e.preventDefault();
+    const { dispatch } = this.props
+    const { tid } =this.state;
+    dispatch({
+      type: 'team/seemjlink',
+      payload: {tid, aid: record.aid}
+    }).then(
+      () => {
+        const {team: {mjLink}} = this.props;
+       if(mjLink && mjLink.ret ===0) {
+         this.setState({
+          linkCode:mjLink.data.linkcode,
+          password: mjLink.data.password
+         })
+       }
+      }
+    )
+  }
+
+  copy = (text, result) => {
+    if(result) {
+      message.success('已经复制到剪切板')
+    } else {
+      message.error('操作失败')
+    }
+  
+  };
+
   render() {
     const {team: {info}, loading, team:{staff} } = this.props;
-    const {loaded, statusMap, visible, accountList, accountAddList, delList, modalVisible, delModal, delCurrent, noDownLoad } =this.state
+    const {loaded, statusMap, visible, accountList, accountAddList, delList, modalVisible, delModal, delCurrent, noDownLoad, mjVisible, curMj } =this.state
     const teamInfo= info.team_info
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -710,6 +862,27 @@ class TeamDetailPage extends Component {
             rowKey="id"
           />
         </Card>
+        <Modal
+          title="马甲验证密码"
+          centered
+          width={640}
+          destroyOnClose
+          visible={mjVisible}
+          onOk={() => this.getMjLink(curMj)}
+          onCancel={this.handleMjCancel}
+          maskClosable={false}
+        >
+          <Form>
+            <Form.Item>
+              {this.props.form.getFieldDecorator('password', {
+                rules: [{ required: true, message: '输入马甲验证密码' }],
+              })(
+                <Input placeholder="输入马甲验证密码" /> 
+              )}
+              
+            </Form.Item>
+          </Form>
+        </Modal>
         <Modal
           title='账户添加'
           centered

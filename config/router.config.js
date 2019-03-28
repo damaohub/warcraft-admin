@@ -1,4 +1,34 @@
 export default [
+  {
+    name: 'exception',
+    icon: 'warning',
+    path: '/exception',
+    hideInMenu: true,
+    routes: [
+      // exception
+      {
+        path: '/exception/403',
+        name: 'not-permission',
+        component: './Exception/403',
+      },
+      {
+        path: '/exception/404',
+        name: 'not-find',
+        component: './Exception/404',
+      },
+      {
+        path: '/exception/500',
+        name: 'server-error',
+        component: './Exception/500',
+      },
+      {
+        path: '/exception/trigger',
+        name: 'trigger',
+        hideInMenu: true,
+        component: './Exception/TriggerException',
+      },
+    ],
+  },
   //login
   {
     path: '/login',
@@ -7,6 +37,28 @@ export default [
       { path: './', component: './Login' },
       
     ]
+  },
+  {
+    path: '/login1',
+    component: '../layouts/UserLayout',
+    routes: [
+      { path: './', component: './Login1' },
+      
+    ]
+  },
+  // 团队操作
+  {
+    path: '/player-team',
+    icon: 'table',
+    name: 'player-team',
+    authority: ['1','2','3'],
+    hideInMenu: true,
+    component: '../layouts/BlankLayout',
+    routes: [
+      { path: './',  component: "./Player/Team1" },
+      
+    ]
+   
   },
   // app
   {
@@ -189,36 +241,7 @@ export default [
           },
         ]
       },
-      {
-        name: 'exception',
-        icon: 'warning',
-        path: '/exception',
-        hideInMenu: true,
-        routes: [
-          // exception
-          {
-            path: '/exception/403',
-            name: 'not-permission',
-            component: './Exception/403',
-          },
-          {
-            path: '/exception/404',
-            name: 'not-find',
-            component: './Exception/404',
-          },
-          {
-            path: '/exception/500',
-            name: 'server-error',
-            component: './Exception/500',
-          },
-          {
-            path: '/exception/trigger',
-            name: 'trigger',
-            hideInMenu: true,
-            component: './Exception/TriggerException',
-          },
-        ],
-      },
+     
       //个人中心
       {
         path: '/user',
@@ -274,4 +297,6 @@ export default [
       },
     ],
   },
+
+ 
 ];

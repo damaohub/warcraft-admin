@@ -302,6 +302,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
 装备等级: ${record.equip_level}; 
 联系方式: ${record.account_phone}; 
 备注: ${record.account_remark};`
+// const str = <Fragment> <div>账号：${record.account_name}</div><div>密码: ${record.account_pwd}</div><div>子账号: ${record.child_name}</div></Fragment>
       return str
   };
 

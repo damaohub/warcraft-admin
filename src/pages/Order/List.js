@@ -388,10 +388,14 @@ const getValue = obj =>
         }).then(
           () => {
             this.handleCancel()
-            dispatch({
-              type: 'order/fetch',
-            });
-            message.success('更新成功！')
+            const {order:{res}} =this.props;
+            if(res.ret ===0 ) {
+              dispatch({
+                type: 'order/fetch',
+              });
+              message.success('更新成功！')
+            }
+            
           }
         );
       });
@@ -405,10 +409,13 @@ const getValue = obj =>
         payload: {id:record.id,}
       }).then(
         () => {
-          dispatch({
-            type: 'order/fetch',
-          });
-          message.success('已删除！')
+          const {order:{res}} =this.props;
+          if(res.ret === 0) {
+            dispatch({
+              type: 'order/fetch',
+            });
+            message.success('已删除！')
+          }
         }
       );
     } 

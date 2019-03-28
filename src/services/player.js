@@ -22,6 +22,13 @@ export async function queryTask(params) {
   });
 }
 
+export async function queryTask1(params) {
+  return request('/api/majia/index', {
+    method: 'POST',
+    body: params
+  });
+}
+
 export async function queryTeam(params) {
   return request('/api/gamer/teaminfo', {
     method: 'POST',

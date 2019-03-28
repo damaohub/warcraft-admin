@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { FormattedMessage } from 'umi/locale';
-import { Spin, Tag, Menu, Icon, Avatar } from 'antd';
+import { Tag, Menu, Icon, Avatar } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 // import NoticeIcon from '../NoticeIcon';
@@ -180,7 +180,8 @@ export default class GlobalHeaderRight extends PureComponent {
             </span>
           </HeaderDropdown>
         ) : (
-          <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
+          // 
+          null
         )}
         <SelectLang className={styles.action} />
       </div>

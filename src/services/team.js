@@ -129,3 +129,26 @@ export async function downLoadItem(params) {
   });
 }
 
+export async function getMjLink(params) {
+  return request('/api/team/getmjlink', {
+    method: 'POST',
+    body: params
+  });
+}
+
+export async function seeMjLink(params) {
+  return request('/api/team/seemjlink', {
+    method: 'POST',
+    body: params
+  });
+}
+
+export async function removeProblem(params) {
+  return request('/api/team/movedel', {
+    method: 'POST',
+    body: params
+  });
+}
+
+
+

@@ -1,4 +1,4 @@
-import { queryPlayer, queryTask, queryTeam, addScreen, removeScreen, finish} from '@/services/player';
+import { queryPlayer, queryTask, queryTeam, addScreen, removeScreen, finish, queryTask1} from '@/services/player';
 
 export default {
   namespace: 'player',
@@ -59,6 +59,15 @@ export default {
         payload: response,
       });
     },
+
+    *loginhtm({ payload }, { call, put }) {
+      const response = yield call(queryTask1, payload);
+      yield put({
+        type: 'saveTeam',
+        payload: response.data,
+      });
+    },
+    
     
 
   },

@@ -16,7 +16,10 @@ import {
   delAccount,
   addAccount,
   downLoad,
-  downLoadItem
+  downLoadItem,
+  getMjLink,
+  seeMjLink,
+  removeProblem
 } from '@/services/team';
 
 export default {
@@ -32,7 +35,8 @@ export default {
     group: {},
     account: {},
     staff:[],
-    downLoadLink: undefined
+    downLoadLink: undefined,
+    mjLink: undefined
   },
 
   effects: {
@@ -170,6 +174,28 @@ export default {
           payload: response,
         });
       },
+      *getmjlink({ payload }, { call, put }) {
+        const response = yield call(getMjLink, payload);
+        yield put({
+          type: 'item',
+          payload: response,
+        });
+      },
+      *seemjlink({ payload }, { call, put }) {
+        const response = yield call(seeMjLink, payload);
+        yield put({
+          type: 'saveMjLink',
+          payload: response,
+        });
+      },
+      *removeproblem({ payload, callback }, { call, put }) {
+        const response = yield call(removeProblem, payload);
+        yield put({
+          type: 'item',
+          payload: response,
+        });
+        if (callback) callback();
+      },
       
    
   },
@@ -217,6 +243,13 @@ export default {
         ...state,
         downLoadLink: action.payload
       }
-    }
+    },
+    saveMjLink(state, action) {
+      return {
+        ...state,
+        mjLink: action.payload
+      }
+    },
+    
   }
 };

@@ -17,6 +17,15 @@ const getValue = obj =>
 
 
 
+const getTalentIds = talents => {
+  if (talents === undefined) return;
+  const ids = talents.split(',');
+  ids.shift();
+  ids.pop();
+  // eslint-disable-next-line consistent-return
+  return ids
+}
+
   @Form.create()
   class CreateForm extends Component {
     static defaultProps = {
@@ -158,6 +167,7 @@ const getValue = obj =>
           width={640}
           bodyStyle={{ padding: '32px 40px 48px' }}
           destroyOnClose
+          maskClosable={false}
           title="添加"
           visible={modalVisible}
           footer={this.renderFooter()}
@@ -220,6 +230,7 @@ class UpdateForm extends Component {
 
   renderContent = () => {
     const { form, parentData, values} = this.props;
+    console.log(values)
     return [
       <FormItem key="equip_name" {...this.formLayout} label="装备名称">
         {form.getFieldDecorator('equip_name', {
@@ -230,7 +241,7 @@ class UpdateForm extends Component {
       <FormItem key="equip_location" {...this.formLayout} label="装备部位">
         {form.getFieldDecorator('equip_location', {
           rules: [{ required: true, message: '请选择装备部位！'}],
-          initialValue: this.getId(values.equip_location, parentData.equipLocationList),
+          initialValue: values.equip_location
         })(
           <Select placeholder="请选择装备部位" style={{ width: '100%' }} onSelect={(value) => { if(!parentData.needTypeList.includes(value)) { form.setFieldsValue({equip_type: '0'})} }}>
             {parentData.equipLocationList.map( (item) => 
@@ -243,7 +254,7 @@ class UpdateForm extends Component {
         <FormItem key="equip_type" {...this.formLayout} label="装备类型">
           {form.getFieldDecorator('equip_type', {
             rules: [{ required: true, message: '请选择装备类型！'}],
-            // initialValue: values.equip_type,
+            initialValue: values.equip_type,
           })(
             <Select placeholder="请选择装备类型" style={{ width: '100%' }}>
               {parentData.equipTypeList.map( (item) => 
@@ -256,7 +267,7 @@ class UpdateForm extends Component {
       <FormItem key="talent_ids" {...this.formLayout} label="适用天赋">
         {form.getFieldDecorator('talent_ids', {
           rules: [{ required: true, message: '请选择适用天赋！'}],
-          // initialValue: values.ids,
+          initialValue: getTalentIds(values.talent_ids),
         })(
           <Select placeholder="请选择适用天赋" mode="multiple" style={{ width: '100%' }}>
             {parentData.talentList.map( (item) => 
@@ -268,9 +279,9 @@ class UpdateForm extends Component {
       <FormItem key="monster_id" {...this.formLayout} label="所属怪物">
         {form.getFieldDecorator('monster_id', {
           rules: [{ required: true, message: '请选择所属怪物！'}],
-          // initialValue: values.monster_name,
+          initialValue: values.monster_id,
         })(
-          <RemoteSelect url="/api/monster/searchlist" onSelectHandel={this.onSelectHandel} initialValue title={values.monster_name} />
+          <RemoteSelect url="/api/monster/searchlist" onSelectHandel={this.onSelectHandel} initialValue={values.monster_name} title={values.monster_name} />
         )}
       </FormItem>,
     ];

@@ -1,6 +1,6 @@
 import { routerRedux } from 'dva/router';
 import { stringify } from 'qs';
-import { accountLogin, getFakeCaptcha, accountLogout } from '@/services/api';
+import { accountLogin, getFakeCaptcha, accountLogout, majiaLogin} from '@/services/api';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import { reloadAuthorized } from '@/utils/Authorized';
@@ -42,6 +42,18 @@ export default {
         }
         yield put(routerRedux.replace(redirect || '/'));
         window.location.reload()
+      }
+    },
+
+    *login1({ payload }, { call, put }) {
+      const response = yield call(majiaLogin, payload);
+      if (response.ret === 0) {
+        yield put({
+          type: 'changeLoginStatus',
+          payload: response,
+        });
+        reloadAuthorized();
+        yield put(routerRedux.replace('/player-team'));
       }
     },
 

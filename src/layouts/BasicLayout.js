@@ -220,7 +220,8 @@ class BasicLayout extends React.Component {
   }
 }
 
-export default connect(({ global, setting, menu }) => ({
+export default connect(({user, global, setting, menu }) => ({
+  currentUser: user.currentUser,
   collapsed: global.collapsed,
   layout: setting.layout,
   menuData: menu.menuData,

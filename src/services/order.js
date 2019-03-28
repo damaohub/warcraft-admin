@@ -42,3 +42,10 @@ export async function changeOrder(params) {
     body: params
   });
 }
+export async function identForm(params) {
+  return request('/api/ident/ident', {
+    method: 'POST',
+    body: params
+  });
+}
+

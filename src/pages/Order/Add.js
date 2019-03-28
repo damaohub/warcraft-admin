@@ -88,7 +88,22 @@ class AdvancedForm extends Component {
     const {
       form: { getFieldsError },
     } = this.props;
-    const errors = getFieldsError();
+    const errors = getFieldsError([
+      'account_name', 
+      'account_pwd',
+      'child_name', 
+      'region_id', 
+      'game_role_name', 
+      'organization',
+      'level',
+      'profession_id', 
+      'talent_id',
+      'need_talent_id',
+      'equip_level',
+      'taobaoid',
+      'remark',
+      'phone'
+    ]);
     const errorCount = Object.keys(errors).filter(key => errors[key]).length;
     if (!errors || errorCount === 0) {
       return null;
@@ -146,7 +161,23 @@ class AdvancedForm extends Component {
       form: { validateFieldsAndScroll, resetFields },
       dispatch,
     } = this.props;
-    validateFieldsAndScroll((error, values) => {
+    validateFieldsAndScroll([
+      'account_name', 
+      'account_pwd',
+      'child_name', 
+      'region_id', 
+      'game_role_name', 
+      'organization',
+      'level',
+      'profession_id', 
+      'talent_id',
+      'need_talent_id',
+      'equip_level',
+      'taobaoid',
+      'remark',
+      'phone'
+    ],
+    (error, values) => {
       if (!error) {
         const prjs = []
         // eslint-disable-next-line
@@ -179,7 +210,50 @@ class AdvancedForm extends Component {
     });
   };
 
- 
+  subInfo =() => {
+    const { form: { validateFields, resetFields}, dispatch,} = this.props;
+    resetFields([
+      'account_name', 
+      'account_pwd',
+      'child_name', 
+      'region_id', 
+      'game_role_name', 
+      'organization',
+      'level',
+      'profession_id', 
+      'talent_id',
+      'need_talent_id',
+      'equip_level',
+      'taobaoid',
+      'remark',
+      'phone'
+    ]);
+    validateFields(['info'], (err, value) => {
+      if(!err) {
+        dispatch({
+          type: 'order/ident',
+          payload: {content: value.info}
+        }).then(
+          () => {
+            const {order: {form}} =this.props;
+            if(form && form.ret ===0 ) {
+              if(form.data.profession_id) {
+                dispatch({
+                  type: 'talent/fetch',
+                  payload: { profession_id: form.data.profession_id,pageSize: 10000}
+                });
+              }
+              this.setState({
+                form: form.data
+              })
+              
+            }
+          } 
+         
+        )
+      }
+    })
+  }
 
   onRef = (ref) => {
     itemsMap.push(ref)
@@ -214,7 +288,7 @@ class AdvancedForm extends Component {
       form: { getFieldDecorator },
       submitting,
     } = this.props;
-    const { width, items } = this.state;
+    const { width, items, form } = this.state;
     const parentMethods = {
       onDel: this.deleItem,
       onChange: this.onItemChange
@@ -225,12 +299,32 @@ class AdvancedForm extends Component {
       <PageHeaderWrapper
         wrapperClassName={styles.advancedForm}
       > 
+        <Card title="自动识别" className={styles.card} bordered={false}>
+          <Form>
+            <Form.Item>
+              {getFieldDecorator('info', {
+                  rules: [{ required: true, message: '请输入文字信息' }],
+                  validateTrigger: 'onSubmit'
+                })(
+                  <TextArea
+                    style={{ minHeight: 32 }}
+                    placeholder='请输入文字信息'
+                    rows={3}
+                  />
+                )}
+            </Form.Item>
+           
+            <Button type="primary" onClick={this.subInfo}>识别</Button>
+           
+          </Form>
+        </Card>
         <Card title="账号信息" className={styles.card} bordered={false}>
           <Form layout="vertical">
             <Row gutter={16}>
               <Col lg={6} md={12} sm={24}>
                 <Form.Item label={fieldLabels.account_name}>
                   {getFieldDecorator('account_name', { 
+                    initialValue: form ? form.account_name : null,
                     rules: [{ required: true, message: `请选择${fieldLabels.account_name}` }],
                   })(
                     <Input
@@ -243,6 +337,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.account_pwd}>
                   {getFieldDecorator('account_pwd', {
+                    initialValue: form ? form.account_pwd : null,
                     rules: [{ required: true, message: `请选择${fieldLabels.account_pwd}`  }],
                   })(
                     <Input
@@ -254,6 +349,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.child_name}>
                   {getFieldDecorator('child_name', {
+                    initialValue: form ? form.child_name : null,
                     rules: [{ required: true, message: `请选择${fieldLabels.child_name}`  }],
                   })(
                     <Input
@@ -267,6 +363,7 @@ class AdvancedForm extends Component {
               <Col lg={6} md={12} sm={24}>
                 <Form.Item label={fieldLabels.region_id}>
                   {getFieldDecorator('region_id', {
+                    initialValue: form ? form.region_id : null,
                     rules: [{ required: true, message: `请选择${fieldLabels.region_id}`  }],
                   })(
                     <Input
@@ -278,6 +375,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.game_role_name}>
                   {getFieldDecorator('game_role_name', {
+                    initialValue: form ? form.game_role_name : null,
                     rules: [{ required: true, message: `请选择${fieldLabels.game_role_name}`  }],
                   })(
                     <Input
@@ -289,6 +387,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.organization}>
                   {getFieldDecorator('organization', {
+                    initialValue: form ? form.organization : null,
                     rules: [{ required: true, message: '请选择阵营' }],
                   })(
                     <Select placeholder="请选择阵营">
@@ -303,6 +402,7 @@ class AdvancedForm extends Component {
               <Col lg={6} md={12} sm={24}>
                 <Form.Item label={fieldLabels.level}>
                   {getFieldDecorator('level', {
+                    initialValue: form ? form.level : null,
                     rules: [{ required: true, message: `请选择${fieldLabels.level}`  }],
                   })(
                     <Input
@@ -315,6 +415,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.profession_id}>
                   {getFieldDecorator('profession_id', {
+                    initialValue: form ? form.profession_id : null,
                     rules: [{ required: true, message: `请选择${fieldLabels.profession_id}` }],
                   })(
                     <Select placeholder={`请选择${fieldLabels.profession_id}`} style={{ width: '100%' }} onSelect={(value) => {this.selectHandel(value)}}>
@@ -326,6 +427,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.talent_id}>
                   {getFieldDecorator('talent_id', {
+                    initialValue: form ? form.talent_id : null,
                     rules: [{ required: true, message: `请选择${fieldLabels.talent_id}` }],
                   })(
                     <Select mode="multiple" placeholder={`请选择${fieldLabels.talent_id}`}>
@@ -339,6 +441,7 @@ class AdvancedForm extends Component {
               <Col lg={6} md={12} sm={24}>
                 <Form.Item label={fieldLabels.need_talent_id}>
                   {getFieldDecorator('need_talent_id', {
+                    initialValue: form ? form.need_talent_id : null,
                     rules: [{ required: true, message: `请选择${fieldLabels.need_talent_id}` }],
                   })(
                     <Select placeholder={`请选择${fieldLabels.need_talent_id}`} style={{ width: '100%' }}>
@@ -350,6 +453,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.equip_level}>
                   {getFieldDecorator('equip_level', {
+                    initialValue: form ? form.equip_level : null,
                     rules: [{ required: true, message: `请输入${fieldLabels.equip_level}` }],
                   })(
                     <Input
@@ -362,7 +466,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.phone}>
                   {getFieldDecorator('phone', {
-                    
+                    initialValue: form ? form.phone : null,
                   })(
                     <Input
                       placeholder="请输入"
@@ -376,7 +480,7 @@ class AdvancedForm extends Component {
               <Col sm={{span: 6}}>
                 <Form.Item label={fieldLabels.taobaoid}>
                   {getFieldDecorator('taobaoid', {
-                    
+                    initialValue: form ?form.taobaoid : null,
                   })(
                     <Input
                       placeholder="请输入"
@@ -388,12 +492,13 @@ class AdvancedForm extends Component {
               <Col sm={{span: 14, offset: 2}}>
                 <Form.Item label={fieldLabels.remark}>
                   {getFieldDecorator('remark', {
+                      initialValue: form ? form.remark: null,
                       rules: [{ required: false, message: `请输入${fieldLabels.remark}` }],
                     })(
                       <TextArea
                         style={{ minHeight: 32 }}
                         placeholder={`请输入${fieldLabels.remark}`}
-                        rows={4}
+                        rows={2}
                       />
                     )}
                 </Form.Item>

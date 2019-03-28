@@ -1,4 +1,4 @@
-import { queryOrder, addOrder, queryOrderInfo, removeOrder,updateOrder,changeOrder } from '@/services/order';
+import { queryOrder, addOrder, queryOrderInfo, removeOrder,updateOrder,changeOrder, identForm } from '@/services/order';
 
 export default {
   namespace: 'order',
@@ -60,6 +60,14 @@ export default {
       });
       if (callback) callback();
     },
+    *ident({ payload, callback }, { call, put }) {
+      const response = yield call(identForm, payload);
+      yield put({
+        type: 'saveForm',
+        payload: response,
+      });
+      if (callback) callback();
+    },
   },
 
   
@@ -82,6 +90,12 @@ export default {
         ...state,
             info: action.payload
         }
-    }
+    },
+    saveForm(state, action) {
+      return {
+      ...state,
+          form: action.payload
+      }
+  },
   },
 };

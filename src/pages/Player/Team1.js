@@ -11,7 +11,7 @@ import {
   Modal,
   Popconfirm,
   Empty,
-  Alert
+  Alert,
 } from 'antd';
 
 import DescriptionList from '@/components/DescriptionList';
@@ -21,7 +21,6 @@ import saltMD5 from '@/utils/saltMD5'
 import styles from '../Team/AdvancedProfile.less';
 
 const { Description } = DescriptionList;
-
 const createSign = (obj) => {
   let str = ''
   const sortedKeys = Object.keys(obj).sort()
@@ -45,7 +44,8 @@ const createSign = (obj) => {
 const typeMap = {"0":'工作室账号',"1":"客户账号", "2": "借用账号"}
 @connect(({ player, loading }) => ({
     player,
-    loading: loading.effects['player/team'],
+   
+    loading: loading.effects['player/loginhtm'],
     submitting: loading.effects['player/screenadd'],
     finishLoading: loading.effects['player/finish']
 }))
@@ -59,22 +59,21 @@ class TeamDetailPage extends Component {
   };
 
   componentWillMount() {
-    const { dispatch, location: {query: {id}} } = this.props
+    const { dispatch } = this.props
     dispatch({
-      type: 'player/team',
-      payload: {id}
+      type: 'player/loginhtm',
+      payload: {}
     }).then(() => {
       const { player:{team} } =this.props
       const screenshots = team.account_list.screenshots_arr
+      const tid = team.team_info.id
       this.setState({
+        tid,
+        urlList: [],
         screenList: screenshots,
         loaded: true
       })
     });
-    this.setState({
-      tid: id,
-      urlList: []
-    })
   
     window.addEventListener('resize', this.setStepDirection, { passive: true });
    
@@ -112,7 +111,7 @@ class TeamDetailPage extends Component {
           this.setState({ fileList: [], urlList: [] },() => {
             message.success("提交成功！");
             dispatch({
-              type: 'player/team',
+              type: 'player/loginhtm',
               payload: {id: tid}
             }).then(() => {
               // eslint-disable-next-line
@@ -144,7 +143,7 @@ class TeamDetailPage extends Component {
         if(res && res.ret === 0) { 
           message.success('已删除！')
           dispatch({
-            type: 'player/team',
+            type: 'player/loginhtm',
             payload: {id: tid}
           }).then(() => {
             // eslint-disable-next-line
@@ -174,7 +173,7 @@ class TeamDetailPage extends Component {
         if(res && res.ret === 0) { 
           message.success('已提交！')
           dispatch({
-            type: 'player/team',
+            type: 'player/loginhtm',
             payload: {id: tid}
           })
         }
@@ -248,6 +247,7 @@ class TeamDetailPage extends Component {
 
     return (loaded? 
       <PageHeaderWrapper
+        hiddenBreadcrumb
         title={`团号：${teamInfo.id}`}
         content={
           <DescriptionList className={styles.headerList} size="small" col="2">
@@ -268,7 +268,7 @@ class TeamDetailPage extends Component {
           <div>
             
             {/* <Row>
-               <Col xs={24} sm={12}>
+              <Col xs={24} sm={12}>
                 <div className={styles.textSecondary}>订单状态：{teamInfo.status==="2"?statusMap[teamInfo.status]: ''}</div>
                 <div className={styles.heading}>
                   {
@@ -339,7 +339,7 @@ class TeamDetailPage extends Component {
 
               
               <Divider orientation="left" dashed style={{paddingTop:"20px"}}>上传截图</Divider>
-             
+            
               <Upload fileList={fileList} {...uploadProps}>
                 <Button type="primary">
                   <Icon type="upload" />选择文件
@@ -360,11 +360,15 @@ class TeamDetailPage extends Component {
             
           </div>
         </Card>
-       
+      
         <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
           <img alt="example" style={{ width: '100%' }} src={previewImage} />
         </Modal>
-      </PageHeaderWrapper>: <Spin size="large" />
+      </PageHeaderWrapper> : <Spin size="large" />
+
+    
+  
+      
     );
   }
 }
