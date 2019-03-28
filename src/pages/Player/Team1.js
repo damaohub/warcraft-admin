@@ -14,6 +14,7 @@ import {
   Alert,
 } from 'antd';
 
+import router from 'umi/router';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import saltMD5 from '@/utils/saltMD5'
@@ -59,7 +60,7 @@ class TeamDetailPage extends Component {
   };
 
   componentWillMount() {
-    const { dispatch } = this.props
+    const { dispatch, location: {query: {code}} } = this.props
     dispatch({
       type: 'player/loginhtm',
       payload: {}
@@ -68,6 +69,7 @@ class TeamDetailPage extends Component {
       const screenshots = team.account_list.screenshots_arr
       const tid = team.team_info.id
       this.setState({
+        code,
         tid,
         urlList: [],
         screenList: screenshots,
@@ -162,7 +164,7 @@ class TeamDetailPage extends Component {
   subFinish = (e) => {
     e.preventDefault();
     const {dispatch, player:{team}} = this.props
-    const {tid} = this.state
+    const {tid, code} = this.state
     const {aid, uid} = team.account_list
     dispatch({
       type: 'player/finish',
@@ -172,10 +174,12 @@ class TeamDetailPage extends Component {
         const { player: {res} } = this.props;
         if(res && res.ret === 0) { 
           message.success('已提交！')
-          dispatch({
-            type: 'player/loginhtm',
-            payload: {id: tid}
-          })
+          // dispatch({
+          //   type: 'player/loginhtm',
+          //   payload: {id: tid}
+          // })
+          localStorage.clear();
+          router.push(`/login1/?code=${code}`);
         }
        
       }

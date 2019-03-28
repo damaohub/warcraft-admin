@@ -46,6 +46,7 @@ export default {
     },
 
     *login1({ payload }, { call, put }) {
+      const code = payload.linkcode
       const response = yield call(majiaLogin, payload);
       if (response.ret === 0) {
         yield put({
@@ -53,7 +54,7 @@ export default {
           payload: response,
         });
         reloadAuthorized();
-        yield put(routerRedux.replace('/player-team'));
+        yield put(routerRedux.replace(`/player-team?code=${code}`));
       }
     },
 

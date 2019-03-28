@@ -168,7 +168,7 @@ class TeamDetailPage extends Component {
               <Popover 
                 title={this.state.linkCode? 
                   <div> 
-                    <span style={{marginRight: '5px'}}>
+                    <span style={{marginRight: '5px', textDecoration: record.status!=="0"? 'line-through': ''}}>
                       {`http://${ window.location.host}/#/login1?code=${this.state.linkCode}`}
                     </span>
                     <CopyToClipboard
@@ -184,7 +184,7 @@ class TeamDetailPage extends Component {
                 content={this.state.password? `密码: ${this.state.password}`: <Spin size="small" />}
                 trigger="click"
               >
-                <Button type="primary" size="small" ghost onClick={e => {this.seeMjLink(e, record)}}>链接</Button>
+                <Button type={record.status!=="0"? 'danger' :"primary"} size="small" ghost onClick={e => {this.seeMjLink(e, record)}}>链接</Button>
               </Popover>
               
             </Fragment>
