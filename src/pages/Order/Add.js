@@ -387,7 +387,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.organization}>
                   {getFieldDecorator('organization', {
-                    initialValue: form ? form.organization : null,
+                    initialValue: form ? form.organization : undefined,
                     rules: [{ required: true, message: '请选择阵营' }],
                   })(
                     <Select placeholder="请选择阵营">
@@ -415,7 +415,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.profession_id}>
                   {getFieldDecorator('profession_id', {
-                    initialValue: form ? form.profession_id : null,
+                    initialValue: form ? form.profession_id : undefined,
                     rules: [{ required: true, message: `请选择${fieldLabels.profession_id}` }],
                   })(
                     <Select placeholder={`请选择${fieldLabels.profession_id}`} style={{ width: '100%' }} onSelect={(value) => {this.selectHandel(value)}}>
@@ -427,7 +427,7 @@ class AdvancedForm extends Component {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label={fieldLabels.talent_id}>
                   {getFieldDecorator('talent_id', {
-                    initialValue: form ? form.talent_id : null,
+                    initialValue: form ? form.talent_id : undefined,
                     rules: [{ required: true, message: `请选择${fieldLabels.talent_id}` }],
                   })(
                     <Select mode="multiple" placeholder={`请选择${fieldLabels.talent_id}`}>
@@ -441,7 +441,7 @@ class AdvancedForm extends Component {
               <Col lg={6} md={12} sm={24}>
                 <Form.Item label={fieldLabels.need_talent_id}>
                   {getFieldDecorator('need_talent_id', {
-                    initialValue: form ? form.need_talent_id : null,
+                    initialValue: form ? form.need_talent_id : undefined,
                     rules: [{ required: true, message: `请选择${fieldLabels.need_talent_id}` }],
                   })(
                     <Select placeholder={`请选择${fieldLabels.need_talent_id}`} style={{ width: '100%' }}>
