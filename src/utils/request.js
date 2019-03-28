@@ -64,6 +64,8 @@ service.interceptors.request.use(
     config.data = data;
      // eslint-disable-next-line
     config.headers = { ...config.headers, ...{'Authorization':  `Bearer ${JSON.parse(localStorage.getItem('token'))}`}}
+    // eslint-disable-next-line no-param-reassign
+    config.timeout = 0;
     return config
   },
   error => {
