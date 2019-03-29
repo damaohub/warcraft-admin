@@ -120,12 +120,12 @@ class RulePage extends Component {
         <TreeNode 
           title={
             <span>
-              {item.title} 
+              {item.title || item.rule_name} 
               <Icon title="修改组名" type="edit" style={{color: '#40a9ff', marginLeft: '25px' }} onClick={(e) => {this.showEditModal(e, item)}} />
               <Icon title="增加权限" type="plus" style={{color: '#40a9ff', marginLeft: '25px' }} onClick={(e) => {this.showModal(e, item)}} />
             </span>
           } 
-          key={item.key} 
+          key={item.key || item.id} 
           dataRef={item}
         >
         
@@ -134,12 +134,12 @@ class RulePage extends Component {
               <TreeNode 
                 title={
                   <span>
-                    {child.title}： 
+                    {child.title|| child.rule_name}： 
                     {child.rule_api}
                     <Icon title="修改权限" type="form" style={{color: '#40a9ff', marginLeft: '25px' }} onClick={(e) => {this.showEditModal(e, child)}} />
                   </span>
                 } 
-                key={child.key} 
+                key={child.key || child.id} 
                 dataRef={child} 
               />
             ))

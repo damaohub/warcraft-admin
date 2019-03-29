@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import React, { PureComponent ,Fragment } from 'react';
+import React, { Component ,Fragment } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { connect } from 'dva';
 import { Card, Modal, Form, Input, Button, Divider, Popconfirm, message, Select, Row, Col, Tooltip, Tag } from 'antd';
@@ -30,7 +30,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
     Loading: loading.models.account,
   }))
   @Form.create()
-  class AccountPage extends PureComponent {
+  class AccountPage extends Component {
     state = {
       visible: false,
     };
@@ -649,19 +649,23 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
               />
             </div>
           </Card>
-          <Modal
-            title={`账号${(current && current.id) ? '编辑' : '添加'}`}
-            className={styles.standardListForm}
-            width={640}
-            bodyStyle={{ padding: '28px 0 0' }}
-            destroyOnClose
-            visible={visible}
-            {...modalFooter}
-            maskClosable={false}
-           
-          >
-            {getModalContent()}
-          </Modal>
+          {
+            visible && 
+            <Modal
+              title={`账号${(current && current.id) ? '编辑' : '添加'}`}
+              className={styles.standardListForm}
+              width={640}
+              bodyStyle={{ padding: '28px 0 0' }}
+              destroyOnClose
+              visible={visible}
+              {...modalFooter}
+              maskClosable={false}
+            
+            >
+              {getModalContent()}
+            </Modal>
+          }
+          
         </PageHeaderWrapper>
       );
     }
