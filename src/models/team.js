@@ -20,7 +20,8 @@ import {
   getMjLink,
   seeMjLink,
   removeProblem,
-  changeStatus
+  changeStatus,
+  checkFileadd
 } from '@/services/team';
 
 export default {
@@ -201,6 +202,16 @@ export default {
       // 修改团员提交状态
       *change({ payload, callback }, { call, put }) {
         const response = yield call(changeStatus, payload);
+        yield put({
+          type: 'item',
+          payload: response,
+        });
+        if (callback) callback();
+      },
+      // 安全令文件提交
+      
+      *checkfileadd({ payload, callback }, { call, put }) {
+        const response = yield call(checkFileadd, payload);
         yield put({
           type: 'item',
           payload: response,

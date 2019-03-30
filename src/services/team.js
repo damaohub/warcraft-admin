@@ -157,6 +157,14 @@ export async function changeStatus(params) {
   });
 }
 
+export async function checkFileadd(params) {
+  return request('/api/team/checkfileadd', {
+    method: 'POST',
+    body: params
+  });
+}
+
+
 
 
 

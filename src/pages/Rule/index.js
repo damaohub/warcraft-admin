@@ -36,23 +36,23 @@ class RulePage extends Component {
   }
 
   showModal = (e, item) => {
-    e.preventDefault()
+    e.preventDefault();
     let newCurrent
     let newTypeIndex = 3
     if(item) {
-      newCurrent = {pid: item.key}
+      newCurrent = {pid: item.key || item.pid}
       newTypeIndex = 1
     }
     this.setState({
       typeIndex: newTypeIndex,
       visible: true,
-      current: newCurrent
+      current: {...newCurrent, ...{ isAdd: true }}
     });
   };
 
   showEditModal = (e,item) => {
     e.preventDefault()
-    const newTypeIndex = item.pid === '0' ? 4 : 2
+    const newTypeIndex = parseInt(item.pid, 10) === 0 ? 4 : 2
     this.setState({
       typeIndex: newTypeIndex,
       visible: true,
@@ -182,7 +182,8 @@ class RulePage extends Component {
     const treeData = data.list
 
     const modalFooter = { okText: '保存', onOk: this.handleSubmit, onCancel: this.handleCancel };
-    const labelName = !current.pid || current.pid === "0"? '分组名称' : '接口名称'
+    // eslint-disable-next-line no-prototype-builtins
+    const labelName = current.hasOwnProperty('pid') ? '接口名称' : '分组名称'
 
     const getModalContent = () => 
       (
@@ -190,10 +191,11 @@ class RulePage extends Component {
           <FormItem label={labelName} {...this.formLayout}>
             {getFieldDecorator('rule_name', {
               rules: [{ required: true, message: `请输入${labelName}` }],
-              initialValue: current.title,
+              initialValue: current.title || current.rule_name,
             })(<Input placeholder="请输入" />)}
           </FormItem>
-          {current.pid && current.rule_api !== '0' && 
+          {/* eslint-disable-next-line no-prototype-builtins */}
+          {current.hasOwnProperty('pid') && 
           <FormItem label="接口URL" {...this.formLayout}>
             {getFieldDecorator('rule_api', {
               rules: [{ required: true, message: '请输入接口URL' }],
@@ -243,7 +245,7 @@ class RulePage extends Component {
         </Card>
        
         <Modal
-          title={`权限${current.key && current.key !== '0' ? '编辑' : '添加'}`}
+          title={`权限${current.isAdd ? '添加' : '编辑'}`}
           className={styles.standardListForm}
           width={640}
           bodyStyle={{ padding: '28px 0 0' }}

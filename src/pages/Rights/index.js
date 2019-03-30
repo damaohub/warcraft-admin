@@ -46,22 +46,20 @@ class RightsPage extends Component {
 
   init = (roleId) => {
     const {role: {data:{list}}} = this.props
-  
     const defaultId = roleId || '2'
-
-      const selectedMap = {}
-      // eslint-disable-next-line
-      list.map(item => {
-        const key = item.id
-        const value= item.role_rule.split(',')
-        selectedMap[key] = value
-      })
-     const checked = selectedMap[defaultId]
-      this.setState({
-        checkedMap: selectedMap,
-        roleId: defaultId,
-        checkedKeys: checked
-      })
+    const selectedMap = {}
+    // eslint-disable-next-line
+    list.map(item => {
+      const key = item.id
+      const value= item.role_rule.split(',')
+      selectedMap[key] = value
+    })
+    const checked = selectedMap[defaultId]
+    this.setState({
+      checkedMap: selectedMap,
+      roleId: defaultId,
+      checkedKeys: checked
+    })
   }
 
   renderTreeNodes = data => data.map((item) => {
@@ -70,10 +68,10 @@ class RightsPage extends Component {
         <TreeNode 
           title={
             <span>
-              {item.title} 
+              {item.title || item.rule_name} 
             </span>
           } 
-          key={item.key} 
+          key={item.key || item.id} 
           dataRef={item}
         >
         
@@ -82,11 +80,11 @@ class RightsPage extends Component {
               <TreeNode 
                 title={
                   <span>
-                    {child.title}： 
+                    {child.title || child.rule_name}： 
                     {child.rule_api}
                   </span>
                 } 
-                key={child.key} 
+                key={child.key || child.id} 
                 dataRef={child} 
               />
             ))
@@ -97,12 +95,12 @@ class RightsPage extends Component {
       );
     }
     return <TreeNode 
-      title={ 
+      title={
         <span>
-          {item.title}
+          {item.title || item.rule_name}
         </span>
       } 
-      key={item.key} 
+      key={item.key || item.id} 
       dataRef={item} 
     />;
   })
@@ -129,7 +127,6 @@ class RightsPage extends Component {
   }
  
   handleSubmit = e => {
-    console.log("sub")
     e.preventDefault();
     const { dispatch } = this.props;
     const { checkedKeys, roleId } = this.state;
@@ -177,10 +174,10 @@ class RightsPage extends Component {
         <div className={styles.cardList}>
           <Card bordered={false}>
             <Divider dashed orientation="left" style={{marginTop:'0'}}>选择角色↓</Divider>
-            <RadioGroup name="radiogroup" onChange={this.onRoleChange} defaultValue={roleId}>
+            <RadioGroup name="radiogroup" onChange={this.onRoleChange} value={`${roleId}`}>
               {
                 roleList.map( item => (
-                  <Radio key={item.id} value={item.id}>{item.role_name}</Radio>
+                  <Radio key={`${item.id}`} value={`${item.id}`}>{item.role_name}</Radio>
                 ))
               }
             </RadioGroup>

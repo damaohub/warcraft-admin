@@ -23,9 +23,11 @@ import {
   Form,
   Icon,
   Tag,
-  Popover
+  Popover,
+  Upload
 } from 'antd';
 
+import saltMD5 from '@/utils/saltMD5'
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import AddModal from './Add/Addmodal';
@@ -51,6 +53,26 @@ const getImageSet = (arr) => {
     return v
   })
   return tmpArr
+}
+
+const createSign = (obj) => {
+  let str = ''
+  const sortedKeys = Object.keys(obj).sort()
+  let tmp
+  // eslint-disable-next-line
+  for (let elem of sortedKeys.values()) {
+    tmp = obj[elem]
+   if(typeof  obj[elem] !== "string") {
+      // eslint-disable-next-line
+     tmp =JSON.stringify(obj[elem])
+   }
+
+  if(obj[elem]) {
+    str += (elem.toString() + tmp)
+   }
+  }
+
+  return saltMD5.md5(str)
 }
 
 
@@ -144,6 +166,13 @@ class TeamDetailPage extends Component {
         </Fragment>
       )
       
+    },
+    {
+      title: '安全令',
+      key: 'checkfile',
+      dataIndex: 'checkfile',
+      align: 'center',
+      render: (item, record) => (<Fragment>{item===null?<span>未上传</span>:<span style={{color:"#4cd964"}}>已上传</span>}<Icon onClick={e => {this.showCheckModal(e, record)}} type="upload" style={{color: '#1890FF', fontSize: '20px'}} title='上传安全令' /></Fragment>)
     },
     {
       title: '操号团员',
@@ -809,10 +838,66 @@ class TeamDetailPage extends Component {
     )
   }
 
+  showCheckModal = (e, record) => {
+    e.preventDefault();
+    this.setState({
+      checkVisible: true,
+      curCheck: record
+    })
+  }
+
+  handleCheckCancel = () => {
+    this.setState({
+      checkVisible: false
+    })
+  }
+
+  normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.file;
+  }
+
+  subCheckFile =(record) => {
+    const { dispatch, form } = this.props
+    const { tid } =this.state;
+    form.validateFields(['file'], (err, values) => {
+      
+      if(!err) {
+        dispatch({
+          type: 'team/checkfileadd',
+          payload: {checkfile: values.file.response.data, aid: record.aid}
+        }).then(
+          () => {
+            const {team: {res}} = this.props;
+            if(res.ret ===0 ) {
+              dispatch({
+                type: 'team/info',
+                payload: {id: tid}
+              }).then(
+                () => {
+                  const { team: {info}} = this.props
+                  this.setState({
+                    accountList:info.account_list,
+                  })
+                }
+              )
+              message.success("已上传！");
+            }
+            this.handleCheckCancel()
+          }
+        )
+      }
+    })
+  }
+
   render() {
     const {team: {info}, loading, team:{staff}, downLoadPathLoading } = this.props;
-    const {loaded, statusMap, visible, accountList, accountAddList, delList, modalVisible, delModal, delCurrent, noDownLoad, mjVisible, curMj } =this.state
+    const {loaded, statusMap, visible, accountList, accountAddList, delList, modalVisible, delModal, delCurrent, noDownLoad, mjVisible, curMj, checkVisible, curCheck={} } =this.state
     const teamInfo= info.team_info
+    const time = Date.parse(new Date()) / 1000;
+    const token = localStorage.getItem('token')? JSON.parse(localStorage.getItem('token')) : null;
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
@@ -955,6 +1040,34 @@ class TeamDetailPage extends Component {
                 rules: [{ required: true, message: '输入删除的原因' }],
               })(
                 <Input placeholder="输入原因" /> 
+              )}
+              
+            </Form.Item>
+          </Form> 
+        </Modal>
+        <Modal
+          title="上传安全令"
+          visible={checkVisible}
+          onOk={() => this.subCheckFile(curCheck)}
+          destroyOnClose
+          onCancel={this.handleCheckCancel}
+        >
+          <Form>
+            <Form.Item>
+              {this.props.form.getFieldDecorator('file', {
+                  valuePropName: 'file',
+                  getValueFromEvent: this.normFile,
+                  rules: [{ required: true, message: '未上传文件' }],
+                })(
+                  <Upload 
+                    action={`http://${window.location.host}/api/team/updatecheckfile`} 
+                    data={{time, token, sign: createSign({time, token, aid: curCheck.aid || null}), aid: curCheck.aid || null }}
+                    listType="picture"
+                  >
+                    <Button>
+                      <Icon type="upload" />点击上传
+                    </Button>
+                  </Upload>
               )}
               
             </Form.Item>
