@@ -19,7 +19,8 @@ import {
   downLoadItem,
   getMjLink,
   seeMjLink,
-  removeProblem
+  removeProblem,
+  changeStatus
 } from '@/services/team';
 
 export default {
@@ -188,6 +189,7 @@ export default {
           payload: response,
         });
       },
+      // 移除问题单
       *removeproblem({ payload, callback }, { call, put }) {
         const response = yield call(removeProblem, payload);
         yield put({
@@ -196,7 +198,15 @@ export default {
         });
         if (callback) callback();
       },
-      
+      // 修改团员提交状态
+      *change({ payload, callback }, { call, put }) {
+        const response = yield call(changeStatus, payload);
+        yield put({
+          type: 'item',
+          payload: response,
+        });
+        if (callback) callback();
+      },
    
   },
 

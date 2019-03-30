@@ -150,5 +150,13 @@ export async function removeProblem(params) {
   });
 }
 
+export async function changeStatus(params) {
+  return request('/api/team/change', {
+    method: 'POST',
+    body: params
+  });
+}
+
+
 
 

@@ -38,6 +38,8 @@ const typeMap = {"0":'工作室账号',"1":"客户账号", "3": "借用账号"}
 const positionMap = {"d":'输出',"t":"坦克", "n": "治疗"}
 const typeTag = {"0":'工',"1":"客", "2": "借"}
 const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
+const subStatusMap= {'0': '未提交', '1': '已提交'}
+const subStatusColors ={'0': '#ff9500', '1': '#4cd964'}
 
 const getImageSet = (arr) => {
   const tmpArr = []
@@ -155,7 +157,20 @@ class TeamDetailPage extends Component {
       dataIndex: 'status',
       key: 'status',
       align: 'center',
-      render: item => (item==="0"?<span style={{color: "orange"}}>未提交</span>:<span style={{color: "green"}}>已提交</span>)
+      // render: item => (item==="0"?<span style={{color: "orange"}}>未提交</span>:<span style={{color: "green"}}>已提交</span>)
+      render: (item, record) => (
+        <Fragment>
+          {<span style={{color: subStatusColors[item]}}>{subStatusMap[item]}</span>}
+          <Popconfirm 
+            title={<span><span>确定要更改状态为:</span>{item === '0'? <span style={{color:'#ff4d4f'}}>提交</span>: <span style={{color:'#ff4d4f'}}>未提交</span>}</span>}
+            okText="确定"
+            cancelText="取消"
+            onConfirm={e => {this.changeSubStatus(e,record)}}
+          >
+            <Icon type="edit" title="修改状态" />
+          </Popconfirm>
+        </Fragment>
+      )
     },
     {
       title: '操作',
@@ -296,6 +311,7 @@ class TeamDetailPage extends Component {
       key: 'status',
       align: 'center',
       render: item => (item==="0"?<span style={{color: "orange"}}>未提交</span>:<span style={{color: "green"}}>已提交</span>)
+      
     },
     {
       title: '删除原因',
@@ -763,6 +779,35 @@ class TeamDetailPage extends Component {
     }
   
   };
+
+  changeSubStatus = (e, record) => {
+    e.preventDefault()
+    const { dispatch }=this.props;
+    const { tid } = this.state;
+    dispatch({
+      type: 'team/change',
+      payload: {tid, aid: record.aid}
+    }).then(
+      () => {
+        const {team: {res}} =this.props;
+        if(res.ret === 0) {
+          dispatch({
+            type: 'team/info',
+            payload: {id: tid}
+          }).then(
+            () => {
+              const { team: {info}} = this.props
+              this.setState({
+                accountList:info.account_list,
+              })
+            }
+          )
+          message.success('状态已修改！')
+        }
+        
+      }
+    )
+  }
 
   render() {
     const {team: {info}, loading, team:{staff}, downLoadPathLoading } = this.props;
