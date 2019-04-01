@@ -5,7 +5,7 @@ import { Card, Button, Form, message, Divider, Modal, Input, Select, Popconfirm,
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import saltMD5 from '@/utils/saltMD5';
-
+import { getCurrentPage } from '@/utils/utils';
 import styles from '../GameRole/game.less';
 
 const FormItem = Form.Item;
@@ -68,11 +68,11 @@ class StaffPage extends Component {
       render: (text,record) => (
         <Fragment>
           {
-            text ==="在职" ?
+            (text ==="在职" || text === 1) ?
               <Popconfirm title="确定该员工离职？" onConfirm={(e) => this.getWay(e, record)}>
-                <Tag color="#108ee9">{text}</Tag>
+                <Tag color="#108ee9">{typeof text === 'string'? <span>{text}</span> : <span>{text===1? '在职': '离职'}</span> }</Tag>
               </Popconfirm> : 
-              <Tag>{text}</Tag>
+              <Tag>{typeof text === 'string'? <span>{text}</span> : <span>{text===1? '在职': '离职'}</span> }</Tag>
           }
         </Fragment>
       ),
@@ -126,23 +126,50 @@ class StaffPage extends Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'staff/fetch',
-    });
+    }).then(
+      () => {
+        const {staff: { data }} = this.props
+        this.setState({
+          pagination: data.pagination
+        })
+      }
+      
+    );
     dispatch({
       type: 'role/fetch',
     });
    
   }
 
- 
-  handleCall = (okText) => {
-    const {dispatch, staff: {res} } = this.props;
+
+
+      /**
+   * @param okText str 请求成功后提示信息，如果是默认undifined, 会提示接口返回信息
+   * @param type 操作类型, 1:增加，-1:删除，0：修改(默认)
+   */
+  handleCall = (okText = undefined, type ) => {
+    const { dispatch, staff: {res} } = this.props;
+    const { pagination } = this.state;
+    const currentPage = getCurrentPage(pagination, type);
     if(res && res.ret === 0) {
       message.success(okText || res.msg);
+      
       dispatch({
         type: 'staff/fetch',
-      });
-    } 
-    
+        payload: { currentPage, pageSize: pagination.pageSize},
+      }).then(
+        ()=> {
+          const {staff: { data }} = this.props;
+          const paginationProps = data.pagination
+          pagination.pageSize = paginationProps.pageSize;
+          pagination.total = paginationProps.total
+          pagination.current = currentPage
+          this.setState({
+            pagination
+          })
+        }
+      )
+    }
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -167,6 +194,9 @@ class StaffPage extends Component {
     dispatch({
       type: 'staff/fetch',
       payload: params,
+    });
+    this.setState({
+      pagination
     });
   };
 
@@ -203,7 +233,7 @@ class StaffPage extends Component {
       }).then(
         () => {
           this.handleCancel()
-          this.handleCall('操作成功!');
+          this.handleCall('操作成功!', 1);
         }
       );
     });

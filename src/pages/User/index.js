@@ -30,10 +30,12 @@ const customPanelStyle = {
       const { dispatch } = this.props;
       dispatch({
         type: 'user/fetchCurrent',
-      });
+      })
      
     }
   
+
+
     handleSubmit = (e) => {
       e.preventDefault();
       const {dispatch ,form} = this.props;
@@ -168,7 +170,14 @@ const customPanelStyle = {
                      
                       <Row type="flex" justify="space-between" align="middle">
                         <Col>在职状态：</Col>
-                        <Col>{currentUser.status}</Col>
+                        <Col>
+                          {
+                            <span>
+                              <span>{typeof (currentUser.status) === 'string' && currentUser.status}</span>
+                              <span>{typeof (currentUser.status) === 'number' && currentUser.status === 1 ? '在职' : '离职'}</span>
+                            </span>
+                          }
+                        </Col>
                       </Row>
                       <Row type="flex" justify="space-between" align="middle">
                         <Col style={{textAlign:'left'}}>基本工资：</Col>

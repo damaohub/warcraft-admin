@@ -130,6 +130,7 @@ class RightsPage extends Component {
     e.preventDefault();
     const { dispatch } = this.props;
     const { checkedKeys, roleId } = this.state;
+    console.log(checkedKeys)
     if(checkedKeys.length === 0 || !roleId) {
       message.error("请选择角色或权限！");
       return

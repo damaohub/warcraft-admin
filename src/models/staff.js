@@ -63,7 +63,7 @@ export default {
       const response = yield call(getwayStaff, payload);
       yield put({
         type: 'item',
-        payload: response.data,
+        payload: response,
       });
     }
   },

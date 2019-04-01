@@ -230,7 +230,6 @@ class UpdateForm extends Component {
 
   renderContent = () => {
     const { form, parentData, values} = this.props;
-    console.log(values)
     return [
       <FormItem key="equip_name" {...this.formLayout} label="装备名称">
         {form.getFieldDecorator('equip_name', {
