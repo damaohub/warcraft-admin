@@ -35,6 +35,13 @@ const createSign = (obj) => {
   return saltMD5.md5(str)
 }
 
+const getStatus = (status) => {
+  if(typeof status === 'number') {
+    return status === 1 ? '在职' : '离职';
+  }
+  return status;
+}
+
 @Form.create()
 @connect(({ staff, loading }) => ({
   staff,
@@ -210,7 +217,7 @@ class SettingPage extends Component {
                       message: '请输入',
                     },
                   ],
-                  initialValue: current.status
+                  initialValue: getStatus(current.status) 
                 })(<Input placeholder="" disabled />)}
                 </FormItem>
                 <FormItem {...formItemLayout} label="角色">
