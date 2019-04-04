@@ -42,7 +42,7 @@ class StaffPage extends Component {
       dataIndex: 'real_name',
       key: 'real_name',
       align: 'center',
-      width: 80,
+      width: 120,
     },
     {
       title: '手机号',

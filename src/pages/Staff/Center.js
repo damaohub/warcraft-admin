@@ -43,7 +43,7 @@ class CenterPage extends Component {
       key: 'money',
       align: 'center',
       render: (item, row) => {
-        if(row.type === "1" || row.type === "3") {
+        if(parseInt(row.type, 10) === 1 || parseInt(row.type, 10) === 3) {
           return (<span style={{color: 'green'}}>{`+${item}`}</span>)
         }
         return (<span style={{color: 'red'}}>{`-${item}`}</span>)

@@ -280,7 +280,7 @@ export default [
           path: '/dashboard/player-team',
           icon: 'table',
           name: 'player-team',
-          authority: ['1','2','3'],
+          authority: ['1','2','3', '4'],
           hideInMenu: true,
           component: "./Player/Team"
         },

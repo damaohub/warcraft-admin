@@ -136,8 +136,6 @@ class SettingPage extends Component {
             if(res && res.ret === 0) {
               message.success("提交成功！");
               router.push(`/staff`);
-            } else {
-              message.error(res.msg);
             }
           }
         );
@@ -155,7 +153,8 @@ class SettingPage extends Component {
     const time = Date.parse(new Date()) / 1000;
     const token = localStorage.getItem('token')? JSON.parse(localStorage.getItem('token')) : null;
     const uploadProps = {
-      action: `http://localhost:7001/user/upload-cardimg`,
+      action: `http://${window.location.host}/api/user/upload-cardimg`,
+      // action: `http://${window.location.host}/user/upload-cardimg`,
       showUploadList: false,
       onChange: this.handleChange,
       data: {
@@ -163,6 +162,7 @@ class SettingPage extends Component {
         token,
         sign: createSign({token, time})
       },
+      headers: {'Authorization':  `Bearer ${token}`}
     }
 
     const uploadHolder = (state) => {
