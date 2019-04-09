@@ -223,7 +223,7 @@ class CenterPage extends Component {
           <Card bordered={false}>
             <Row>
               <Col sm={12} xs={24}>
-                <Info title="基本工资" value={salary.basic_money?salary.basic_money: '0'} bordered />
+                <Info title="基本工资" value={salary.basic_money?salary.basic_money: current.basic_salary} bordered />
               </Col>
               <Col sm={12} xs={24}>
                 <Info title="最终工资" value={salary.current_month_money?salary.current_month_money: '0'} />
