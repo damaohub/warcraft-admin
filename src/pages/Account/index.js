@@ -98,7 +98,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
         align: 'center',
         width: 100,
         render: (item) => (
-          item ==='0'? '联盟': '部落'
+          parseInt(item, 10) ===0? '联盟': '部落'
         )
       },
       {
@@ -510,7 +510,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           <FormItem label="账号类型" {...this.formLayout}>
             {getFieldDecorator('type', {
               rules: [{ required: true, message: `请选择账号类型` }],
-              initialValue: current.type,
+              initialValue: current.type ? `${current.type}` : undefined,
             })(
               <Select placeholder="请选择账号类型" style={{ width: '100%' }}>
                 <Option key='0'>工作室账号</Option>
@@ -559,7 +559,7 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           <FormItem label="所属阵营" {...this.formLayout}>
             {getFieldDecorator('organization', {
               rules: [{ required: true, message: '请选择阵营' }],
-              initialValue: current.organization,
+              initialValue: current.organization ?`${current.organization}` : undefined,
             })(
               <Select placeholder="请选择阵营" style={{ width: '100%' }}>
                 <Option key='0'>联盟</Option>
@@ -576,11 +576,11 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           <FormItem label="角色职业" {...this.formLayout}>
             {getFieldDecorator('profession_id', {
               rules: [{ required: true, message: '请选择职业' }],
-              initialValue: `${current.profession_id}`,
+              initialValue: current.profession_id? `${current.profession_id}` : undefined,
             })(
               <Select placeholder="请选择职业" style={{ width: '100%' }} onSelect={(value) => {this.selectHandel(value)}}>
                 {professionList.map( (item) => 
-                  (<Option key={item.id}>{item.profession_name}</Option>)
+                  (<Option key={`${item.id}`}>{item.profession_name}</Option>)
                 )}
               </Select>
             )}
@@ -600,11 +600,11 @@ const typeTagColor = {"0":'blue',"1":"green", "2": "orange"}
           <FormItem label="拾取天赋" {...this.formLayout}>
             {getFieldDecorator('need_talent_id', {
               rules: [{ required: true, message: '请选择拾取天赋' }],
-              initialValue: `${current.need_talent_id}`,
+              initialValue: current.need_talent_id? `${current.need_talent_id}` : undefined,
             })(
               <Select placeholder="请选择拾取天赋" style={{ width: '100%' }}>
                 {talentList.map( (item) => 
-                  (<Option key={item.id}>{item.talent_name}</Option>)
+                  (<Option key={`${item.id}`}>{item.talent_name}</Option>)
                 )}
               </Select>
             )}
