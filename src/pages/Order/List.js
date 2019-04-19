@@ -116,29 +116,29 @@ const getValue = obj =>
         key: 'game_role_name',
         align: 'center',
         width: 200,
-        render: (item,record) => (
-          <Tooltip 
-            placement="right" 
-            title={
-              <div style={{display:"flex",flexDirection:"column"}}>
-                <div>账号: {record.account_name}</div>
-                <div>密码：{record.account_pwd}</div>
-                <div>账号类型：{typeMap[record.type]}</div>
-                <div>子账号：{record.child_name}</div>
-                <div>服务器：{record.region_id}</div>
-                <div>角色名：{record.game_role_name}</div>
-                <div>角色等级：{record.level}</div>
-                <div>阵营：{record.organization ===0 ?"联盟": '部落'}</div>
-                <div>职业：{record.profession_name}</div>
-                <div>可用天赋：{record.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
-                <div>装备等级：{record.equip_level}</div>
+        // render: (item,record) => (
+        //   <Tooltip 
+        //     placement="right" 
+        //     title={
+        //       <div style={{display:"flex",flexDirection:"column"}}>
+        //         <div>账号: {record.account_name}</div>
+        //         <div>密码：{record.account_pwd}</div>
+        //         <div>账号类型：{typeMap[record.type]}</div>
+        //         <div>子账号：{record.child_name}</div>
+        //         <div>服务器：{record.region_id}</div>
+        //         <div>角色名：{record.game_role_name}</div>
+        //         <div>角色等级：{record.level}</div>
+        //         <div>阵营：{record.organization ===0 ?"联盟": '部落'}</div>
+        //         <div>职业：{record.profession_name}</div>
+        //         <div>可用天赋：{record.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</div>
+        //         <div>装备等级：{record.equip_level}</div>
                 
-              </div>     
-              }
-          >
-            {item}
-          </Tooltip>
-        )
+        //       </div>     
+        //       }
+        //   >
+        //     {item}
+        //   </Tooltip>
+        // )
       },
 
       {
@@ -199,7 +199,7 @@ const getValue = obj =>
   
     expandedRowRender = (data) => {
       const columns = [
-        { title: '项目号', dataIndex: 'item_id', key: 'item_id', align:'center'  },
+        data.items.item_id ? { title: '项目号', dataIndex: 'item_id', key: 'item_id', align:'center'  } : { title: '项目号', dataIndex: 'id', key: 'id', align:'center'  },
         { title: '类型', dataIndex: 'instance_or_secret', align:'center',  key: 'instance_or_secret',render:item=>(item==="1"?'地下城':'团本') },
         { title: '副本', dataIndex: 'instance_name', key: 'instance_name',align:'center' },
         { title: '怪物', dataIndex: 'monster_id', key: 'monster_id',align:'center' },
@@ -443,6 +443,17 @@ const getValue = obj =>
         order: { data },
         form: { getFieldDecorator }
       } = this.props;
+     const { list } = data;
+      for( let i = 0, l = list.length; i < l; i++) {
+        if(list[i].account) {
+          list[i].items.item_id= list[i].items.id;
+          delete list[i].items.id;
+          delete list[i].account.id;
+          Object.assign(list[i], list[i].account)
+          delete list[i].account;
+        }
+      }
+     
       const {visible, current={}} = this.state
       const modalFooter = { okText: '保存', onOk: this.handleSubmit, onCancel: this.handleCancel };
       const getModalContent = () => (
