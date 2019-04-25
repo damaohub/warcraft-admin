@@ -75,23 +75,39 @@ class DetailPage extends Component {
               <Description term="备注">{data.remark}</Description>
             </DescriptionList>
             <DescriptionList className={styles.accountList} style={{ marginBottom: 24 }} title="账号信息：">
-              <Description term="账号">{data.account_name}</Description>
-              <Description term="密码">{data.account_pwd}</Description>
-              <Description term="类型">{typeMap[data.type]}</Description>
-              <Description term="子账号">{data.child_name}</Description>
-              <Description term="服务器">{data.region_id}</Description>
-              <Description term="角色名">{data.game_role_name}</Description>
-              <Description term="角色等级">{data.level}</Description>
-              <Description term="阵营">{data.organization ===0 ?"联盟": '部落'}</Description>
-              <Description term="职业">{data.profession_name}</Description>
-              <Description term="可用天赋">{data.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</Description>
-              <Description term="装等">{data.equip_level}</Description>
+              <Description term="账号">{data.account_name || data.account.account_name}</Description>
+              <Description term="密码">{data.account_pwd || data.account.account_pwd}</Description>
+              <Description term="类型">{typeMap[data.type || data.account.type]}</Description>
+              <Description term="子账号">{data.child_name || data.account.child_name}</Description>
+              <Description term="服务器">{data.region_id || data.account.region_id}</Description>
+              <Description term="角色名">{data.game_role_name || data.account.game_role_name}</Description>
+              <Description term="角色等级">{data.level || data.account.level}</Description>
+              {
+                data.organization && 
+                <Description term="阵营">{ data.organization === 0 ?"联盟": '部落'}</Description>
+              }
+              {
+                data.account.organization && 
+                <Description term="阵营">{ data.account.organization === 0 ?"联盟": '部落'}</Description>
+              }
+              
+              <Description term="职业">{data.profession_name || data.account.profession_name}</Description>
+              {
+                data.talent &&
+                <Description term="可用天赋">{data.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</Description>
+              }
+              {
+                 data.account.talent &&
+                 <Description term="可用天赋">{data.account.talent.map((v,i)=>(i===0?<span key={`${i+1}`}>{v}</span>: <span key={`${i+1}`}> <Divider type="vertical" />{v}</span> ))}</Description>
+              }
+              
+              <Description term="装等">{data.equip_level || data.account.equip_level}</Description>
             </DescriptionList>
             <h4 style={{ marginBottom: 16 }}>项目：</h4>
             {
               data.items.map(v=> (
                 <Fragment>
-                  <Card style={{marginLeft: '20px'}} type="inner" title={`项目号：${v.item_id}`}>
+                  <Card style={{marginLeft: '20px'}} type="inner" title={`项目号：${v.item_id || v.id}`}>
                     <DescriptionList size="small" style={{ marginBottom: 16 }}>
                       <Description term="类型">{v.instance_or_secret==="1"?'地下城':'团本'}</Description>
                       <Description term="副本">{v.instance_name}</Description>
