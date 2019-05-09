@@ -80,6 +80,7 @@ class Item extends React.Component{
             mOptions.push({label: item.name, value: item.sort })
             return item
           })
+          console.log(mOptions)
           this.setState({
             mOptions,
             sortArr,
@@ -166,7 +167,7 @@ class Item extends React.Component{
             </Form.Item>
 
             {
-              getFieldValue('instance_or_secret')==='2' && getFieldValue('difficult')==="m" && mSelect && 
+              getFieldValue('instance_or_secret')===('2' || 2) && getFieldValue('difficult')==="m" && mSelect && 
               <Form.Item {...formItemLayout} label={labels.monster_id}>
                 {getFieldDecorator('monster_id', {
                   rules: [{ required: true, message: `请选择${labels.monster_id}` },{validator: this.checkArr}],
