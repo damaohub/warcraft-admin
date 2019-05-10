@@ -77,10 +77,9 @@ class Item extends React.Component{
           const sortArr =[]
           monstersList.map((item) => {
             sortArr.push(item.sort)
-            mOptions.push({label: item.name, value: item.sort })
+            mOptions.push({label: item.name, value: item.sort || 0 })
             return item
           })
-          console.log(mOptions)
           this.setState({
             mOptions,
             sortArr,
@@ -99,6 +98,7 @@ class Item extends React.Component{
     })
   }
 
+  // 还要考虑直选一个的情况
   checkArr = (rule, value, callback) =>{
     const result = value.sort().every((item , index, arr) => {
 
@@ -107,7 +107,7 @@ class Item extends React.Component{
       }
       return parseInt(arr[index+1], 10) - parseInt(item, 10) === 1
     })
-    if(result) {
+    if(value.length === 1 || result) {
       callback()
     } else {
       callback('选择顺序需要连续！')
