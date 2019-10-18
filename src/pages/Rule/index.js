@@ -35,6 +35,7 @@ class RulePage extends Component {
     });
   }
 
+  // 增加权限的弹窗
   showModal = (e, item) => {
     e.preventDefault();
     let newCurrent
@@ -50,6 +51,7 @@ class RulePage extends Component {
     });
   };
 
+  // 编辑权限的弹窗
   showEditModal = (e,item) => {
     e.preventDefault()
     const newTypeIndex = parseInt(item.pid, 10) === 0 ? 4 : 2
@@ -75,6 +77,7 @@ class RulePage extends Component {
     const typeMap = ['rule/fetch', 'rule/add', 'rule/update', 'rule/addGroup', 'rule/editGroup']
     const id = current ? current.key : '';
     const pid = current && current.pid ? current.pid : '';
+    delete current.isAdd
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       dispatch({
