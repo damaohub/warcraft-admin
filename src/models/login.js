@@ -41,7 +41,7 @@ export default {
           }
         }
         yield put(routerRedux.replace(redirect || '/'));
-        window.location.reload()
+        // window.location.reload() // 解决全局布局组件不显示数据，进行页面刷新
       }
     },
 
