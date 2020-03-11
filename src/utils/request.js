@@ -1,11 +1,13 @@
 import axios from 'axios'
-import { message ,notification} from 'antd';
+import { message } from 'antd';
 
 import router from 'umi/router';
 // import hash from 'hash.js';
 // import { isAntdPro } from './utils';
 import saltMD5 from './saltMD5'
 
+
+const noConsole = false
 
 const createSign = (obj) => {
   let str = ''
@@ -54,7 +56,7 @@ service.interceptors.request.use(
     localStorage.removeItem('dummy');
     
     if(localStorage.getItem('token') !== 'undefined') {
-      const Nobj = {...config.body, ...{ token: JSON.parse(localStorage.getItem('token')), time: `${Date.parse(new Date()) / 1000}`} }
+      const Nobj = {...config.body, ...{ token: JSON.parse(localStorage.getItem('token')), time: `${Date.parse(new Date()) / 1000}`}}
       const sign = createSign(Nobj)
       data ={...Nobj,sign}
     } else {
@@ -78,41 +80,52 @@ service.interceptors.request.use(
 
 // response 拦截器
 service.interceptors.response.use(
+  // eslint-disable-next-line consistent-return
   response => {
- 
-    const res = response.data
-    return new Promise((resolve, reject) => {
-    if(res.ret !==0 ) {
-      message.error(res.msg) // 需要修改很多
-      if(res.ret === 2006) {
-        router.push('/exception/403');
-       }
-       if(res.ret === 1001) {
-        router.push('/exception/404');
-       }
-       if(res.ret ===1003 || res.ret ===1000 || res.ret === 1004) {
-        localStorage.removeItem('token')
-        router.push('/login');
-        reject();
-       }
-    } 
-    resolve(res)
-       
-    })
+    // if(response.status>=200 && response.status<300) {
+      const res = response.data
+      if (!noConsole) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `${new Date().toLocaleString()}【 M=${response.request.responseURL} 】【接口响应：】`,
+          res
+        );
+      }
+      return new Promise((resolve, reject) => {
+      if(res.ret !==0 ) {
+        message.error(res.msg) // 需要修改很多
+        reject(res.msg)
+        // if(res.ret === 2006) {
+        //   router.push('/exception/403');
+        // }
+        // if(res.ret === 1001) {
+        //   router.push('/exception/404');
+        // }
+        // if(res.ret ===1003 || res.ret ===1000 || res.ret === 1004) {
+        //   localStorage.removeItem('token')
+        //   router.push('/login');
+        //   reject();
+        // }
+      }
+      resolve(res)
+        
+      })
+    // }
+    
   },
 
+// 500,404等状态会走error
   error => {
-    notification.error({
-      message: `请求错误 ${error.response.status}: ${error.response.request.responseURL}`,
-      description: error.response.statusText,
-    });
-    router.push('/exception/500');
-    // const err = new Error(error.response.statusText);
-    // err.name = error.response.status;
-    // err.response = error.response;
-    // throw err;
-
-    return Promise.reject(error.response.data)
+    const {status} = error.response
+    if(status === 404) {
+      router.push('/exception/404');
+    } else if(status === 403) {
+      router.push('/exception/403');
+    }else if(status === 500) {
+      router.push('/exception/500');
+    }
+    throw error;
+    // return Promise.reject(error.response.data)
   }
  
 )
