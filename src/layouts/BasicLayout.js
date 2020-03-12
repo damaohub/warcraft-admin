@@ -64,7 +64,7 @@ class BasicLayout extends React.Component {
     } = this.props;
     dispatch({
       type: 'user/fetchCurrent',
-    });
+    }).catch(e => console.log('layout', e));
     dispatch({
       type: 'setting/getSetting',
     });

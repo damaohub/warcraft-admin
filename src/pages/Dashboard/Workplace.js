@@ -50,12 +50,18 @@ class Workplace extends PureComponent {
   componentDidMount() {
     
     const { dispatch } = this.props;
-    dispatch({
-      type: 'user/fetchCurrent',
-    });
-    dispatch({
-      type: 'player/task',
-    });
+
+    try {
+      dispatch({
+        type: 'user/fetchCurrent',
+      });
+      dispatch({
+        type: 'player/task',
+      });
+    } catch (error) {
+      console.log('workplace', error)
+    }
+   
   
 
   }

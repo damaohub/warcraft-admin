@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { message } from 'antd';
 
 import router from 'umi/router';
 // import hash from 'hash.js';
@@ -91,10 +90,10 @@ service.interceptors.response.use(
           res
         );
       }
-      return new Promise((resolve, reject) => {
+      // return new Promise((resolve, reject) => {
       if(res.ret !==0 ) {
-        message.error(res.msg) // 需要修改很多
-        reject(res.msg)
+        // message.error(res.msg) // 需要修改很多
+         throw (res.msg)
         // if(res.ret === 2006) {
         //   router.push('/exception/403');
         // }
@@ -107,9 +106,9 @@ service.interceptors.response.use(
         //   reject();
         // }
       }
-      resolve(res)
+      return res
         
-      })
+      // })
     // }
     
   },

@@ -14,11 +14,15 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryAccount, payload);
+      
+      const {response} = yield call(queryAccount, payload);
+      
       yield put({
         type: 'save',
         payload: response.data,
       });
+      
+      
     },
     *add({ payload, callback }, { call, put }) {
       const response = yield call(addAccount, payload);
