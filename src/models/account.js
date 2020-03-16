@@ -15,12 +15,17 @@ export default {
   effects: {
     *fetch({ payload }, { call, put }) {
       
-      const {response} = yield call(queryAccount, payload);
+      try {
+        const {response} = yield call(queryAccount, payload);
       
-      yield put({
-        type: 'save',
-        payload: response.data,
-      });
+        yield put({
+          type: 'save',
+          payload: response.data,
+        });
+      } catch (error) {
+        console.log('models', error)
+      }
+     
       
       
     },

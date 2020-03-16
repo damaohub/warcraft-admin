@@ -70,8 +70,7 @@ service.interceptors.request.use(
     return config
   },
   error => {
-    // Do something with request error
-    
+    // eslint-disable-next-line no-console
     console.log(error) // for debug
     Promise.reject(error)
   }
@@ -79,7 +78,6 @@ service.interceptors.request.use(
 
 // response 拦截器
 service.interceptors.response.use(
-  // eslint-disable-next-line consistent-return
   response => {
     // if(response.status>=200 && response.status<300) {
       const res = response.data
@@ -92,7 +90,7 @@ service.interceptors.response.use(
       }
       // return new Promise((resolve, reject) => {
       if(res.ret !==0 ) {
-        // message.error(res.msg) // 需要修改很多
+        // message.error(res.msg) 
          throw (res.msg)
         // if(res.ret === 2006) {
         //   router.push('/exception/403');
