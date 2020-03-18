@@ -22,6 +22,11 @@ export default [
         component: './Exception/500',
       },
       {
+        path: '/exception/504',
+        name: 'server-error',
+        component: './Exception/504',
+      },
+      {
         path: '/exception/trigger',
         name: 'trigger',
         hideInMenu: true,
