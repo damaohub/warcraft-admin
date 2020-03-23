@@ -120,6 +120,8 @@ service.interceptors.response.use(
       router.push('/exception/403');
     }else if(status === 500) {
       router.push('/exception/500');
+    }else if(status === 504) {
+      router.push('/exception/504');
     }
     throw error;
     // return Promise.reject(error.response.data)
